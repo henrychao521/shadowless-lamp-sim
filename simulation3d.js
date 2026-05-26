@@ -13,6 +13,10 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 // 3D 空間無影燈物理模擬 - 基於 Three.js
 console.log("3D Simulation Initialized (with Realistic Mode)");
 
+// ── 行動裝置偵測：降低渲染品質以維持流暢幀率 ──
+const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    || window.innerWidth < 768;
+
 const container = document.getElementById('canvas3d');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0f172a); // 匹配深色主題
@@ -21,13 +25,13 @@ scene.background = new THREE.Color(0x0f172a); // 匹配深色主題
 const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 1, 1000);
 camera.position.set(0, 80, 150);
 
-// Renderer
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+// Renderer — 行動裝置限制 pixelRatio 最多 2，避免 Retina 造成 3x 渲染負擔
+const renderer = new THREE.WebGLRenderer({ antialias: !isMobile });
 renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-// 啟用陰影渲染
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 2 : 2));
+// 陰影：行動裝置用 PCF（較快），桌機用 PCFSoft（較細膩）
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.type = isMobile ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 container.appendChild(renderer.domElement);
@@ -37,6 +41,11 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 30, 0);
 controls.enableDamping = true;
 controls.dampingFactor = 0.05;
+// 行動裝置觸控：啟用 touch pan / rotate
+controls.touches = {
+    ONE: THREE.TOUCH.ROTATE,
+    TWO: THREE.TOUCH.DOLLY_PAN
+};
 
 // Post-Processing (order: Render → SSAO → Bloom → Output)
 const composer = new EffectComposer(renderer);
@@ -44,16 +53,18 @@ const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
 
 // SSAO must come before Bloom to work on clean depth/normal buffers
+// 行動裝置：停用 SSAO（環境遮蔽計算耗 GPU，手機易降幀）
 const ssaoPass = new SSAOPass(scene, camera, container.clientWidth, container.clientHeight);
 ssaoPass.kernelRadius = 16;
 ssaoPass.minDistance = 0.005;
 ssaoPass.maxDistance = 0.1;
+ssaoPass.enabled = !isMobile;  // disabled on mobile for performance
 composer.addPass(ssaoPass);
 
 // Reduced bloom: softer glow instead of overexposed flare
 const bloomPass = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 1.5, 0.4, 0.85);
 bloomPass.threshold = 0.85;
-bloomPass.strength = 0.35;
+bloomPass.strength = isMobile ? 0.25 : 0.35;  // lighter bloom on mobile
 bloomPass.radius = 0.8;
 composer.addPass(bloomPass);
 

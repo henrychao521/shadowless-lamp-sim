@@ -96,7 +96,9 @@
         <tr><td>IBL 環境光</td><td><span class="badge badge-green">✅ 完成</span></td><td>RoomEnvironment + HemisphereLight 取代 AmbientLight</td></tr>
         <tr><td>後處理順序</td><td><span class="badge badge-green">✅ 修正</span></td><td>SSAO → Bloom（原本相反）</td></tr>
         <tr><td>手術房牆面</td><td><span class="badge badge-green">✅ 完成</span></td><td>BoxGeometry BackSide，SSAO 有空間吃</td></tr>
-        <tr><td>手機介面</td><td><span class="badge badge-amber">🔄 進行中</span></td><td>滑桿觸控優化、版面響應式改善</td></tr>
+        <tr><td>手機介面</td><td><span class="badge badge-green">✅ Phase 4 完成</span></td><td>控制面板折疊、觸控滑桿、CSS cascade 修正、行動 GPU 效能</td></tr>
+        <tr><td>CSS 架構</td><td><span class="badge badge-green">✅ 修正</span></td><td>Media query 移至檔案末尾（修正 cascade 順序 bug）</td></tr>
+        <tr><td>行動 3D 效能</td><td><span class="badge badge-green">✅ 完成</span></td><td>行動裝置停用 SSAO、限制 pixelRatio ≤ 2、輕量 shadow map</td></tr>
         <tr><td>GitHub Actions CI</td><td><span class="badge badge-green">✅ 正常</span></td><td>事故恢復後 workflow 成功執行</td></tr>
       </tbody>
     </table>
@@ -155,7 +157,7 @@
 
     <div class="phase-card">
       <h3>Phase 3 — 手機介面優化 <span class="badge badge-green">完成</span></h3>
-      <div class="meta">2026-05-26 · 自動 Loop 完成</div>
+      <div class="meta">2026-05-26 · 自動 Loop 完成 · commit <span class="commit-hash">50fb19d</span></div>
       <ul>
         <li><strong>控制面板折疊按鈕</strong>：手機顯示 ⚙️ 按鈕，預設收合，點擊展開；桌機自動隱藏</li>
         <li><strong>滑桿觸控點放大</strong>：16px → 28px（mobile），更容易手指操作</li>
@@ -165,6 +167,38 @@
         <li><strong>Tab 全寬</strong>：flex:1 分配，觸控目標高度加大</li>
         <li><strong>觸控提示</strong>：偵測觸控裝置切換「🖱️ 拖曳」→「👆 單指・雙指縮放」</li>
         <li><strong>超小螢幕（≤390px）</strong>：字型縮小、隱藏 badge、canvas 高度 60vw</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 4 — CSS Cascade 修正 + 行動 GPU 效能 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續 · commit <span class="commit-hash">（本次）</span></div>
+      <p>發現並修正 Phase 3 中潛藏的 CSS 架構 Bug，同時加入行動裝置 3D 效能優化。</p>
+      <ul>
+        <li>
+          <strong>🐛 修正 CSS 層疊順序 Bug</strong>：
+          index.css 中三個 <code>@media</code> 區塊原來放在 <em>基礎樣式之前</em>，
+          導致同優先級的桌機樣式（後定義）覆蓋手機響應式樣式。
+          重組 CSS：所有 <code>@media</code> 移至檔案末尾，確保手機樣式正確生效。
+          受影響的 class：<code>.controls-panel</code>、<code>.tab-btn</code>、
+          <code>input[type="range"]</code>、<code>.canvas-3d</code>、
+          <code>.card-header</code>、<code>.legend</code>、<code>.view-card</code> 等。
+        </li>
+        <li><strong>新增 <code>--accent-amber</code> CSS 變數</strong>：補上 <code>#f59e0b</code>，修正智慧補償 label 顏色缺失。</li>
+        <li><strong>canvas touch-action: none</strong>：防止 iOS 在 3D 畫布上觸發頁面滾動，確保 pinch-zoom 正常。</li>
+        <li><strong>手機橫向（landscape）斷點</strong>：新增 <code>@media (max-width:768px) and (orientation:landscape)</code>，canvas 高度調整為 70vw / max 380px。</li>
+        <li>
+          <strong>行動裝置 3D 效能</strong>（simulation3d.js）：
+          <ul>
+            <li>UA + viewport 偵測 <code>isMobile</code></li>
+            <li>行動：停用 SSAO（<code>ssaoPass.enabled = false</code>），避免環境遮蔽耗盡 GPU</li>
+            <li>行動：Bloom strength 0.35 → 0.25（減輕後處理負擔）</li>
+            <li>行動：<code>antialias: false</code>（WebGL 抗鋸齒改由手機 GPU 硬體處理效率更高）</li>
+            <li>行動：shadow map 從 <code>PCFSoftShadowMap</code> → <code>PCFShadowMap</code>（減少 shadow 採樣）</li>
+            <li>行動：<code>pixelRatio</code> 上限 2（Retina 3x → 限 2x，渲染面積降 11%）</li>
+            <li>OrbitControls 明確設定 <code>touches.ONE = ROTATE, TWO = DOLLY_PAN</code></li>
+          </ul>
+        </li>
       </ul>
     </div>
   </section>
@@ -317,6 +351,26 @@
         <div class="content">啟動自我調速 Loop，計劃手機介面優化（控制面板折疊、滑桿觸控優化、3D canvas 響應式高度、header 改善），每階段建立 dev-log.html 並 push 到 gh-pages。</div>
       </div>
 
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 3 實作）</div>
+        <div class="content">
+          <strong>index.html</strong>：加入 <code>.panel-toggle</code> 折疊按鈕（含 aria-expanded / aria-controls）、雙模觸控提示（.touch-hint-desktop / .touch-hint-mobile）、inline JS 偵測觸控裝置並控制展開/收合邏輯。<br>
+          <strong>index.css</strong>：新增 .panel-toggle 樣式、@media 768px 區塊（controls-panel 收合、滑桿 28px thumb、tab 全寬、canvas-3d 55vw、圖例 flex-wrap）、@media 390px 區塊（iPhone SE）。<br>
+          <strong>dev-log.html</strong>：建立完整開發紀錄頁面並 push（commit 50fb19d）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 4 CSS bug 修正）</div>
+        <div class="content">
+          重新閱讀 index.css 後發現嚴重問題：<strong>CSS 層疊順序 Bug</strong>。<br>
+          原始結構：<code>@media 1024px、@media 768px、@media 390px</code> 放在第 138–273 行，而 <code>.controls-panel</code>（第 276 行）、<code>.tab-btn</code>（第 399 行）等基礎樣式放在後面。<br>
+          由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
+          修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
+          simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -331,13 +385,18 @@
         <li>✅ 手術房牆面 / 天花板</li>
         <li>✅ GitHub Pages 部署上線</li>
         <li>✅ 個人站 henrychao521.github.io 更新</li>
-        <li>🔄 手機版面優化（控制面板折疊按鈕）</li>
-        <li>🔄 滑桿觸控點放大（16px → 28px on mobile）</li>
-        <li>🔄 3D canvas 響應式高度（固定 600px → 動態）</li>
-        <li>🔄 Header 手機版縮排</li>
+        <li>✅ 手機控制面板折疊按鈕 + 動畫</li>
+        <li>✅ 滑桿觸控點放大（16px → 28px on mobile）</li>
+        <li>✅ 3D canvas 響應式高度（固定 600px → 55vw 動態）</li>
+        <li>✅ Header 手機版縮排 + 超小螢幕斷點</li>
+        <li>✅ CSS cascade 架構修正（media queries 移至末尾）</li>
+        <li>✅ 行動裝置 SSAO 停用 + pixelRatio 限制</li>
+        <li>✅ iOS touch-action: none（防止 pinch-zoom 被頁面 scroll 搶奪）</li>
+        <li>✅ 手機橫向（landscape）斷點</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
         <li>⬜ 醫生手套可拖曳遮擋物</li>
         <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>
+        <li>⬜ Phase 5：2D 圖表手機優化（chart.js responsive）</li>
       </ul>
     </div>
   </section>
