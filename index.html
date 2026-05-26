@@ -52,6 +52,7 @@
             <span class="badge">IEC 60601-2-41</span>
             <span class="badge active">即時幾何光路追跡</span>
             <span class="badge realistic-badge" id="realistic-mode-badge" style="display:none">✨ 真實模式</span>
+            <button class="badge key-hint-btn" title="顯示鍵盤快捷鍵 (?)">⌨️</button>
         </div>
     </header>
 
@@ -352,6 +353,98 @@
     </script>
     <script src="simulation.js?v=3"></script>
     <script type="module" src="simulation3d.js?v=3"></script>
+    <script>
+    // ── 鍵盤快捷鍵 ──
+    (function() {
+        document.addEventListener('keydown', function(e) {
+            // 忽略輸入框中的按鍵
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+            // ⌨️ button in header
+        var keyBtn = document.querySelector('.key-hint-btn');
+        if (keyBtn) { keyBtn.addEventListener('click', showKeyHelp); }
+
+        switch (e.key) {
+                case '1':
+                    document.getElementById('preset-iec')    && document.getElementById('preset-iec').click();
+                    break;
+                case '2':
+                    document.getElementById('preset-dense')  && document.getElementById('preset-dense').click();
+                    break;
+                case '3':
+                    document.getElementById('preset-sparse') && document.getElementById('preset-sparse').click();
+                    break;
+                case '4':
+                    document.getElementById('preset-hard')   && document.getElementById('preset-hard').click();
+                    break;
+                case 'p': case 'P':
+                    // 只在手機版切換面板
+                    if (window.innerWidth <= 768) {
+                        document.getElementById('panel-toggle-btn') && document.getElementById('panel-toggle-btn').click();
+                    }
+                    break;
+                case 'Tab':
+                    // 切換 2D / 3D tab（不 preventDefault，保留焦點移動）
+                    break;
+                case 'f': case 'F':
+                    // 全螢幕快捷
+                    document.getElementById('fullscreen-3d-btn') && document.getElementById('fullscreen-3d-btn').click();
+                    break;
+                case '?':
+                    // 顯示快捷說明
+                    showKeyHelp();
+                    break;
+            }
+        });
+
+        function showKeyHelp() {
+            var existing = document.getElementById('key-help-toast');
+            if (existing) { existing.remove(); return; }
+            var toast = document.createElement('div');
+            toast.id = 'key-help-toast';
+            toast.className = 'onboard-toast';
+            toast.style.cssText = 'max-width:280px;';
+            toast.innerHTML = '<div style="font-weight:700;margin-bottom:0.5rem;color:#f8fafc">⌨️ 鍵盤快捷鍵</div>' +
+                '<div style="font-size:0.8rem;color:#94a3b8;line-height:1.8">' +
+                '<span style="color:#0ea5e9;font-family:monospace">1</span> IEC標準 &nbsp;' +
+                '<span style="color:#0ea5e9;font-family:monospace">2</span> 高效多燈 &nbsp;' +
+                '<span style="color:#0ea5e9;font-family:monospace">3</span> 少燈對比 &nbsp;' +
+                '<span style="color:#0ea5e9;font-family:monospace">4</span> 嚴苛遮擋<br>' +
+                '<span style="color:#0ea5e9;font-family:monospace">F</span> 全螢幕 &nbsp;' +
+                '<span style="color:#0ea5e9;font-family:monospace">P</span> 開關面板（手機）&nbsp;' +
+                '<span style="color:#0ea5e9;font-family:monospace">?</span> 關閉此提示</div>';
+            document.body.appendChild(toast);
+            toast.classList.add('visible');
+            setTimeout(function() {
+                toast.classList.remove('visible');
+                setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
+            }, 5000);
+        }
+    })();
+    </script>
+    <script>
+    // ── 首次訪問引導提示（手機版）──
+    (function() {
+        // 只對手機版 + 首次訪問顯示
+        if (window.innerWidth > 768) return;
+        try { if (localStorage.getItem('sls_visited')) return; } catch(e) {}
+
+        var toast = document.createElement('div');
+        toast.className = 'onboard-toast';
+        toast.innerHTML = '⚙️ 點擊上方 <strong>「模擬參數控制面板」</strong> 按鈕，即可調整各項參數觀察陰影變化！' +
+            '<br><span style="font-size:0.75rem;color:#64748b;margin-top:0.3rem;display:block">左右滑動可切換 2D / 3D 視圖</span>';
+        document.body.appendChild(toast);
+
+        setTimeout(function() { toast.classList.add('visible'); }, 800);
+        setTimeout(function() {
+            toast.classList.remove('visible');
+            setTimeout(function() { if (toast.parentNode) toast.remove(); }, 400);
+        }, 5500);
+
+        try { localStorage.setItem('sls_visited', '1'); } catch(e) {}
+    })();
+    </script>
     <script>
     // ── 截圖下載（合成 Ray Canvas + 照度圖表）──
     (function() {

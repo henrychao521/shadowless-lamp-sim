@@ -108,6 +108,20 @@ body {
     box-shadow: 0 0 8px rgba(14, 165, 233, 0.2);
 }
 
+.key-hint-btn {
+    background: rgba(51, 65, 85, 0.5);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.75rem;
+    border-radius: 999px;
+    transition: background 0.2s;
+}
+.key-hint-btn:hover {
+    background: rgba(51, 65, 85, 0.8);
+    color: var(--text-primary);
+}
+
 .badge.realistic-badge {
     background: rgba(245, 158, 11, 0.15);
     border-color: var(--accent-amber);
@@ -661,6 +675,34 @@ input[type="range"]::-webkit-slider-thumb:hover {
     margin-top: 0.75rem;
     font-size: 0.85rem;
     color: var(--text-muted);
+}
+
+/* ── 首次訪問 / 快捷鍵提示 Toast ── */
+.onboard-toast {
+    position: fixed;
+    bottom: 1.25rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(1rem);
+    background: rgba(15, 23, 42, 0.96);
+    border: 1px solid var(--border-highlight);
+    border-radius: 12px;
+    padding: 0.9rem 1.2rem;
+    max-width: 340px;
+    width: calc(100vw - 2rem);
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    line-height: 1.5;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    pointer-events: none;
+}
+.onboard-toast.visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* ── 截圖下載按鈕 ── */

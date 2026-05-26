@@ -110,6 +110,7 @@
         <tr><td>教學預設場景</td><td><span class="badge badge-green">✅ Phase 19</span></td><td>4 個快速預設按鈕（IEC / 多燈 / 少燈 / 嚴苛），一鍵切換教學情境</td></tr>
         <tr><td>IEC 合規指示</td><td><span class="badge badge-green">✅ Phase 20</span></td><td>中心照度旁即時 PASS/FAIL 徽章；@media print 列印教材樣式</td></tr>
         <tr><td>截圖下載</td><td><span class="badge badge-green">✅ Phase 21</span></td><td>📸 按鈕合成光路圖 + 照度圖 → PNG，供學生截圖繳交作業</td></tr>
+        <tr><td>鍵盤快捷鍵</td><td><span class="badge badge-green">✅ Phase 22</span></td><td>1-4 預設、F 全螢幕、? 說明；首次訪問手機引導 Toast</td></tr>
       </tbody>
     </table>
   </section>
@@ -559,6 +560,17 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 22 鍵盤快捷鍵 + 首次訪問引導）</div>
+        <div class="content">
+          <strong>鍵盤快捷鍵</strong>：document keydown 監聽（忽略 input/textarea 中的輸入，忽略 Ctrl/Meta/Alt 組合鍵）。<br>
+          快捷鍵對應：<code>1</code> IEC標準、<code>2</code> 高效多燈、<code>3</code> 少燈對比、<code>4</code> 嚴苛遮擋（呼叫 preset-btn.click()）；<code>P</code> 手機面板開關；<code>F</code> 全螢幕切換；<code>?</code> 顯示快捷鍵說明 Toast。<br>
+          標題列加入 ⌨️ 按鈕，連結到相同的 showKeyHelp() 函式。<br><br>
+          <strong>首次訪問引導 Toast（手機版）</strong>：window.innerWidth ≤ 768 且 <code>!localStorage.getItem('sls_visited')</code> 時，800ms 後淡入 Toast（bottom:1.25rem，fixed定位，blur背景），5.5s 後自動淡出。提示內容：點擊面板按鈕、左右滑動切換視圖。寫入 localStorage 確保只顯示一次。<br><br>
+          <code>.onboard-toast</code> CSS：固定底部、translateX(-50%) 水平居中、opacity 0→1 + translateY 1rem→0 的入場動畫、blur backdrop-filter。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 21 截圖下載按鈕）</div>
         <div class="content">
           在照度圖表的 card-header 加入 📸 截圖按鈕（<code>.screenshot-btn</code>）。<br><br>
@@ -718,6 +730,19 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 22 — 鍵盤快捷鍵 + 首次訪問引導 Toast <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>鍵盤快捷鍵</strong>：<code>1-4</code> 套用預設、<code>F</code> 全螢幕、<code>P</code> 手機面板、<code>?</code>/⌨️ 顯示說明</li>
+        <li>showKeyHelp() Toast 顯示 5s，再按 ? 可立即關閉</li>
+        <li>標題列 ⌨️ 按鈕連結到相同說明 Toast（桌機使用者發現快捷鍵的入口）</li>
+        <li><strong>首次訪問 Toast</strong>：手機版 + 未訪問過 → 800ms 後顯示，5.5s 自動淡出</li>
+        <li>localStorage <code>sls_visited</code> 確保引導只顯示一次</li>
+        <li>.onboard-toast：fixed bottom、translateX(-50%) 居中、blur backdrop-filter</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 21 — 截圖下載按鈕 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css</div>
       <ul>
@@ -829,6 +854,8 @@
         <li>✅ <strong>Phase 20</strong>：IEC PASS/FAIL 即時徽章（中心照度旁，≥50% teal / &lt;50% red）</li>
         <li>✅ <strong>Phase 20</strong>：@media print 列印樣式（隱藏互動 UI、展開文獻、保留彩色圖表）</li>
         <li>✅ <strong>Phase 21</strong>：📸 截圖下載按鈕（合成 1600px 光路圖 + 照度圖表 → PNG 下載）</li>
+        <li>✅ <strong>Phase 22</strong>：鍵盤快捷鍵（1-4 預設、F 全螢幕、P 面板、? 說明 Toast）</li>
+        <li>✅ <strong>Phase 22</strong>：首次訪問引導 Toast（手機版首次造訪 → 操作提示，localStorage 記憶）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
