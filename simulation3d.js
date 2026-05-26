@@ -754,19 +754,29 @@ function animate() {
 }
 
 // Bind UI Events
+// NOTE: lamp_height is included — without it, moving the lamp slider
+// while on the 3D tab would not update the scene (pre-existing bug fix).
 ['input', 'change'].forEach(evt => {
-    ['obstacle_x', 'num_leds', 'beam_spread', 'obstacle_y', 'obstacle_z', 'obstacle_rad'].forEach(id => {
+    ['lamp_height', 'obstacle_x', 'num_leds', 'beam_spread',
+     'obstacle_y', 'obstacle_z', 'obstacle_rad'].forEach(id => {
         const el = document.getElementById(id);
-        if(el) {
-            el.addEventListener(evt, () => {
-                const valId = 'val_' + id;
-                const labelElem = document.getElementById(valId);
-                if(labelElem) {
-                    labelElem.textContent = el.value;
-                }
-                updateSimulation3D(true);
-            });
-        }
+        if (!el) return;
+        el.addEventListener(evt, () => {
+            // Update the value display span
+            const labelElem = document.getElementById('val_' + id);
+            if (labelElem) {
+                labelElem.textContent = el.value;
+                // Pulse animation: same pattern as simulation.js val-pulse
+                labelElem.classList.remove('val-pulse');
+                void labelElem.offsetWidth;
+                labelElem.classList.add('val-pulse');
+            }
+            // Haptic bump when slider hits boundary (Android Chrome)
+            if (navigator.vibrate && (el.value == el.min || el.value == el.max)) {
+                navigator.vibrate(18);
+            }
+            updateSimulation3D(true);
+        });
     });
 });
 

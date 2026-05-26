@@ -176,6 +176,29 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 11 — 3D 同步 Bug 修正 + 觸感增強 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>🐛 lamp_height 3D 不同步修正</strong>（simulation3d.js）：<br>
+          原始事件綁定陣列漏掉 <code>'lamp_height'</code>，在 3D tab 上移動燈高滑桿時，
+          <code>updateSimulation3D()</code> 不會被呼叫，燈頭停在上次位置。
+          現在將 <code>lamp_height</code> 加入綁定清單，確保燈高即時同步更新到 3D 場景。
+        </li>
+        <li>
+          <strong>val-pulse 補完</strong>：simulation3d.js 的事件處理器也觸發 <code>val-pulse</code> 動畫，
+          包含 <code>val_obstacle_z</code>、<code>val_lamp_height</code> 在 3D 側的顯示更新。
+        </li>
+        <li>
+          <strong>觸控震動反饋</strong>（navigator.vibrate）：<br>
+          滑桿到達 min 或 max 邊界時觸發 18ms 震動，讓使用者不需看螢幕也能感知邊界。
+          Android Chrome 支援；iOS Safari 無 vibrate API（靜默忽略）。
+          simulation.js（2D 滑桿）和 simulation3d.js（3D 滑桿）均已加入。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 10 — 部署修正 + Favicon <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
       <ul>
@@ -479,6 +502,14 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 11 Bug 修正 + 觸感增強）</div>
+        <div class="content">
+          讀取 simulation3d.js 時發現 <strong>既有 Bug</strong>：lamp_height 不在第 758 行的事件綁定陣列中，導致使用者在 3D tab 移動燈高滑桿時，3D 場景不會更新（燈頭停在原位）。修正：將 <code>'lamp_height'</code> 加入陣列。<br><br>
+          同步加入：每個 3D 事件處理器也觸發 <code>val-pulse</code> 動畫（包含 obstacle_z），以及 <code>navigator.vibrate(18)</code> 觸控震動（當滑桿觸碰最小/最大值時，Android Chrome 支援）。simulation.js 的 2D 滑桿也加入相同的 haptic feedback。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 10 部署修正 + Favicon）</div>
         <div class="content">
           發現 deploy.yml 漏掉 dev-log.html — 用戶無法在 Pages 看到開發紀錄！也漏掉 .docx 下載檔案。修正 workflow，改用個別 cp 指令，加入 dev-log.html 和 .docx，移除 operate.js（Puppeteer 腳本不需公開部署）。<br>
@@ -567,6 +598,9 @@
         <li>✅ <strong>Phase 9</strong>：prefers-reduced-motion 無障礙 CSS（前庭功能敏感使用者）</li>
         <li>✅ <strong>Phase 10</strong>：deploy.yml 修正（補上 dev-log.html + .docx，移除 operate.js）</li>
         <li>✅ <strong>Phase 10</strong>：SVG favicon（內嵌手術燈圖示，主頁 + dev-log）</li>
+        <li>✅ <strong>Phase 11</strong>：🐛 修正 lamp_height 在 3D tab 不同步 bug（加入 simulation3d.js 的事件綁定）</li>
+        <li>✅ <strong>Phase 11</strong>：val-pulse 動畫補到 obstacle_z（simulation3d.js 內的 val_* span）</li>
+        <li>✅ <strong>Phase 11</strong>：觸控震動反饋（navigator.vibrate 18ms，滑桿碰到邊界時）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
         <li>⬜ 醫生手套可拖曳遮擋物</li>
         <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>
