@@ -113,6 +113,7 @@
         <tr><td>鍵盤快捷鍵</td><td><span class="badge badge-green">✅ Phase 22</span></td><td>1-4 預設、F 全螢幕、? 說明；首次訪問手機引導 Toast</td></tr>
         <tr><td>3D Demo 旋轉</td><td><span class="badge badge-green">✅ Phase 24</span></td><td>▶ 自動旋轉按鈕，觸碰後自動停止，課堂投影展示用</td></tr>
         <tr><td>掃描演示動畫</td><td><span class="badge badge-green">✅ Phase 25</span></td><td>🎬 一鍵 6s 遮擋掃描動畫（rAF + easeInOut），光路即時更新</td></tr>
+        <tr><td>iOS 適配</td><td><span class="badge badge-green">✅ Phase 26</span></td><td>viewport-fit=cover + Safe Area inset，捲動提示箭頭</td></tr>
       </tbody>
     </table>
   </section>
@@ -562,6 +563,15 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 26 iOS Safe Area + 捲動提示）</div>
+        <div class="content">
+          <strong>viewport-fit=cover</strong>：meta viewport 加入 <code>viewport-fit=cover</code>，啟用 CSS 環境變數 <code>env(safe-area-inset-*)</code>。<br>
+          <strong>iOS Safe Area</strong>：<code>.app-header</code> 的 padding-top 改為 <code>max(1rem, calc(0.75rem + env(safe-area-inset-top, 0px)))</code>，確保 Dynamic Island（iPhone 14 Pro+）不遮擋標題。<code>.paper-reference-container</code> 加入 <code>padding-bottom: env(safe-area-inset-bottom, 0)</code>，確保 Home Indicator 不遮擋最底部按鈕。<br><br>
+          <strong>照度圖捲動提示</strong>：在 2D canvas 容器底部加入 <code>.scroll-hint</code> 絕對定位標籤「↓ 照度分佈圖」（桌機 display:none，手機版 display:block）。首次手機訪問後 2.5s 淡入，3s 後淡出，localStorage <code>sls_chart_hint</code> 記憶避免重複顯示。提示手機使用者下方還有照度分析圖表。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 25 自動掃描演示動畫）</div>
         <div class="content">
           在控制面板加入 <strong>🎬 自動掃描演示按鈕</strong>，一鍵觸發 6 秒來回掃描動畫。<br><br>
@@ -762,6 +772,18 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 26 — iOS Safe Area + 捲動提示 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>viewport-fit=cover</strong>：啟用 CSS env(safe-area-inset-*) 變數</li>
+        <li>app-header: <code>padding-top: max(1rem, calc(0.75rem + env(safe-area-inset-top)))</code>（Dynamic Island 相容）</li>
+        <li>paper-reference-container: <code>padding-bottom: env(safe-area-inset-bottom)</code>（Home Indicator 相容）</li>
+        <li><strong>捲動提示</strong>：2D canvas 底部「↓ 照度分佈圖」；首次手機訪問 2.5s 後淡入 3s</li>
+        <li>localStorage <code>sls_chart_hint</code> 確保只顯示一次</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 25 — 自動掃描演示動畫 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css</div>
       <ul>
@@ -916,6 +938,8 @@
         <li>✅ <strong>Phase 23</strong>：🐛 修正 keyBtn 重複 listener 堆疊 Bug（移至 IIFE 直接執行）；?v=4 強制清除快取</li>
         <li>✅ <strong>Phase 24</strong>：▶ 3D 自動旋轉 Demo 模式（OrbitControls autoRotate + 觸控自動停止 + window.sls3d API）</li>
         <li>✅ <strong>Phase 25</strong>：🎬 自動掃描演示（rAF + easeInOut，6s 遮擋物來回掃描，pointerdown 中斷）</li>
+        <li>✅ <strong>Phase 26</strong>：viewport-fit=cover + iOS Safe Area（header top / paper bottom）</li>
+        <li>✅ <strong>Phase 26</strong>：2D canvas 底部捲動提示「↓ 照度分佈圖」（首次手機訪問 2.5s 顯示）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>

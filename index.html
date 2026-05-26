@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>外科手術無影燈 - 光學設計與陰影稀釋模擬器</title>
     <!-- SEO & Social Sharing -->
     <meta name="description" content="互動式 3D 模擬器：探索多 LED 矩陣如何稀釋手術遮擋陰影。即時 Ray-Tracing + Three.js PBR 渲染，符合 IEC 60601-2-41 標準。">
@@ -180,6 +180,8 @@
                         </div>
                     </div>
                     <canvas id="rayCanvas" width="1600" height="800"></canvas>
+                    <!-- 手機版：引導向下捲動查看照度圖 -->
+                    <div class="scroll-hint" id="scroll-hint-chart" aria-hidden="true">↓ 照度分佈圖</div>
                 </div>
 
                 <div class="view-card chart-container">
@@ -429,6 +431,21 @@
                 setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
             }, 5000);
         }
+    })();
+    </script>
+    <script>
+    // ── 照度圖捲動提示（手機版首次訪問）──
+    (function() {
+        if (window.innerWidth > 768) return;
+        // 不使用 sls_visited（那是面板引導），這個用獨立的 key
+        try { if (localStorage.getItem('sls_chart_hint')) return; } catch(e) {}
+        var hint = document.getElementById('scroll-hint-chart');
+        if (!hint) return;
+        setTimeout(function() {
+            hint.classList.add('visible');
+            setTimeout(function() { hint.classList.remove('visible'); }, 3000);
+        }, 2500);
+        try { localStorage.setItem('sls_chart_hint', '1'); } catch(e) {}
     })();
     </script>
     <script>

@@ -677,6 +677,38 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-muted);
 }
 
+/* ── iOS Safe Area（iPhone notch / 底部 Home indicator）── */
+.paper-reference-container {
+    /* 確保最底層內容不被 iPhone Home Indicator 遮擋 */
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+/* sticky header 需要 safe-area-inset-top 以免被 Dynamic Island 蓋住 */
+.app-header {
+    padding-top: max(1rem, calc(0.75rem + env(safe-area-inset-top, 0px)));
+}
+
+/* ── 捲動提示箭頭（2D canvas 底部）── */
+.scroll-hint {
+    display: none; /* 桌機隱藏 */
+    position: absolute;
+    bottom: 0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(14, 165, 233, 0.18);
+    border: 1px solid var(--border-highlight);
+    color: var(--accent-blue);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    white-space: nowrap;
+    z-index: 5;
+}
+.scroll-hint.visible { opacity: 1; }
+
 /* ── 首次訪問 / 快捷鍵提示 Toast ── */
 .onboard-toast {
     position: fixed;
@@ -1025,6 +1057,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
     .paper-header h2 {
         font-size: 0.95rem;
     }
+
+    /* 捲動提示：手機版才顯示 */
+    .scroll-hint { display: block; }
 }
 
 /* ── 超小螢幕（iPhone SE 等 390px 以下）── */
