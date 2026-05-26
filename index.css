@@ -155,6 +155,10 @@ body {
 }
 
 /* ── 手機：控制面板折疊按鈕（桌機隱藏） ── */
+:root {
+    --header-height: 60px; /* JS 動態更新，此為初始預估值 */
+}
+
 .panel-toggle {
     display: none;
     width: 100%;
@@ -174,6 +178,22 @@ body {
 .panel-toggle:active { background: rgba(14,165,233,0.22); }
 .panel-toggle .toggle-arrow { float: right; transition: transform 0.25s; }
 .panel-toggle.collapsed .toggle-arrow { transform: rotate(-90deg); }
+
+/* 折疊按鈕內的即時照度指示（手機版）*/
+.toggle-metric {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 0.72rem;
+    font-family: monospace;
+    font-weight: 700;
+    color: var(--accent-teal);
+    background: rgba(20, 184, 166, 0.12);
+    border: 1px solid rgba(20, 184, 166, 0.35);
+    border-radius: 4px;
+    padding: 0.05rem 0.4rem;
+    vertical-align: middle;
+    transition: color 0.3s;
+}
 
 /* Sidebar Controls */
 .controls-panel {
@@ -1094,9 +1114,24 @@ input[type="range"]:focus-visible {
         gap: 0.75rem;
     }
 
-    /* 控制面板：預設收合，展開按鈕顯示 */
+    /* 控制面板：預設收合，展開按鈕顯示，sticky 懸浮於 header 下方 */
     .panel-toggle {
         display: block;
+        position: sticky;
+        top: var(--header-height);
+        z-index: 90;
+        /* 加深背景以免內容透出 */
+        background: rgba(11, 17, 32, 0.92);
+        border-color: var(--border-highlight);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+        border-radius: 0 0 10px 10px;
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+    }
+    .panel-toggle:not(.collapsed) {
+        border-radius: 10px 10px 0 0;
     }
     .controls-panel {
         padding: 0 1rem;
