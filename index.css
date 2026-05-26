@@ -26,6 +26,17 @@
     padding: 0;
 }
 
+/* ── 觸控優化：消除 300ms tap delay，不阻止頁面縮放 ── */
+button,
+input[type="range"],
+input[type="checkbox"],
+a,
+label[for],
+[role="button"],
+[tabindex] {
+    touch-action: manipulation;
+}
+
 body {
     font-family: 'Inter', 'Noto Sans TC', sans-serif;
     background-color: var(--bg-main);
@@ -1183,6 +1194,29 @@ input[type="range"]:focus-visible {
 
     /* 浮動指標條：手機版才顯示 */
     .mobile-metric-bar { display: flex; }
+
+    /* ── WCAG 2.5.5：最小觸控目標 44×44px ── */
+    /* preset-btn、demo-btn、share-btn 手機版加高至 44px */
+    .preset-btn {
+        padding: 0.65rem 0.5rem;
+        min-height: 44px;
+    }
+    .demo-btn {
+        min-height: 44px;
+        padding: 0.65rem 1rem;
+    }
+    .share-btn {
+        min-height: 44px;
+        padding: 0.75rem 1rem;
+    }
+    .panel-toggle {
+        min-height: 48px; /* 已夠大，確認不被重設 */
+    }
+
+    /* ── 控制面板捲動隔離（防止過捲動傳導至頁面）── */
+    .controls-panel.open {
+        overscroll-behavior-y: contain;
+    }
 }
 
 /* ── 超小螢幕（iPhone SE 等 390px 以下）── */

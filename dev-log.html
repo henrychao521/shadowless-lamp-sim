@@ -119,6 +119,7 @@
         <tr><td>圖表放大</td><td><span class="badge badge-green">✅ Phase 29</span></td><td>⤢ 按鈕切換 220px ↔ 380px（動畫過渡），手機閱讀更清晰</td></tr>
         <tr><td>手機浮動指標條</td><td><span class="badge badge-green">✅ Phase 30</span></td><td>調整滑桿時視覺化區頂端永遠顯示當前照度 + IEC 狀態，無需捲動</td></tr>
         <tr><td>IEC 閾值觸覺反饋</td><td><span class="badge badge-green">✅ Phase 30</span></td><td>IEC 閾值（50%）穿越時觸發差異化震動型態（達標雙振 / 跌破重短重）</td></tr>
+        <tr><td>觸控延遲消除</td><td><span class="badge badge-green">✅ Phase 31</span></td><td>touch-action:manipulation 消除按鈕 300ms 延遲，44px 最小觸控目標（WCAG 2.5.5）</td></tr>
       </tbody>
     </table>
   </section>
@@ -568,6 +569,16 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 31 觸控延遲 + 44px 觸控目標）</div>
+        <div class="content">
+          <strong>touch-action: manipulation</strong>：在 CSS 全局層（緊跟 * 重置之後）加入規則，讓所有 button、input[type="range"]、input[type="checkbox"]、a、label[for]、[role="button"]、[tabindex] 元素啟用 manipulation 模式。<br>
+          效果：①消除行動裝置 300ms 點擊延遲（瀏覽器不需等待確認是否為雙擊縮放）；②保留頁面級捏放縮放（不影響無障礙需求）；③比 <code>user-scalable=no</code> 更精確的控制（僅作用於特定元素）。<br><br>
+          <strong>WCAG 2.5.5 最小觸控目標（44×44px）</strong>：在 @media (max-width: 768px) 中為 .preset-btn / .demo-btn / .share-btn 加入 <code>min-height: 44px</code>，原本只有 ~26px 高度的預設按鈕和演示按鈕現在符合 WCAG AA 建議。<br><br>
+          <strong>overscroll-behavior-y: contain</strong>：控制面板 <code>.controls-panel.open</code> 在手機展開後，捲動到面板頂/底邊界時不再將捲動事件傳導至頁面（防止面板內容捲完後意外觸發整頁捲動）。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 30 手機浮動指標條 + IEC 觸覺反饋）</div>
         <div class="content">
           會話壓縮後恢復，優先完成 Phase 29 未 commit 的圖表放大功能，push 到 main。<br><br>
@@ -973,6 +984,20 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 31 — 觸控延遲消除 + 44px 觸控目標 + 捲動隔離 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.css · commit 待提交</div>
+      <ul>
+        <li><strong>touch-action: manipulation</strong>：CSS 全局規則（緊跟 * 重置後），作用於所有可互動元素</li>
+        <li>效果：消除手機瀏覽器的 300ms 點擊延遲（不需等待確認雙擊），保留頁面縮放能力（比 user-scalable=no 更符合無障礙標準）</li>
+        <li>作用元素：button、input[type="range"]、input[type="checkbox"]、a、label[for]、[role="button"]、[tabindex]</li>
+        <li><strong>WCAG 2.5.5 觸控目標</strong>：@media (max-width:768px) 中加入 min-height:44px</li>
+        <li>受益元素：.preset-btn（原 ~26px）/ .demo-btn（原 ~38px）/ .share-btn（原 ~38px）</li>
+        <li>符合 WCAG 2.1 Level AA 成功準則 2.5.5（觸控目標大小 44×44 CSS px）</li>
+        <li><strong>overscroll-behavior-y: contain</strong>：.controls-panel.open — 面板捲動到頂/底邊界時不傳導至頁面捲動，避免手機使用者在面板內捲動時意外觸發頁面移動</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 30 — 手機浮動指標條 + IEC 閾值觸覺反饋 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css + simulation.js · commit 待提交</div>
       <ul>
@@ -1052,6 +1077,9 @@
         <li>✅ <strong>Phase 29</strong>：⤢ 圖表放大按鈕（220px ↔ 380px 動態高度，Chart.js resize 同步）</li>
         <li>✅ <strong>Phase 30</strong>：手機浮動指標條（調整滑桿時實時顯示照度 + IEC 狀態，無需捲動圖表）</li>
         <li>✅ <strong>Phase 30</strong>：IEC 50% 閾值觸覺反饋（達標/跌破差異化震動型態，Android Chrome）</li>
+        <li>✅ <strong>Phase 31</strong>：touch-action:manipulation 全局（消除 300ms tap delay，保留頁面縮放）</li>
+        <li>✅ <strong>Phase 31</strong>：WCAG 2.5.5 — 44px 最小觸控目標（preset-btn / demo-btn / share-btn）</li>
+        <li>✅ <strong>Phase 31</strong>：overscroll-behavior-y:contain 控制面板（防止捲動傳導至頁面）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
