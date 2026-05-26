@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>開發紀錄 — shadowless-lamp-sim</title>
+<meta name="description" content="shadowless-lamp-sim 開發紀錄 — 3D 無影燈模擬器的設計過程、手機優化與對話逐字稿">
+<meta name="theme-color" content="#0b1120">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='14' r='8' fill='%230ea5e9' opacity='.9'/%3E%3Ccircle cx='16' cy='14' r='5' fill='%23fff' opacity='.95'/%3E%3Crect x='14.5' y='22' width='3' height='6' rx='1.5' fill='%2314b8a6'/%3E%3Cellipse cx='16' cy='14' rx='12' ry='12' fill='none' stroke='%230ea5e9' stroke-width='1.5' opacity='.35'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0b1120; --panel: rgba(15,23,42,0.9); --card: rgba(30,41,59,0.7);
+    --teal: #14b8a6; --blue: #0ea5e9; --amber: #f59e0b; --red: #ef4444;
+    --green: #22c55e; --text: #f8fafc; --muted: #94a3b8; --border: rgba(51,65,85,0.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--blue); }
+  nav { position: sticky; top: 0; z-index: 50; background: var(--panel); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+  nav h1 { font-size: 1rem; font-weight: 700; color: var(--teal); }
+  nav .links { display: flex; gap: 1rem; font-size: 0.85rem; }
+  nav .links a { color: var(--muted); text-decoration: none; } nav .links a:hover { color: var(--text); }
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem; }
+  .hero { text-align: center; padding: 2.5rem 0 2rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+  .hero h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .hero p { color: var(--muted); font-size: 0.95rem; }
+  .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; border: 1px solid; margin: 0.15rem; }
+  .badge-green { background: rgba(34,197,94,0.15); border-color: var(--green); color: var(--green); }
+  .badge-blue  { background: rgba(14,165,233,0.15); border-color: var(--blue); color: var(--blue); }
+  .badge-amber { background: rgba(245,158,11,0.15); border-color: var(--amber); color: var(--amber); }
+  .badge-red   { background: rgba(239,68,68,0.15); border-color: var(--red); color: var(--red); }
+  .badge-teal  { background: rgba(20,184,166,0.15); border-color: var(--teal); color: var(--teal); }
+  section { margin-bottom: 3rem; }
+  section > h2 { font-size: 1.2rem; font-weight: 700; color: var(--teal); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; }
+  .phase-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+  .phase-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .phase-card p { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .phase-card ul { font-size: 0.88rem; color: var(--muted); padding-left: 1.25rem; }
+  .phase-card li { margin-bottom: 0.25rem; }
+  .phase-card li strong { color: var(--text); }
+  .meta { font-size: 0.78rem; color: #475569; margin-bottom: 0.75rem; }
+  .commit-hash { font-family: monospace; background: rgba(51,65,85,0.5); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.78rem; color: var(--blue); }
+  .timeline { position: relative; padding-left: 1.5rem; }
+  .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .tl-item { position: relative; margin-bottom: 1.5rem; }
+  .tl-item::before { content: ''; position: absolute; left: -1.6rem; top: 0.4rem; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); border: 2px solid var(--bg); }
+  .tl-item .tl-time { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; }
+  .tl-item .tl-content { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.88rem; }
+  .tl-item .tl-content strong { color: var(--text); }
+  .tl-item .tl-content p { color: var(--muted); margin-top: 0.3rem; }
+  .tl-item.error::before { background: var(--red); }
+  .tl-item.success::before { background: var(--green); }
+  .tl-item.warn::before { background: var(--amber); }
+  .transcript { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .msg { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+  .msg:last-child { border-bottom: none; }
+  .msg .role { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .msg.user .role { color: var(--blue); }
+  .msg.ai .role { color: var(--teal); }
+  .msg .content { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .msg.user { background: rgba(14,165,233,0.04); }
+  pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; font-size: 0.78rem; overflow-x: auto; color: #a5f3fc; margin: 0.5rem 0; }
+  .status-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .status-table th { text-align: left; padding: 0.5rem 0.75rem; background: rgba(30,41,59,0.8); color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .status-table td { padding: 0.6rem 0.75rem; border-top: 1px solid var(--border); }
+  .status-table tr:hover td { background: rgba(51,65,85,0.2); }
+  footer { text-align: center; padding: 2rem; color: #334155; font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 3rem; }
+  @media (max-width: 600px) {
+    .container { padding: 1rem 0.75rem; }
+    .hero h2 { font-size: 1.3rem; }
+    .phase-card { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <h1>🔦 shadowless-lamp-sim 開發紀錄</h1>
+  <div class="links">
+    <a href="index.html">← 返回模擬器</a>
+    <a href="https://github.com/henrychao521/shadowless-lamp-sim" target="_blank">GitHub ↗</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h2>開發日誌 × 對話逐字稿</h2>
+    <p>記錄 shadowless-lamp-sim 的開發過程、3D 真實感優化、部署歷程與手機介面改善。</p>
+    <p style="margin-top:0.5rem; font-size:0.82rem; color:#475569;">專案網址：<a href="https://henrychao521.github.io/shadowless-lamp-sim/">henrychao521.github.io/shadowless-lamp-sim</a></p>
+  </div>
+
+  <!-- ── 目前狀態 ── -->
+  <section>
+    <h2>📊 目前狀態</h2>
+    <table class="status-table">
+      <thead><tr><th>項目</th><th>狀態</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td>GitHub Pages</td><td><span class="badge badge-green">✅ 上線</span></td><td>https://henrychao521.github.io/shadowless-lamp-sim/</td></tr>
+        <tr><td>3D PBR 材質</td><td><span class="badge badge-green">✅ 完成</span></td><td>MeshPhysicalMaterial：覆布 sheen、皮膚 SSS、傷口 clearcoat</td></tr>
+        <tr><td>IBL 環境光</td><td><span class="badge badge-green">✅ 完成</span></td><td>RoomEnvironment + HemisphereLight 取代 AmbientLight</td></tr>
+        <tr><td>後處理順序</td><td><span class="badge badge-green">✅ 修正</span></td><td>SSAO → Bloom（原本相反）</td></tr>
+        <tr><td>手術房牆面</td><td><span class="badge badge-green">✅ 完成</span></td><td>BoxGeometry BackSide，SSAO 有空間吃</td></tr>
+        <tr><td>手機介面</td><td><span class="badge badge-green">✅ Phase 4 完成</span></td><td>控制面板折疊、觸控滑桿、CSS cascade 修正、行動 GPU 效能</td></tr>
+        <tr><td>CSS 架構</td><td><span class="badge badge-green">✅ 修正</span></td><td>Media query 移至檔案末尾（修正 cascade 順序 bug）</td></tr>
+        <tr><td>行動 3D 效能</td><td><span class="badge badge-green">✅ 完成</span></td><td>行動裝置停用 SSAO、限制 pixelRatio ≤ 2、輕量 shadow map</td></tr>
+        <tr><td>URL 狀態分享</td><td><span class="badge badge-green">✅ 完成</span></td><td>滑桿參數即時編碼入 URL hash，可複製網址分享特定設定</td></tr>
+        <tr><td>滑桿數值動畫</td><td><span class="badge badge-green">✅ 完成</span></td><td>移動滑桿時數值 span 短暫白光閃爍，視覺回饋清晰</td></tr>
+        <tr><td>GitHub Actions CI</td><td><span class="badge badge-green">✅ 正常</span></td><td>事故恢復後 workflow 成功執行</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ── 開發階段 ── -->
+  <section>
+    <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 0 — 初始研究與分析 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · commit <span class="commit-hash">d0a4b9b</span> 初始版本</div>
+      <p>對現有 3D 介面進行全面分析，識別出四大改善方向：</p>
+      <ul>
+        <li><strong>光學物理</strong>：12 顆 SpotLight 配置、IES 光形、平方反比衰減</li>
+        <li><strong>PBR 材質</strong>：所有物件使用純色 MeshStandardMaterial，無貼圖導致「塑膠感」</li>
+        <li><strong>場景構圖</strong>：缺少牆面、天花板，SSAO 無空間發揮</li>
+        <li><strong>後處理管線</strong>：Bloom 在 SSAO 前（錯誤順序）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 1 — 後處理修正 + 材質升級 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · commit <span class="commit-hash">15fbe6f</span></div>
+      <ul>
+        <li><strong>修正後處理順序</strong>：Render → SSAO → Bloom → Output</li>
+        <li><strong>Bloom 調整</strong>：strength 1.0 → 0.35，radius 0.5 → 0.8（柔光感）</li>
+        <li><strong>加入 RoomEnvironment IBL</strong>：程序生成室內環境光，不需外部 HDR 檔</li>
+        <li><strong>AmbientLight → HemisphereLight</strong>：天花板暖光 + 地板冷反射</li>
+        <li><strong>材質升級 MeshPhysicalMaterial</strong>：
+          <ul>
+            <li>地板：clearcoat 0.5（醫療磁磚光澤）</li>
+            <li>手術台：clearcoat 1.0（拋光不鏽鋼）</li>
+            <li>覆布：sheen 1.0 + sheenColor（手術布料微光澤）</li>
+            <li>傷口：clearcoat 0.8, roughness 0.3（濕潤組織）</li>
+            <li>皮膚：transmission 0.08 + attenuation（次表面散射近似）</li>
+            <li>燈頭：clearcoat 0.7（烤漆金屬感）</li>
+          </ul>
+        </li>
+        <li><strong>加入手術房</strong>：BoxGeometry BackSide 牆面 + 天花板</li>
+        <li><strong>shadow.normalBias = 0.02</strong>：消除表面自陰影噪點</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 2 — GitHub Pages 部署 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26</div>
+      <p>過程遭遇 GitHub 平台事故（<a href="https://www.githubstatus.com/incidents/gnftqj9htp0g" target="_blank">gnftqj9htp0g</a>），Actions 認證系統大規模故障。</p>
+      <ul>
+        <li>Repo 從 private 改為 public（Free 方案限制）</li>
+        <li>加入 .nojekyll（避免 Jekyll 處理 ES Module 語法）</li>
+        <li>GitHub 事故恢復後 workflow 成功，Pages 正式上線</li>
+        <li>個人站（henrychao521.github.io）同步更新精選卡片、計數 24→25</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 3 — 手機介面優化 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 完成 · commit <span class="commit-hash">50fb19d</span></div>
+      <ul>
+        <li><strong>控制面板折疊按鈕</strong>：手機顯示 ⚙️ 按鈕，預設收合，點擊展開；桌機自動隱藏</li>
+        <li><strong>滑桿觸控點放大</strong>：16px → 28px（mobile），更容易手指操作</li>
+        <li><strong>3D canvas 響應式高度</strong>：600px → 55vw（min 280px / max 480px）</li>
+        <li><strong>Header 手機優化</strong>：隱藏英文副標題、badge 縮小，超小螢幕隱藏 badge</li>
+        <li><strong>圖例 flex-wrap</strong>：窄螢幕自動換行，不 overflow</li>
+        <li><strong>Tab 全寬</strong>：flex:1 分配，觸控目標高度加大</li>
+        <li><strong>觸控提示</strong>：偵測觸控裝置切換「🖱️ 拖曳」→「👆 單指・雙指縮放」</li>
+        <li><strong>超小螢幕（≤390px）</strong>：字型縮小、隱藏 badge、canvas 高度 60vw</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 10 — 部署修正 + Favicon <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>deploy.yml 修正</strong>：原工作流程漏掉了 <code>dev-log.html</code> 與 <code>手術無影燈光學設計與模擬.docx</code>，移除了不需部署的 <code>operate.js</code>（Puppeteer 自動化腳本）。現在使用個別 <code>cp</code> 複製（替代 <code>cp /tmp/site/*</code>），避免萬用字元意外複製多餘檔案。
+        </li>
+        <li>
+          <strong>SVG Favicon</strong>（內嵌 Data URI）：無需額外 .ico 檔，手術燈圖示（藍色圓圈 + 白色核心 + 青色支柱 + 外圈暈光）直接寫入 <code>link[rel=icon]</code> 的 href data URL。同時加入 index.html 和 dev-log.html。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 9 — SEO Meta + 完整 URL Hash + 無障礙動畫 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li><strong>Meta tags</strong>：og:title / og:description / og:url / og:type / twitter:card / meta description / theme-color #0b1120。改善社群分享預覽與 PWA 外觀。</li>
+        <li><strong>URL hash 補完</strong>：encodeHash() 加入 <code>oz</code>（obstacle_z）和 <code>rm</code>（realistic_mode）。simulation.js DOMContentLoaded 內直接附加 obstacle_z / realistic_mode / smart_compensation 的 input/change listener 呼叫 encodeHash，避免閉包外存取問題。restoreFromHash() 還原後 dispatch events 以觸發 simulation3d.js 的監聽器。</li>
+        <li><strong>prefers-reduced-motion</strong>：<code>@media (prefers-reduced-motion: reduce)</code> 設定所有 animation/transition duration 為 0.001ms，停用 .loading-ring 旋轉和 .val-pulse 閃爍，保護前庭功能敏感使用者。</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 8 — 複製連結按鈕 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>「📋 複製連結分享此設定」按鈕</strong>（index.html + index.css）：<br>
+          控制面板中段加入 <code>.share-row</code> 區塊，使用 Clipboard API（<code>navigator.clipboard.writeText</code>）複製目前完整 URL（含 hash）。
+          舊版 iOS Safari 使用 <code>document.execCommand('copy')</code> fallback（textarea trick）。
+          按下後顯示「✅ 已複製！」提示（opacity 過渡，2.2s 後消失）。
+          搭配 Phase 7 的 URL hash，教師可設定好特定遮擋場景，一鍵複製連結傳給學生。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 7 — URL 狀態分享 + 滑桿數值動畫 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>URL Hash 狀態編碼</strong>（simulation.js）：<br>
+          每次 <code>input</code> 事件後呼叫 <code>encodeHash()</code>，將六個參數編碼為
+          <code>#h=100&amp;ox=0&amp;oy=50&amp;or=10.5&amp;n=25&amp;s=6.0</code> 格式寫入
+          <code>window.location.hash</code>（使用 <code>history.replaceState</code> 不產生瀏覽記錄）。<br>
+          頁面載入時 <code>restoreFromHash()</code> 讀取 hash 並還原各滑桿數值，讓用戶可複製 URL 分享特定設定。
+        </li>
+        <li>
+          <strong>滑桿數值閃光動畫</strong>（index.css + simulation.js）：<br>
+          新增 <code>@keyframes value-pulse</code>：0% 藍色 → 35% 純白 + glow → 100% 藍色，
+          duration 0.45s ease-out。每次 input 事件對對應的 <code>val_*</code> span 重設動畫
+          （先 <code>classList.remove</code> + reflow + <code>classList.add</code>）。
+          手機用戶移動滑桿時，數值有即時閃光提示，不需低頭看 label。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 6 — 3D 載入提示 + Tab 自動捲動 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>3D Canvas 載入 Spinner</strong>（index.html + index.css + simulation3d.js）：<br>
+          在 <code>#canvas3d</code> 內加入 <code>.canvas-loading</code> 覆蓋層，旋轉環動畫 + 「3D 模擬載入中…」文字。
+          Three.js 第一次成功呼叫 <code>composer.render()</code> 後，<code>dismissLoading()</code> 觸發：
+          overlay 加上 <code>.hidden</code>（opacity 0 過渡），<code>transitionend</code> 後 DOM 節點移除，
+          不再佔用渲染層。
+        </li>
+        <li><strong>position: relative</strong> 加入 <code>.canvas-3d</code>，使 overlay 正確定位於畫布容器內。</li>
+        <li>
+          <strong>Tab 切換自動捲動</strong>（index.html switchView）：<br>
+          手機版（≤768px）切換 tab 後 80ms，執行 <code>tabs.scrollIntoView({behavior:'smooth'})</code>，
+          確保用戶視窗自動定位到 tab 列 + 畫布區，不需手動往下滑。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 5 — 動畫精確化 + 圖表手機響應式 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>控制面板動畫精確化</strong>（index.html JS）：<br>
+          取代 <code>max-height:9999px</code> 反模式，改用 <code>panel.scrollHeight</code> 動態測量實際高度，
+          展開時設精確目標值 + <code>transitionend</code> 後解除限制；
+          收合時雙 <code>requestAnimationFrame</code> 確保瀏覽器正確執行 max-height 0 的過渡。
+          easing 從 <code>ease</code> 改為 <code>cubic-bezier(0.4,0,0.2,1)</code>（Material Design 標準）。
+        </li>
+        <li>
+          <strong>Chart.js 手機響應式</strong>（simulation.js）：
+          <ul>
+            <li>偵測 <code>window.innerWidth &lt; 768</code></li>
+            <li>手機：隱藏 X/Y 軸標題（節省高度），字型縮至 10px</li>
+            <li>手機：X 軸 tick 限制 5 個，Y 軸 5 個</li>
+            <li>手機：縮短 dataset 標籤（避免圖例過長截斷）</li>
+            <li>手機：legend boxWidth 縮至 12、padding 8</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 4 — CSS Cascade 修正 + 行動 GPU 效能 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續 · commit <span class="commit-hash">（本次）</span></div>
+      <p>發現並修正 Phase 3 中潛藏的 CSS 架構 Bug，同時加入行動裝置 3D 效能優化。</p>
+      <ul>
+        <li>
+          <strong>🐛 修正 CSS 層疊順序 Bug</strong>：
+          index.css 中三個 <code>@media</code> 區塊原來放在 <em>基礎樣式之前</em>，
+          導致同優先級的桌機樣式（後定義）覆蓋手機響應式樣式。
+          重組 CSS：所有 <code>@media</code> 移至檔案末尾，確保手機樣式正確生效。
+          受影響的 class：<code>.controls-panel</code>、<code>.tab-btn</code>、
+          <code>input[type="range"]</code>、<code>.canvas-3d</code>、
+          <code>.card-header</code>、<code>.legend</code>、<code>.view-card</code> 等。
+        </li>
+        <li><strong>新增 <code>--accent-amber</code> CSS 變數</strong>：補上 <code>#f59e0b</code>，修正智慧補償 label 顏色缺失。</li>
+        <li><strong>canvas touch-action: none</strong>：防止 iOS 在 3D 畫布上觸發頁面滾動，確保 pinch-zoom 正常。</li>
+        <li><strong>手機橫向（landscape）斷點</strong>：新增 <code>@media (max-width:768px) and (orientation:landscape)</code>，canvas 高度調整為 70vw / max 380px。</li>
+        <li>
+          <strong>行動裝置 3D 效能</strong>（simulation3d.js）：
+          <ul>
+            <li>UA + viewport 偵測 <code>isMobile</code></li>
+            <li>行動：停用 SSAO（<code>ssaoPass.enabled = false</code>），避免環境遮蔽耗盡 GPU</li>
+            <li>行動：Bloom strength 0.35 → 0.25（減輕後處理負擔）</li>
+            <li>行動：<code>antialias: false</code>（WebGL 抗鋸齒改由手機 GPU 硬體處理效率更高）</li>
+            <li>行動：shadow map 從 <code>PCFSoftShadowMap</code> → <code>PCFShadowMap</code>（減少 shadow 採樣）</li>
+            <li>行動：<code>pixelRatio</code> 上限 2（Retina 3x → 限 2x，渲染面積降 11%）</li>
+            <li>OrbitControls 明確設定 <code>touches.ONE = ROTATE, TWO = DOLLY_PAN</code></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── 部署歷程時間軸 ── -->
+  <section>
+    <h2>⏱️ 部署歷程時間軸</h2>
+    <div class="timeline">
+      <div class="tl-item success">
+        <div class="tl-time">~10:00 UTC</div>
+        <div class="tl-content"><strong>程式碼改動完成，push 到 main</strong><p>3D 材質、後處理、IBL、牆面改動全部完成</p></div>
+      </div>
+      <div class="tl-item error">
+        <div class="tl-time">10:57 UTC</div>
+        <div class="tl-content"><strong>GitHub 平台事故開始</strong><p>Actions 和 Pages 服務降低（官方事故 gnftqj9htp0g）</p></div>
+      </div>
+      <div class="tl-item error">
+        <div class="tl-time">11:53 UTC</div>
+        <div class="tl-content"><strong>認證系統大規模故障</strong><p>codeload.github.com 無法下載 action tarball；大多數 Actions runs 失敗</p></div>
+      </div>
+      <div class="tl-item warn">
+        <div class="tl-time">12:18–12:39 UTC</div>
+        <div class="tl-content"><strong>多種部署方案嘗試</strong>
+          <p>peaceiris/actions-gh-pages → 失敗；純 shell deploy → 失敗；Page build 卡在 building</p></div>
+      </div>
+      <div class="tl-item warn">
+        <div class="tl-time">12:37 UTC</div>
+        <div class="tl-content"><strong>GitHub 找到原因，開始修復</strong><p>"We have identified the cause of the authentication issues"</p></div>
+      </div>
+      <div class="tl-item success">
+        <div class="tl-time">~13:10 UTC</div>
+        <div class="tl-content"><strong>事故恢復，Actions 正常</strong><p>workflow 重新觸發，checkout + shell deploy 全部 ✅</p></div>
+      </div>
+      <div class="tl-item success">
+        <div class="tl-time">~13:15 UTC</div>
+        <div class="tl-content"><strong>🎉 網站正式上線</strong><p>HTTP 200，Pages build: built</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 對話逐字稿 ── -->
+  <section>
+    <h2>💬 對話逐字稿（2026-05-26）</h2>
+    <div class="transcript">
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry（使用者）</div>
+        <div class="content">幫我研究這個專案，並分析如何可以讓這個專案呈現的3D介面更符合真實狀況？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          已詳細閱讀 simulation3d.js、README.md 及機械/光學參數設定。結論：此專案 3D 視圖目前是「視覺感受合理 + 幾何近似」，要更接近真實，主要瓶頸在光學物理性、PBR 材質、解剖/環境細節、體積散射四大塊。<br><br>
+          分析七大改善方向：①光學物理（燈數、photometric units、IES）②PBR 材質（sheen/SSS/clearcoat）③場景解剖（病人 GLTF、醫生手套）④體積光散射（raymarching）⑤陰影品質（VSM/PCSS）⑥後處理管線（SSAO 順序）⑦互動標示。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">逐步開始實作，然後評估是否可以在github page上呈現？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">逐步實作六項改動（後處理順序、Bloom、IBL、PBR 材質、牆面、normalBias），確認純靜態方案完全可部署到 GitHub Pages，並加入 GitHub Actions CI workflow。所有改動 commit 並建立 PR。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">你直接幫我部署吧</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          嘗試透過 GitHub API 直接啟用 Pages，發現 repo 是 private（Free 方案限制）。詢問使用者後改為 public，Pages 啟用。<br>
+          <strong>遭遇 GitHub 平台事故（10:57 UTC 開始）：</strong>codeload.github.com 無法下載任何 action tarball，多次嘗試不同方案（configure-pages@v4/v5、peaceiris、純 shell deploy）均失敗。同時 Pages legacy build 卡在 building 狀態超過 30 分鐘。<br>
+          誤判為帳號 Actions 被暫停（因 "Your account is suspended" 訊息），實為認證系統故障的誤導性訊息。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">https://henrychao521.github.io/shadowless-lamp-sim/ 404error</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">檢查發現缺少 .nojekyll，Jekyll 嘗試處理 ES Module 語法失敗。加入 .nojekyll 後 build 仍卡住（平台事故）。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">先前為什麼會出錯？幫我整理出錯的原因，將資料存在桌面上。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">整理六項錯誤原因並存為 Markdown 文件至桌面。初版誤判根本原因為帳號暫停。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">https://www.githubstatus.com/incidents/gnftqj9htp0g</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">讀取 GitHub 官方事故頁面：確認為平台認證系統事故（10:57–12:37+ UTC），所有錯誤均由此引起，帳號完全正常。更新桌面分析文件修正誤判。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">你看一下現在是否可行了？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">事故恢復，重新觸發 workflow：checkout@v4 ✅、shell deploy ✅。觸發 Pages rebuild，HTTP 200，網站正式上線！</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">然後處理好之後，幫我同步更新 https://henrychao521.github.io/ 頁面</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">更新個人站三個檔案：shared.js 加入 PROJECT_META、index.html 加入精選卡片（藍色漸層）+ 計數 24→25、projects.html 計數更新。本地預覽驗證 DOM 正確後 push。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">先沒關係，旁邊的程式還在執行，是否可以先讓他停下呢？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">列出執行中的 preview server：family-album（port 5173）。停止後確認 preview list 為空。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">然後我要出去一小時，你持續幫我優化介面（包含手機操作的優化），優化的內容請用網頁進行開發紀錄，同時幫我記錄我們的對話逐字稿。每階段處理後就上傳，我會透過page來確認內容。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">啟動自我調速 Loop，計劃手機介面優化（控制面板折疊、滑桿觸控優化、3D canvas 響應式高度、header 改善），每階段建立 dev-log.html 並 push 到 gh-pages。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 3 實作）</div>
+        <div class="content">
+          <strong>index.html</strong>：加入 <code>.panel-toggle</code> 折疊按鈕（含 aria-expanded / aria-controls）、雙模觸控提示（.touch-hint-desktop / .touch-hint-mobile）、inline JS 偵測觸控裝置並控制展開/收合邏輯。<br>
+          <strong>index.css</strong>：新增 .panel-toggle 樣式、@media 768px 區塊（controls-panel 收合、滑桿 28px thumb、tab 全寬、canvas-3d 55vw、圖例 flex-wrap）、@media 390px 區塊（iPhone SE）。<br>
+          <strong>dev-log.html</strong>：建立完整開發紀錄頁面並 push（commit 50fb19d）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 4 CSS bug 修正）</div>
+        <div class="content">
+          重新閱讀 index.css 後發現嚴重問題：<strong>CSS 層疊順序 Bug</strong>。<br>
+          原始結構：<code>@media 1024px、@media 768px、@media 390px</code> 放在第 138–273 行，而 <code>.controls-panel</code>（第 276 行）、<code>.tab-btn</code>（第 399 行）等基礎樣式放在後面。<br>
+          由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
+          修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
+          simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 10 部署修正 + Favicon）</div>
+        <div class="content">
+          發現 deploy.yml 漏掉 dev-log.html — 用戶無法在 Pages 看到開發紀錄！也漏掉 .docx 下載檔案。修正 workflow，改用個別 cp 指令，加入 dev-log.html 和 .docx，移除 operate.js（Puppeteer 腳本不需公開部署）。<br>
+          同時加入 SVG 內嵌 favicon（data URI）到 index.html 和 dev-log.html，不需額外 .ico 資源請求。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 9 SEO + URL hash 補完 + 無障礙）</div>
+        <div class="content">
+          加入完整 Open Graph / Twitter Card meta tags，改善社群連結預覽。<br>
+          URL hash 補上 obstacle_z 和 realistic_mode（在 DOMContentLoaded 閉包內附加監聽器，避免閉包外存取問題）。<br>
+          加入 prefers-reduced-motion CSS — 保護前庭功能敏感使用者。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 8 複製連結按鈕）</div>
+        <div class="content">
+          確認 GitHub Actions 全部 ✅（Phase 7 workflow success，Pages build deploying）。<br>
+          加入 「📋 複製連結分享此設定」按鈕至控制面板。Clipboard API 優先，
+          失敗則執行 textarea execCommand fallback（iOS Safari 相容）。
+          按下後 .share-feedback 淡入「✅ 已複製！」，2.2s 後淡出。
+          搭配 Phase 7 URL hash：教師可調好遮擋參數後一鍵分享給全班學生。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 7 URL 狀態 + 數值動畫）</div>
+        <div class="content">
+          <strong>URL hash 分享</strong>：simulation.js 加入 encodeHash() 與 restoreFromHash()。每次 input 事件後 replaceState 更新 hash（短格式 h/ox/oy/or/n/s），頁面載入時自動還原。使用者可直接複製網址（例如：<code>…/#h=80&ox=15&oy=60&or=8&n=45&s=4</code>）分享特定遮擋場景給學生或同事。<br><br>
+          <strong>數值閃光</strong>：@keyframes value-pulse（藍→白glow→藍，0.45s），每次 input 事件對相應 val_* span 觸發。手機使用者滑動時能從餘光察覺數值已更新，不需停下來確認 label。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 6 載入提示 + Tab 捲動）</div>
+        <div class="content">
+          <strong>3D 載入 Spinner</strong>：canvas-3d 容器加 <code>position:relative</code>，內部加入 <code>.canvas-loading</code> 覆蓋層（position:absolute, inset:0）。CSS 旋轉環動畫 (<code>.loading-ring</code>)。simulation3d.js 加入 <code>dismissLoading()</code>，第一幀 <code>composer.render()</code> 後觸發 opacity 過渡，transitionend 後移除節點。<br><br>
+          <strong>Tab 切換捲動</strong>：switchView 加入 <code>tabs.scrollIntoView</code>，手機版自動定位到畫面正確位置。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 5 動畫精確化 + 圖表優化）</div>
+        <div class="content">
+          <strong>控制面板動畫升級</strong>（index.html）：<br>
+          <code>max-height: 9999px</code> 是 CSS 動畫的反模式 — 瀏覽器需要從 0 補間到 9999px，即使實際內容只有 400px，導致開頭一段時間沒有動畫效果，最後瞬間「彈出」。<br>
+          新方法：JS 使用 <code>panel.scrollHeight</code> 測量實際高度，openPanel() 設定精確目標高度，transitionend 事件後清除固定值（允許面板內容變化）；closePanel() 先固定高度再雙幀歸零，確保過渡動畫正確觸發。easing 改為 cubic-bezier Material Design 曲線。<br><br>
+          <strong>Chart.js 手機響應式</strong>（simulation.js）：<br>
+          偵測 window.innerWidth &lt; 768，對手機套用：隱藏 X/Y 軸標題（節省空間）、縮小字型至 10px、tick 數量減至 5、圖例字型 10px / boxWidth 12、縮短 dataset 標籤（「實際相對照度 (%)」→「照度 (%)」）。
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── 待辦事項 ── -->
+  <section>
+    <h2>📋 待辦優化清單</h2>
+    <div class="phase-card">
+      <ul>
+        <li>✅ 後處理順序修正（SSAO → Bloom）</li>
+        <li>✅ PBR 材質升級（MeshPhysicalMaterial）</li>
+        <li>✅ RoomEnvironment IBL</li>
+        <li>✅ 手術房牆面 / 天花板</li>
+        <li>✅ GitHub Pages 部署上線</li>
+        <li>✅ 個人站 henrychao521.github.io 更新</li>
+        <li>✅ 手機控制面板折疊按鈕 + 動畫</li>
+        <li>✅ 滑桿觸控點放大（16px → 28px on mobile）</li>
+        <li>✅ 3D canvas 響應式高度（固定 600px → 55vw 動態）</li>
+        <li>✅ Header 手機版縮排 + 超小螢幕斷點</li>
+        <li>✅ CSS cascade 架構修正（media queries 移至末尾）</li>
+        <li>✅ 行動裝置 SSAO 停用 + pixelRatio 限制</li>
+        <li>✅ iOS touch-action: none（防止 pinch-zoom 被頁面 scroll 搶奪）</li>
+        <li>✅ 手機橫向（landscape）斷點</li>
+        <li>✅ <strong>Phase 5</strong>：控制面板 scrollHeight 精確動畫（取代 max-height:9999px 閃現問題）</li>
+        <li>✅ <strong>Phase 5</strong>：Chart.js 手機響應式（隱藏軸標題、縮小字型、減少 tick、短標籤）</li>
+        <li>✅ <strong>Phase 6</strong>：3D canvas 載入中 spinner（Three.js 初始化期間顯示，第一幀後淡出）</li>
+        <li>✅ <strong>Phase 6</strong>：切換至 3D tab 時自動捲動到畫面頂部（手機版）</li>
+        <li>✅ <strong>Phase 7</strong>：URL hash 狀態編碼（分享特定模擬設定；使用 <code>replaceState</code> 不污染歷史）</li>
+        <li>✅ <strong>Phase 7</strong>：滑桿數值閃光動畫（val-pulse keyframe，移動時白光提示更新）</li>
+        <li>✅ <strong>Phase 8</strong>：📋「複製連結分享此設定」按鈕（Clipboard API + iOS execCommand fallback）</li>
+        <li>✅ <strong>Phase 9</strong>：SEO meta tags（og:title / og:description / twitter:card / theme-color）</li>
+        <li>✅ <strong>Phase 9</strong>：URL hash 補完 obstacle_z 和 realistic_mode（完整狀態序列化）</li>
+        <li>✅ <strong>Phase 9</strong>：prefers-reduced-motion 無障礙 CSS（前庭功能敏感使用者）</li>
+        <li>✅ <strong>Phase 10</strong>：deploy.yml 修正（補上 dev-log.html + .docx，移除 operate.js）</li>
+        <li>✅ <strong>Phase 10</strong>：SVG favicon（內嵌手術燈圖示，主頁 + dev-log）</li>
+        <li>⬜ 體積光（raymarching volumetric spotlight）</li>
+        <li>⬜ 醫生手套可拖曳遮擋物</li>
+        <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  shadowless-lamp-sim · 開發紀錄由 Claude Sonnet 4.6 自動維護 · 最後更新：<span id="ts"></span>
+</footer>
+<script>document.getElementById('ts').textContent = new Date().toLocaleString('zh-TW', {timeZone:'Asia/Taipei'});</script>
+</body>
+</html>
