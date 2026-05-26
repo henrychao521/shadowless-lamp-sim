@@ -89,6 +89,16 @@
 
             <hr class="divider">
 
+            <!-- 分享連結 -->
+            <div class="share-row">
+                <button class="share-btn" id="copy-url-btn" title="複製含目前參數的網址">
+                    📋 複製連結分享此設定
+                </button>
+                <span class="share-feedback" id="copy-url-feedback">✅ 已複製！</span>
+            </div>
+
+            <hr class="divider">
+
             <div class="control-group">
                 <label for="num_leds">LED 發光單元數量 (<span id="val_num_leds">25</span>)</label>
                 <input type="range" id="num_leds" min="5" max="61" step="2" value="25">
@@ -351,6 +361,40 @@
             var mob  = document.querySelector('.touch-hint-mobile');
             if (desk) desk.style.display = 'none';
             if (mob)  mob.style.display  = '';
+        }
+    })();
+    </script>
+    <script>
+    // ── 複製連結按鈕 ──
+    (function() {
+        var btn      = document.getElementById('copy-url-btn');
+        var feedback = document.getElementById('copy-url-feedback');
+        if (!btn || !feedback) return;
+        btn.addEventListener('click', function() {
+            var url = window.location.href;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function() {
+                    showFeedback();
+                }).catch(function() {
+                    fallbackCopy(url);
+                });
+            } else {
+                fallbackCopy(url);
+            }
+        });
+        function showFeedback() {
+            feedback.classList.add('visible');
+            setTimeout(function() { feedback.classList.remove('visible'); }, 2200);
+        }
+        function fallbackCopy(text) {
+            // Fallback for older iOS Safari
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0;';
+            document.body.appendChild(ta);
+            ta.focus(); ta.select();
+            try { document.execCommand('copy'); showFeedback(); } catch(e) {}
+            document.body.removeChild(ta);
         }
     })();
     </script>
