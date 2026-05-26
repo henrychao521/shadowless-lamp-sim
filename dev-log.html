@@ -135,6 +135,7 @@
         <tr><td>手機面板空間優化 + aria-live</td><td><span class="badge badge-green">✅ Phase 44</span></td><td>手機版隱藏面板 h2+說明文字（節省 ~65px）；illuminance display aria-live=polite 螢幕閱讀器相容</td></tr>
         <tr><td>Preload + 超小螢幕 + 圖表按鈕</td><td><span class="badge badge-green">✅ Phase 45</span></td><td>preload simulation.js；390px 隱藏 logo-icon；chart-expand-btn 24→32px（WCAG 觸控目標）</td></tr>
         <tr><td>Canvas ARIA + tablist orientation + resize debounce</td><td><span class="badge badge-green">✅ Phase 46</span></td><td>rayCanvas/illuminanceChart role=img + aria-label；tablist aria-orientation=horizontal；applyMode 100ms debounce</td></tr>
+        <tr><td>Tablist 方向鍵導航 + T 鍵切換 Tab</td><td><span class="badge badge-green">✅ Phase 47</span></td><td>WAI-ARIA tablist ←→ 鍵自動切換 + Home/End；T 鍵全域切換 2D/3D Tab</td></tr>
       </tbody>
     </table>
   </section>
@@ -580,6 +581,14 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 47 WAI-ARIA Tablist 鍵盤導航 + T 鍵）</div>
+        <div class="content">
+          <strong>WAI-ARIA Tablist 鍵盤模式</strong>：WAI-ARIA 1.1 規範要求 tablist widget 支援方向鍵導航（Roving tabindex 或 Arrow key 導航模式）。我們使用 "automatic activation" 模式：按方向鍵即同時移動焦點並啟用 tab（等同於 click）。新增獨立 IIFE 監聽 <code>.view-tabs</code> 的 keydown 事件，處理 ArrowRight / ArrowLeft / ArrowDown / ArrowUp / Home / End，每次找到 next 索引後 <code>e.preventDefault()</code>（避免頁面捲動）並執行 <code>tabs[next].click() + focus()</code>。<br><br>
+          <strong>T 鍵全域快捷</strong>：在 keydown 的 switch 中加入 <code>case 't': case 'T'</code>。根據 <code>#view-2d.classList.contains('active')</code> 決定目標 tab，click + focus 完成切換。updateKeyHelp toast 也加入 T 鍵說明。
         </div>
       </div>
 
@@ -1144,6 +1153,21 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 47 — WAI-ARIA Tablist 鍵盤導航 + T 鍵快捷 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html</div>
+      <ul>
+        <li><strong>WAI-ARIA Tablist 鍵盤導航</strong>：在 <code>.view-tabs</code> 加入 <code>keydown</code> 監聽。WAI-ARIA 1.1 tablist 規範要求支援：<br>
+          → <code>ArrowRight / ArrowDown</code>：移動到下一個 tab（循環）<br>
+          → <code>ArrowLeft / ArrowUp</code>：移動到上一個 tab（循環）<br>
+          → <code>Home</code>：跳至第一個 tab<br>
+          → <code>End</code>：跳至最後一個 tab<br>
+          所有方向鍵均呼叫 <code>tabs[next].click()</code>（自動啟用模式）和 <code>tabs[next].focus()</code>，確保焦點隨 tab 移動</li>
+        <li><strong>T 鍵全域切換 Tab</strong>：在主鍵盤快捷鍵 switch 中加入 <code>case 't': case 'T'</code>，根據當前 active view 切換到另一個 tab，並呼叫 <code>targetTab.focus()</code> 讓鍵盤使用者清楚知道焦點位置</li>
+        <li><strong>鍵盤說明 Toast 更新</strong>：加入「T 切換 Tab」提示，讓使用者在按 ? 時能看到此快捷鍵</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 46 — Canvas ARIA + Tablist Orientation + applyMode Debounce <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.html</div>
       <ul>
@@ -1454,6 +1478,7 @@
         <li>✅ <strong>Phase 44</strong>：手機版隱藏面板 h2+說明文字（節省 65px，控制項更多不需捲動）；aria-live=polite 照度顯示</li>
         <li>✅ <strong>Phase 45</strong>：preload simulation.js（提前下載，縮短首次渲染）；390px 隱藏 logo-icon；圖表按鈕 32px</li>
         <li>✅ <strong>Phase 46</strong>：rayCanvas/illuminanceChart role=img aria-label；tablist aria-orientation=horizontal；applyMode 100ms debounce</li>
+        <li>✅ <strong>Phase 47</strong>：WAI-ARIA tablist ←→ 鍵自動導航（ArrowLeft/Right/Up/Down/Home/End）；T 鍵全域切換 2D/3D</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
