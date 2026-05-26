@@ -423,7 +423,12 @@
             }
         }
         syncHeaderHeight();
-        window.addEventListener('resize', syncHeaderHeight);
+        // Debounce resize（150ms）避免連續 resize 事件密集觸發 offsetHeight 讀取
+        var _shrTimer = null;
+        window.addEventListener('resize', function() {
+            clearTimeout(_shrTimer);
+            _shrTimer = setTimeout(syncHeaderHeight, 150);
+        });
         // 字型載入後重測（Inter 可能讓 header 高度略有變化）
         if (document.fonts) {
             document.fonts.ready.then(syncHeaderHeight);
@@ -445,7 +450,11 @@
                 var panelBodyEl = document.getElementById('controls-panel-body');
                 if (panelBodyEl && panelBodyEl.classList.contains('open')) {
                     var toggleEl = document.getElementById('panel-toggle-btn');
-                    if (toggleEl) { toggleEl.click(); }
+                    if (toggleEl) {
+                        toggleEl.click();
+                        // 焦點返回折疊按鈕（讓鍵盤/螢幕閱讀器知道面板已關閉）
+                        setTimeout(function() { toggleEl.focus(); }, 50);
+                    }
                     e.preventDefault();
                 }
                 return;
@@ -720,6 +729,9 @@
             var p = PRESETS[id];
             if (!p) return;
 
+            // 觸覺反饋：預設場景套用確認震動（Android Chrome / 部分 iOS）
+            if (navigator.vibrate) { navigator.vibrate(12); }
+
             function setSlider(elemId, val) {
                 var el = document.getElementById(elemId);
                 if (!el) return;
@@ -847,6 +859,8 @@
             backdrop.addEventListener('click', function() {
                 if (navigator.vibrate) { navigator.vibrate(8); }
                 closePanel();
+                // 焦點返回折疊按鈕
+                setTimeout(function() { btn.focus(); }, 50);
             });
         }
 

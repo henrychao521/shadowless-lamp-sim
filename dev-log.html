@@ -128,6 +128,7 @@
         <tr><td>深色模式系統整合 + ESC + Slider Active</td><td><span class="badge badge-green">✅ Phase 37</span></td><td>color-scheme:dark + ESC 關閉面板 + 滑桿 :active 放大 + overscroll-behavior:none 兩軸</td></tr>
         <tr><td>手機面板點外關閉（Backdrop 遮罩）</td><td><span class="badge badge-green">✅ Phase 38</span></td><td>半透明遮罩 z-index 層次設計；點擊面板外側區域收合面板，符合手機 UI 慣例</td></tr>
         <tr><td>Web Share API 原生分享</td><td><span class="badge badge-green">✅ Phase 39</span></td><td>手機偵測 navigator.share → 系統分享表單（LINE/訊息/AirDrop 等）；桌機仍為剪貼簿複製</td></tr>
+        <tr><td>焦點管理 + 防抖 resize + 預設震動</td><td><span class="badge badge-green">✅ Phase 40</span></td><td>ESC/backdrop 關閉後焦點返回按鈕；syncHeaderHeight resize 防抖 150ms；預設場景 12ms 觸覺確認</td></tr>
       </tbody>
     </table>
   </section>
@@ -573,6 +574,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 40 焦點管理 + Resize 防抖 + 預設震動）</div>
+        <div class="content">
+          <strong>焦點管理</strong>：ESC keydown handler 的 <code>toggleEl.click()</code> 後加入 <code>setTimeout(() =&gt; toggleEl.focus(), 50)</code>；backdrop click 的 <code>closePanel()</code> 後加入 <code>setTimeout(() =&gt; btn.focus(), 50)</code>。50ms 延遲讓動畫開始後再移動焦點，避免焦點移動中斷 CSS transition。符合 WAI-ARIA 1.1 的 Disclosure Pattern：觸發按鈕關閉後應聚焦於自身。<br><br>
+          <strong>syncHeaderHeight 防抖</strong>：原版直接 <code>window.addEventListener('resize', syncHeaderHeight)</code>，在拖動瀏覽器視窗大小時每個 mousemove 都觸發 offsetHeight 讀取（強制 reflow）。改為 150ms debounce，連續 resize 事件只在 150ms 靜止後執行一次，降低 layout thrashing。<br><br>
+          <strong>預設場景觸覺反饋</strong>：<code>applyPreset()</code> 頭部加 <code>if (navigator.vibrate) navigator.vibrate(12)</code>。12ms 為輕觸確認，與 IEC 閾值穿越的雙/三重震動（25–70ms）形成清晰差異，建立觸覺回饋層次。
         </div>
       </div>
 
@@ -1075,6 +1085,16 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 40 — 焦點管理 + Resize 防抖 + 預設場景觸覺反饋 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html</div>
+      <ul>
+        <li><strong>焦點返回管理（ARIA 合規）</strong>：ESC 關閉面板後執行 <code>toggleEl.focus()</code>（50ms setTimeout 等動畫完成）；backdrop 點擊關閉後執行 <code>btn.focus()</code>。螢幕閱讀器使用者現在能清楚感知面板已關閉（焦點回到觸發按鈕）</li>
+        <li><strong>syncHeaderHeight resize 防抖</strong>：原本 resize 事件每次都讀取 <code>offsetHeight</code>（強制 reflow），在拖曳視窗大小時每幀觸發多次。改為 <code>clearTimeout</code> + <code>setTimeout(fn, 150)</code> 防抖，resize 停止 150ms 後才執行一次測量</li>
+        <li><strong>預設場景觸覺反饋</strong>：<code>applyPreset()</code> 最前面加入 <code>navigator.vibrate(12)</code>，按下任意預設場景按鈕時在 Android Chrome 上觸發 12ms 輕觸確認震動，與 IEC 閾值震動（25–70ms 重型）形成明確差異</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 39 — Web Share API 原生分享（手機）<span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html</div>
       <ul>
@@ -1304,6 +1324,9 @@
         <li>✅ <strong>Phase 37</strong>：overscroll-behavior:none 雙軸（防止 iOS 橫向 rubber-band 彈跳）</li>
         <li>✅ <strong>Phase 38</strong>：面板 Backdrop 遮罩（點外關閉，z-index 88/89/90 層次，fadeIn 動畫）</li>
         <li>✅ <strong>Phase 39</strong>：Web Share API（手機原生分享表單，桌機降級為剪貼簿複製）</li>
+        <li>✅ <strong>Phase 40</strong>：ESC/backdrop 關閉後焦點返回 toggle 按鈕（WAI-ARIA Disclosure Pattern）</li>
+        <li>✅ <strong>Phase 40</strong>：syncHeaderHeight resize 150ms 防抖（減少強制 reflow 次數）</li>
+        <li>✅ <strong>Phase 40</strong>：預設場景套用觸覺反饋 12ms（與 IEC 閾值震動型態區分）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
