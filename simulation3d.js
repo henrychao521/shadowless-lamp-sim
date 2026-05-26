@@ -702,6 +702,20 @@ function hslToRgb(h, s, l) {
     return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 }
 
+// 隱藏 3D 載入提示（第一幀渲染後）
+let _loadingDismissed = false;
+function dismissLoading() {
+    if (_loadingDismissed) return;
+    _loadingDismissed = true;
+    const overlay = document.getElementById('canvas3d-loading');
+    if (!overlay) return;
+    overlay.classList.add('hidden');
+    // opacity 過渡結束後移除 DOM 節點（不再佔用渲染層）
+    overlay.addEventListener('transitionend', function() {
+        overlay.remove();
+    }, { once: true });
+}
+
 // Animation Loop
 function animate() {
     requestAnimationFrame(animate);
@@ -735,6 +749,7 @@ function animate() {
 
     if (document.getElementById('view-3d').classList.contains('active')) {
         composer.render();
+        dismissLoading();  // 第一次成功渲染後隱藏載入提示
     }
 }
 
