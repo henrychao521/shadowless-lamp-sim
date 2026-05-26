@@ -1230,6 +1230,25 @@ input[type="range"]:focus-visible {
     /* 浮動指標條：手機版才顯示 */
     .mobile-metric-bar { display: flex; }
 
+    /* ── 滑桿標尺中間標籤（手機上太擠，隱藏節省空間）── */
+    .range-labels span:nth-child(2) {
+        display: none;
+    }
+
+    /* ── 控制面板內捲動（手機版高度上限 57vh，不讓面板把視覺化區推太遠）── */
+    /* max-height 和 overflow-y 由 JS 動態設定（openPanel / applyMode），
+       此處的 scrollbar 樣式為補充 */
+    .controls-panel.open::-webkit-scrollbar {
+        width: 4px;
+    }
+    .controls-panel.open::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .controls-panel.open::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 2px;
+    }
+
     /* ── WCAG 2.5.5：最小觸控目標 44×44px ── */
     /* preset-btn、demo-btn、share-btn 手機版加高至 44px */
     .preset-btn {

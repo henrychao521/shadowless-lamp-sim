@@ -121,6 +121,7 @@
         <tr><td>IEC 閾值觸覺反饋</td><td><span class="badge badge-green">✅ Phase 30</span></td><td>IEC 閾值（50%）穿越時觸發差異化震動型態（達標雙振 / 跌破重短重）</td></tr>
         <tr><td>觸控延遲消除</td><td><span class="badge badge-green">✅ Phase 31</span></td><td>touch-action:manipulation 消除按鈕 300ms 延遲，44px 最小觸控目標（WCAG 2.5.5）</td></tr>
         <tr><td>Sticky 控制面板按鈕</td><td><span class="badge badge-green">✅ Phase 32</span></td><td>面板折疊按鈕 position:sticky，捲動時永遠貼在 header 下方，按鈕顯示即時照度值</td></tr>
+        <tr><td>面板高度限制 + 捲動</td><td><span class="badge badge-green">✅ Phase 33</span></td><td>手機版面板上限 57vh 可內部捲動，視覺化區域不再被推至螢幕外；中間標尺標籤隱藏</td></tr>
       </tbody>
     </table>
   </section>
@@ -570,6 +571,17 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 33 面板高度限制 + 捲動隔離）</div>
+        <div class="content">
+          觀察到手機版控制面板展開後高度 ~970px，在 667px 手機上把視覺化區域推到 300px 以下，使用者每次調整參數後都要大幅捲動才能看到光路圖。<br><br>
+          <strong>修改 openPanel()</strong>：加入 <code>mobileCap()</code> = <code>Math.floor(window.innerHeight * 0.57)</code>。動畫目標改為 <code>Math.min(scrollHeight, cap)</code>，動畫結束後設定 <code>overflowY = 'auto'</code>，讓面板可獨立捲動（搭配 Phase 31 的 <code>overscroll-behavior:contain</code>，不會傳導至頁面）。<br>
+          <strong>修改 closePanel()</strong>：用 <code>panel.offsetHeight</code>（當前可見高度）取代 <code>scrollHeight</code> 作為動畫起始點，避免在 overflow:auto 下 scrollHeight 包含不可見高度導致動畫起跳值過大。<br>
+          <strong>修改 applyMode()</strong>：resize 事件（手機旋轉）重新計算 cap，確保橫向模式下 cap 正確更新。<br>
+          <strong>標尺清理</strong>：@media 768px 隱藏 <code>.range-labels span:nth-child(2)</code>（中間說明標籤），只留左右最小/最大值，減少視覺雜訊。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 32 Sticky 控制面板按鈕）</div>
         <div class="content">
           觀察到手機使用者捲動到 3D Canvas 或照度圖後，面板折疊按鈕滾出視窗，無法在不捲回頂部的情況下開關控制面板或查看當前照度。<br><br>
@@ -997,6 +1009,21 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 33 — 面板高度限制 + 內部捲動 + 標尺清理 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>問題</strong>：控制面板展開後高度約 970px（含 8 個控制群組），在 667px 手機上會把視覺化區域推到 300px+ 以下折疊處</li>
+        <li><strong>openPanel() 修改</strong>：計算 <code>mobileCap = Math.floor(window.innerHeight * 0.57)</code>，面板動畫目標高度改為 <code>Math.min(scrollHeight, cap)</code></li>
+        <li>動畫結束後：手機版保持 <code>panel.style.maxHeight = cap + 'px'; overflowY = 'auto'</code>，讓使用者在面板內獨立捲動</li>
+        <li>桌機版：仍設定 <code>maxHeight = 'none'</code>，不受限制</li>
+        <li><strong>closePanel() 修改</strong>：先清除 overflowY，再用 <code>panel.offsetHeight</code>（可見高度）而非 scrollHeight 作為關閉動畫的起始值，確保動畫起點正確</li>
+        <li><strong>applyMode() 修改</strong>：視窗旋轉時重新計算 cap 並更新 maxHeight，適應橫向/縱向切換</li>
+        <li><strong>細滾輪樣式</strong>：<code>::-webkit-scrollbar</code> 寬度 4px，透明軌道，符合深色主題</li>
+        <li><strong>範圍標尺中間標籤隱藏</strong>：@media (max-width:768px) 下 <code>.range-labels span:nth-child(2) { display: none }</code>，移除過長的中間說明（如「10.5cm (IEC標準頭部)」），兩端標籤保留</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 32 — Sticky 控制面板按鈕 + 即時照度指示 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css + simulation.js</div>
       <ul>
@@ -1109,6 +1136,9 @@
         <li>✅ <strong>Phase 31</strong>：overscroll-behavior-y:contain 控制面板（防止捲動傳導至頁面）</li>
         <li>✅ <strong>Phase 32</strong>：Sticky 面板折疊按鈕（position:sticky + --header-height CSS 變數，捲動時永遠可見）</li>
         <li>✅ <strong>Phase 32</strong>：按鈕即時照度指示（toggle-metric badge，顯示 XX% ✅/❌）</li>
+        <li>✅ <strong>Phase 33</strong>：手機版面板高度限制 57vh + 內部 overflow-y:auto（視覺化區不再被推太遠）</li>
+        <li>✅ <strong>Phase 33</strong>：closePanel 用 offsetHeight 取代 scrollHeight（修正 overflow:auto 下動畫起點問題）</li>
+        <li>✅ <strong>Phase 33</strong>：.range-labels 中間標籤手機版隱藏（減少控制群組視覺雜訊）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
