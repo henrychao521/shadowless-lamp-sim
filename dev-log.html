@@ -125,6 +125,7 @@
         <tr><td>rAF 防抖渲染</td><td><span class="badge badge-green">✅ Phase 34</span></td><td>slider input 事件將 Canvas + Chart.js 渲染延至 rAF，同幀內多次輸入合併為單次繪製</td></tr>
         <tr><td>ARIA Tab 模式 + 懶載入 3D</td><td><span class="badge badge-green">✅ Phase 35</span></td><td>正確 role="tablist/tab/tabpanel" + 首次點擊 3D tab 才動態 import() Three.js bundle</td></tr>
         <tr><td>Service Worker 離線快取</td><td><span class="badge badge-green">✅ Phase 36</span></td><td>sw.js 快取本地資產（cache-first），重複訪問秒開，2D 模擬完全離線可用</td></tr>
+        <tr><td>深色模式系統整合 + ESC + Slider Active</td><td><span class="badge badge-green">✅ Phase 37</span></td><td>color-scheme:dark + ESC 關閉面板 + 滑桿 :active 放大 + overscroll-behavior:none 兩軸</td></tr>
       </tbody>
     </table>
   </section>
@@ -570,6 +571,27 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 37 color-scheme + ESC + Slider Active）</div>
+        <div class="content">
+          新 Session 啟動，先完成 Phase 36 的未提交 commit（sw.js + index.html SW 注冊 + deploy.yml），push 到 main，然後進入 Phase 37。<br><br>
+          <strong>color-scheme: dark</strong>：CSS <code>:root</code> 加入 <code>color-scheme: dark</code>，HTML <code>&lt;head&gt;</code> 加入 <code>&lt;meta name="color-scheme" content="dark"&gt;</code>。效果：瀏覽器原生 UI（捲軸、系統表單控制項等）自動套用深色主題；iOS Safari 狀態列背景更準確反映應用主題；部分瀏覽器可省略背景色推斷計算。<br><br>
+          <strong>ESC 關閉手機面板</strong>：在 keydown 處理函式最前面（INPUT 標籤攔截之前）加入 ESC 特殊處理：<code>if (e.key === 'Escape' &amp;&amp; window.innerWidth &lt;= 768)</code> 時若面板為 open 狀態就觸發 toggle.click() 關閉。即使使用者焦點在 range input 上（正在拖曳滑桿），也能即時關閉面板。同步更新鍵盤說明 Toast，新增 Esc 快捷鍵說明。<br><br>
+          <strong>滑桿 :active 觸控視覺反饋</strong>：新增 <code>::-webkit-slider-thumb:active</code> 和 <code>::-moz-range-thumb:active</code> CSS 規則：scale(1.4) + 6px 半透明光暈（rgba(14,165,233,0.22)）。在手機觸控拖曳滑桿時，拇指滑塊明顯放大，提供清晰的"正在操作中"視覺確認。<br><br>
+          <strong>overscroll-behavior 兩軸防護</strong>：將 body 的 <code>overscroll-behavior-y: none</code> 改為 <code>overscroll-behavior: none</code>，同時鎖定 X 軸，防止 iOS Safari 橫向橡皮筋彈跳（可能在某些觸控姿勢下意外觸發）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 36 Service Worker 離線快取）</div>
+        <div class="content">
+          <strong>sw.js 新增</strong>：完整 Service Worker，實作 Install / Activate / Fetch 三個生命週期。快取策略為 Cache-First + 背景 stale-while-revalidate：快取命中時立即回傳（離線/弱網秒開），背景異步更新到最新版本；快取未命中時網路取得並存入快取；完全離線時回傳快取的 index.html。<br><br>
+          CDN 資源（Three.js / Chart.js / Google Fonts 等非同源請求）完全繞過 SW，交由瀏覽器正常快取策略處理，避免跨域快取問題。僅攔截同源 GET 請求。<br><br>
+          <strong>index.html 更新</strong>：在 window.load 事件後執行 <code>navigator.serviceWorker.register('/shadowless-lamp-sim/sw.js', { scope: '/shadowless-lamp-sim/' })</code>，失敗時（HTTP 環境、私密模式）靜默降級，不影響功能。<br>
+          <strong>deploy.yml 更新</strong>：sw.js 加入三個部署步驟（cp 到 /tmp/site、cp 到 gh-pages、git add）。
         </div>
       </div>
 
@@ -1031,6 +1053,18 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 37 — 深色模式系統整合 + ESC 關閉面板 + 滑桿 :active 反饋 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.css + index.html</div>
+      <ul>
+        <li><strong>color-scheme: dark</strong>：CSS <code>:root { color-scheme: dark }</code> + <code>&lt;meta name="color-scheme" content="dark"&gt;</code>，讓瀏覽器系統 UI（捲軸、表單控制項、日期選擇器等）自動渲染為深色，無需手動覆寫</li>
+        <li><strong>ESC 關閉面板</strong>：keydown 監聽器在 INPUT/TEXTAREA 攔截前先處理 Escape，手機版面板展開時按 ESC 自動收合（即使焦點在滑桿上亦有效）</li>
+        <li>鍵盤說明 Toast 新增 Esc 快捷鍵提示</li>
+        <li><strong>滑桿 :active 放大</strong>：<code>::-webkit-slider-thumb:active</code> 和 <code>::-moz-range-thumb:active</code> 在拖曳時 scale(1.4) + 6px 半透明光暈，強化觸控拖曳的即時視覺反饋</li>
+        <li><strong>overscroll-behavior: none（兩軸）</strong>：將 body 的 <code>overscroll-behavior-y: none</code> 改為 <code>overscroll-behavior: none</code>，同時防止橫向 iOS rubber-band 彈跳（雙軸防護）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 36 — Service Worker 離線快取（PWA 完整化）<span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · sw.js 新增 + index.html + deploy.yml</div>
       <ul>
@@ -1211,6 +1245,11 @@
         <li>✅ <strong>Phase 34</strong>：rAF 防抖渲染（scheduleSimulation — 同幀多次 input 合併為單次繪製，行動 60fps）</li>
         <li>✅ <strong>Phase 35</strong>：ARIA tab 模式（role=tablist/tab/tabpanel + aria-selected + aria-controls，螢幕閱讀器相容）</li>
         <li>✅ <strong>Phase 35</strong>：懶載入 3D 模組（switchView → dynamic import()，首次訪問不下載 Three.js ~600KB）</li>
+        <li>✅ <strong>Phase 36</strong>：Service Worker 離線快取（cache-first + stale-while-revalidate，2D 完全離線可用）</li>
+        <li>✅ <strong>Phase 37</strong>：color-scheme:dark（系統 UI 深色主題整合，捲軸/表單自動深色）</li>
+        <li>✅ <strong>Phase 37</strong>：ESC 關閉手機面板（keydown 最前攔截，INPUT 焦點下也生效）</li>
+        <li>✅ <strong>Phase 37</strong>：滑桿 :active scale(1.4) + 光暈（觸控拖曳時視覺放大反饋）</li>
+        <li>✅ <strong>Phase 37</strong>：overscroll-behavior:none 雙軸（防止 iOS 橫向 rubber-band 彈跳）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>

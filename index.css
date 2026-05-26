@@ -1,4 +1,5 @@
 :root {
+    color-scheme: dark; /* 告知瀏覽器本站為深色，系統滾動條、表單控制項自動套用深色主題 */
     --bg-main: #0b1120;
     --bg-panel: rgba(15, 23, 42, 0.75);
     --bg-card: rgba(30, 41, 59, 0.6);
@@ -46,8 +47,8 @@ body {
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
-    /* Prevent iOS rubber-band over-scroll on main page background */
-    overscroll-behavior-y: none;
+    /* Prevent iOS/Android rubber-band over-scroll on both axes */
+    overscroll-behavior: none;
     background-image:
         radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.05), transparent 25%),
         radial-gradient(circle at 85% 30%, rgba(20, 184, 166, 0.05), transparent 25%);
@@ -309,6 +310,18 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(1.2);
     background: var(--accent-blue-hover);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+    transform: scale(1.4);
+    background: var(--accent-blue-hover);
+    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0.22);
+}
+
+input[type="range"]::-moz-range-thumb:active {
+    transform: scale(1.4);
+    background: var(--accent-blue-hover);
+    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0.22);
 }
 
 .range-labels {

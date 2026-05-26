@@ -16,6 +16,7 @@
     <meta name="twitter:title" content="外科手術無影燈光學模擬器">
     <meta name="twitter:description" content="互動式 3D 模擬：Ray-Tracing × PBR 渲染 × IEC 60601-2-41">
     <meta name="theme-color" content="#0b1120">
+    <meta name="color-scheme" content="dark">
     <!-- Favicon + PWA manifest -->
     <link rel="icon" type="image/svg+xml" href="icon.svg">
     <link rel="apple-touch-icon" href="icon.svg">
@@ -437,6 +438,16 @@
         if (keyBtn) { keyBtn.addEventListener('click', showKeyHelp); }
 
         document.addEventListener('keydown', function(e) {
+            // Escape：關閉手機版面板（即使焦點在滑桿等 input 內也生效）
+            if (e.key === 'Escape' && window.innerWidth <= 768) {
+                var panelBodyEl = document.getElementById('controls-panel-body');
+                if (panelBodyEl && panelBodyEl.classList.contains('open')) {
+                    var toggleEl = document.getElementById('panel-toggle-btn');
+                    if (toggleEl) { toggleEl.click(); }
+                    e.preventDefault();
+                }
+                return;
+            }
             // 忽略輸入框中的按鍵
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -488,7 +499,8 @@
                 '<span style="color:#0ea5e9;font-family:monospace">3</span> 少燈對比 &nbsp;' +
                 '<span style="color:#0ea5e9;font-family:monospace">4</span> 嚴苛遮擋<br>' +
                 '<span style="color:#0ea5e9;font-family:monospace">F</span> 全螢幕 &nbsp;' +
-                '<span style="color:#0ea5e9;font-family:monospace">P</span> 開關面板（手機）&nbsp;' +
+                '<span style="color:#0ea5e9;font-family:monospace">P</span> 開關面板 &nbsp;' +
+                '<span style="color:#0ea5e9;font-family:monospace">Esc</span> 關閉面板 &nbsp;' +
                 '<span style="color:#0ea5e9;font-family:monospace">?</span> 關閉此提示</div>';
             document.body.appendChild(toast);
             toast.classList.add('visible');
