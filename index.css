@@ -27,6 +27,11 @@
     padding: 0;
 }
 
+/* ── scroll-padding-top：錨點導航 / scrollIntoView 自動避開 sticky header ── */
+html {
+    scroll-padding-top: calc(var(--header-height, 60px) + 0.75rem);
+}
+
 /* ── 觸控優化：消除 300ms tap delay，不阻止頁面縮放 ── */
 button,
 input[type="range"],
@@ -353,7 +358,7 @@ input[type="range"]::-moz-range-thumb:active {
 }
 
 .info-card p {
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: var(--text-secondary);
 }
 

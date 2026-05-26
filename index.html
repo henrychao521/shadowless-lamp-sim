@@ -798,8 +798,12 @@
 
         function isMobile() { return window.innerWidth <= 768; }
 
-        // 手機版：面板高度上限 = 57vh（避免面板過高把視覺化區域推到螢幕外）
-        function mobileCap() { return Math.floor(window.innerHeight * 0.57); }
+        // 手機版：面板高度上限
+        // 橫向（landscape）時螢幕高度更短，提高比例至 78% 避免面板過於矮小
+        function mobileCap() {
+            var isLandscape = window.innerWidth > window.innerHeight;
+            return Math.floor(window.innerHeight * (isLandscape ? 0.78 : 0.57));
+        }
 
         // 使用 scrollHeight 測量實際高度，避免 max-height:9999px 造成的「瞬彈」
         function openPanel() {
