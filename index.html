@@ -396,6 +396,21 @@
         })();
     </script>
     <script>
+    // ── Service Worker 註冊（PWA 離線快取）──
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/shadowless-lamp-sim/sw.js', {
+                scope: '/shadowless-lamp-sim/'
+            }).then(function(reg) {
+                // SW 已成功註冊
+            }).catch(function(e) {
+                // 如果 SW 無法使用（HTTP 環境、私密模式等），靜默降級
+                console.info('[sls] Service Worker not available:', e.message);
+            });
+        });
+    }
+    </script>
+    <script>
     // ── 動態量測 header 高度（供 panel-toggle sticky top 使用）──
     (function() {
         function syncHeaderHeight() {
