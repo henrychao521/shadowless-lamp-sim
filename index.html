@@ -88,8 +88,8 @@
                 <div class="range-labels"><span>20cm</span><span>50cm</span><span>90cm</span></div>
             </div>
 
-            <div class="control-group">
-                <label for="obstacle_z">遮擋物前後深度 (Z: <span id="val_obstacle_z">0</span> cm) <small>[僅限 3D]</small></label>
+            <div class="control-group control-3d-only" id="control-group-z">
+                <label for="obstacle_z">遮擋物前後深度 (Z: <span id="val_obstacle_z">0</span> cm) <span class="tag-3d">僅限 3D</span></label>
                 <input type="range" id="obstacle_z" min="-30" max="30" step="1" value="0">
                 <div class="range-labels"><span>-30cm</span><span>0cm</span><span>+30cm</span></div>
             </div>
@@ -100,10 +100,10 @@
                 <div class="range-labels"><span>2cm</span><span>10.5cm (IEC標準頭部)</span><span>25cm</span></div>
             </div>
 
-            <div class="control-group" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+            <div class="control-group control-3d-only" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
                 <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--accent-teal); font-weight: 600;">
                     <input type="checkbox" id="realistic_mode" style="width: 18px; height: 18px; cursor: pointer;">
-                    切換 3D 真實手術環境模式
+                    切換 3D 真實手術環境模式 <span class="tag-3d">3D</span>
                 </label>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">開啟後將顯示 Low-Poly 手術檯、實體模型與真實陰影效果，並隱藏抽象幾何光束。</p>
             </div>
@@ -334,6 +334,13 @@
             }
             document.getElementById('view-' + viewName).classList.add('active');
 
+            // 3D-only 控制項：切換到 3D 時清晰顯示，2D 時淡化提示
+            var panel = document.getElementById('controls-panel-body');
+            if (panel) {
+                if (viewName === '3d') { panel.classList.add('panel-3d-active'); }
+                else                  { panel.classList.remove('panel-3d-active'); }
+            }
+
             // Trigger resize event to fix canvas rendering sizes
             window.dispatchEvent(new Event('resize'));
 
@@ -355,11 +362,12 @@
         (function() {
             try {
                 var pref = localStorage.getItem('sls_preferredTab');
-                if (pref === '3d') {
-                    // 找到 3D tab 按鈕並切換
-                    var btn3d = document.querySelector('.tab-btn:nth-child(2)');
-                    if (btn3d) switchView('3d', btn3d);
+                var btn3d = document.querySelector('.tab-btn:nth-child(2)');
+                if (pref === '3d' && btn3d) {
+                    switchView('3d', btn3d);
                 }
+                // 初始化：確保 2D 模式下 3D-only 控制項已淡化
+                // (switchView 已在 2D 預設時呼叫，但此處確保 panel class 正確)
             } catch(e) {}
         })();
     </script>

@@ -115,6 +115,7 @@
         <tr><td>掃描演示動畫</td><td><span class="badge badge-green">✅ Phase 25</span></td><td>🎬 一鍵 6s 遮擋掃描動畫（rAF + easeInOut），光路即時更新</td></tr>
         <tr><td>iOS 適配</td><td><span class="badge badge-green">✅ Phase 26</span></td><td>viewport-fit=cover + Safe Area inset，捲動提示箭頭</td></tr>
         <tr><td>鍵盤無障礙</td><td><span class="badge badge-green">✅ Phase 27</span></td><td>Skip to content + :focus-visible 覆蓋，符合 WCAG 2.1 AA</td></tr>
+        <tr><td>控制項情境感知</td><td><span class="badge badge-green">✅ Phase 28</span></td><td>3D-only 控制項切換 2D tab 時自動淡化，避免使用者困惑</td></tr>
       </tbody>
     </table>
   </section>
@@ -564,6 +565,16 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 28 3D-Only 控制項智慧淡化）</div>
+        <div class="content">
+          觀察到 obstacle_z 和 realistic_mode 等控制項在 2D tab 下其實無效，但 UI 沒有任何提示，容易讓使用者困惑（移動 Z 軸滑桿但 2D 畫面沒有反應）。<br><br>
+          解決方案：<code>.control-3d-only</code> class 標記 3D 專屬控制項。switchView() 在切換 tab 時為 controls-panel 加入/移除 <code>.panel-3d-active</code>。<br>
+          CSS：<code>.controls-panel:not(.panel-3d-active) .control-3d-only</code> → <code>opacity: 0.45; pointer-events: none</code>（淡化 + 禁用交互）；切換回 3D 時 <code>opacity: 1; pointer-events: auto</code>（0.3s 過渡）。<br>
+          同時將 "[僅限 3D]" 的 &lt;small&gt; 標籤替換為 <code>.tag-3d</code> 徽章（teal 邊框），視覺更清晰。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 27 鍵盤無障礙）</div>
         <div class="content">
           <strong>Skip to content link</strong>：在 &lt;body&gt; 第一個元素加入 <code>&lt;a href="#controls-panel-body" class="skip-link"&gt;跳至主內容&lt;/a&gt;</code>。平時透過 <code>top: -100%</code> 完全隱藏，鍵盤使用者按 Tab 第一個停留點時 <code>:focus</code> 使其滑入畫面（top:0）。<br><br>
@@ -783,6 +794,19 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 28 — 3D-Only 控制項情境感知淡化 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>問題</strong>：obstacle_z、realistic_mode 在 2D tab 下移動滑桿但畫面無反應，使用者困惑</li>
+        <li><code>.control-3d-only</code> class 標記 3D 專屬控制群組</li>
+        <li>switchView() 動態加入/移除 <code>.panel-3d-active</code> class</li>
+        <li>2D 模式：<code>opacity: 0.45; pointer-events: none</code>（0.3s 過渡）</li>
+        <li>3D 模式：<code>opacity: 1; pointer-events: auto</code>（完全可用）</li>
+        <li><code>.tag-3d</code> teal 徽章取代 &lt;small&gt;[僅限 3D]&lt;/small&gt;，視覺更醒目</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 27 — 鍵盤無障礙（Skip Link + Focus Ring）<span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css</div>
       <ul>
@@ -965,6 +989,7 @@
         <li>✅ <strong>Phase 26</strong>：2D canvas 底部捲動提示「↓ 照度分佈圖」（首次手機訪問 2.5s 顯示）</li>
         <li>✅ <strong>Phase 27</strong>：Skip to content link（鍵盤使用者 Tab 跳過 header）</li>
         <li>✅ <strong>Phase 27</strong>：:focus-visible 全局覆蓋（深色背景可見的 2px 藍色焦點環）</li>
+        <li>✅ <strong>Phase 28</strong>：3D-only 控制項在 2D tab 下淡化（opacity 0.45 + pointer-events:none）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>

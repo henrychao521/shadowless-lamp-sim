@@ -677,6 +677,33 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-muted);
 }
 
+/* ── 3D-Only 控制項標籤與淡化提示 ── */
+.tag-3d {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    background: rgba(20, 184, 166, 0.15);
+    border: 1px solid rgba(20, 184, 166, 0.4);
+    color: var(--accent-teal);
+    letter-spacing: 0.03em;
+    vertical-align: middle;
+    margin-left: 0.3rem;
+}
+/* 2D 模式下淡化 3D-only 控制項 */
+.controls-panel:not(.panel-3d-active) .control-3d-only {
+    opacity: 0.45;
+    pointer-events: none;
+    /* 允許視覺上清楚這些控制項在 2D 模式不適用 */
+    transition: opacity 0.3s ease;
+}
+.controls-panel.panel-3d-active .control-3d-only {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 0.3s ease;
+}
+
 /* ── Skip to content link（鍵盤 / 螢幕閱讀器）── */
 .skip-link {
     position: absolute;
