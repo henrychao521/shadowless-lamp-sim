@@ -554,6 +554,13 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 16 CDN 切換）</div>
+        <div class="content">
+          Three.js import map 從 <code>unpkg.com</code> 換成 <code>cdn.jsdelivr.net</code>。unpkg 在台灣有時需要 500ms+ 才能取得模組；jsDelivr 使用 Cloudflare + Fastly，亞太地區 CDN PoP 較多，Three.js 模組載入通常可降至 80–200ms。相同的 three@0.160.0 版本與 API。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 15 ResizeObserver）</div>
         <div class="content">
           simulation3d.js 中將 <code>window.addEventListener('resize')</code> 替換為 <code>new ResizeObserver(handleCanvasResize).observe(container)</code>。ResizeObserver 直接監聽 #canvas3d DOM 節點，能正確偵測面板開合、sidebar 大小變化等非 window 的容器尺寸改變，確保 Three.js renderer 始終正確填充容器。
@@ -688,6 +695,7 @@
         <li>✅ <strong>Phase 14</strong>：IEC 60601 50% 閾值線加入圖表（紅色虛線，可視化是否達標）</li>
         <li>✅ <strong>Phase 14</strong>：標題列「✨ 真實模式」badge（勾選後淡入，與模式狀態同步）</li>
         <li>✅ <strong>Phase 15</strong>：ResizeObserver 取代 window.resize（精確偵測 canvas 容器大小變化）</li>
+        <li>✅ <strong>Phase 16</strong>：Three.js CDN 從 unpkg → jsDelivr（台灣/亞洲 CDN 覆蓋更佳，載入更快）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
         <li>⬜ 醫生手套可拖曳遮擋物</li>
         <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>
