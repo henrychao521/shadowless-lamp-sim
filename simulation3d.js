@@ -7,6 +7,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 // simulation3d.js
 // 3D 空間無影燈物理模擬 - 基於 Three.js
@@ -28,8 +29,15 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
+renderer.toneMappingExposure = 1.1;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 container.appendChild(renderer.domElement);
+
+// IBL Environment - procedural operating-room-ish lighting probe
+// Provides specular reflections on stainless steel, drape sheen, skin diffuse
+const pmremGenerator = new THREE.PMREMGenerator(renderer);
+const environmentTexture = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+// We assign this only when realistic mode is active (set in updateSimulation3D)
 
 // Controls
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -38,20 +46,23 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.05;
 
 // Post-Processing
+// Order: Render -> SSAO (needs clean depth/normal) -> Bloom (after AO darkens crevices) -> Output
 const composer = new EffectComposer(renderer);
 const renderPass = new RenderPass(scene, camera);
 composer.addPass(renderPass);
-const bloomPass = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 1.5, 0.4, 0.85);
-bloomPass.threshold = 0.8; // Only very bright (emissive) objects will bloom
-bloomPass.strength = 1.0;
-bloomPass.radius = 0.5;
-composer.addPass(bloomPass);
 
 const ssaoPass = new SSAOPass(scene, camera, container.clientWidth, container.clientHeight);
 ssaoPass.kernelRadius = 16;
 ssaoPass.minDistance = 0.005;
 ssaoPass.maxDistance = 0.1;
 composer.addPass(ssaoPass);
+
+// Softer bloom: lower strength so the lamp glows like a precision instrument, not a sun
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(container.clientWidth, container.clientHeight), 0.4, 0.8, 0.9);
+bloomPass.threshold = 0.9;
+bloomPass.strength = 0.4;
+bloomPass.radius = 0.8;
+composer.addPass(bloomPass);
 
 const outputPass = new OutputPass();
 composer.addPass(outputPass);
@@ -114,7 +125,15 @@ const obstacleGeo = new THREE.SphereGeometry(1, 32, 32);
 // 預設為數學網格
 const obstacleMatWireframe = new THREE.MeshBasicMaterial({ color: 0x475569, wireframe: true, transparent: true, opacity: 0.6 });
 // 真實模式的實體材質
-const obstacleMatSolid = new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.7 });
+// Doctor head/cap: dark surgical cap fabric
+const obstacleMatSolid = new THREE.MeshPhysicalMaterial({
+    color: 0x1e40af,
+    roughness: 0.85,
+    metalness: 0.0,
+    sheen: 0.6,
+    sheenColor: new THREE.Color(0x60a5fa),
+    sheenRoughness: 0.9
+});
 const obstacle = new THREE.Mesh(obstacleGeo, obstacleMatWireframe);
 obstacle.castShadow = true;
 obstacle.receiveShadow = true;
@@ -126,23 +145,62 @@ const realisticGroup = new THREE.Group();
 realisticGroup.visible = false;
 scene.add(realisticGroup);
 
-// Environment Ambient Light (Increased for better shadow dilution)
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+// Hemisphere fill: cool blue from ceiling (OR lights) + warm bounce from floor/drape
+// Replaces the flat AmbientLight which was washing out shadows
+const hemiLight = new THREE.HemisphereLight(0xb6cdf0, 0x4a3a30, 0.45);
+realisticGroup.add(hemiLight);
+
+// Small ambient floor to lift deep shadows without killing contrast
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.15);
 realisticGroup.add(ambientLight);
 
-// Solid Floor (Receives shadow) - Medical Tile Floor
+// Solid Floor (Receives shadow) - Polished medical vinyl with clearcoat
 const floorGeo = new THREE.PlaneGeometry(300, 300);
 floorGeo.rotateX(-Math.PI / 2);
-const floorMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.2, metalness: 0.1 });
+const floorMat = new THREE.MeshPhysicalMaterial({
+    color: 0x9fb0c0,
+    roughness: 0.35,
+    metalness: 0.0,
+    clearcoat: 0.8,
+    clearcoatRoughness: 0.3,
+    envMapIntensity: 0.6
+});
 const floor = new THREE.Mesh(floorGeo, floorMat);
 floor.position.y = -60; // Lower floor so table is around Y=0
 floor.receiveShadow = true;
 realisticGroup.add(floor);
 
+// Operating Room walls + ceiling - gives SSAO surfaces to work with and prevents void background
+const roomMat = new THREE.MeshStandardMaterial({
+    color: 0xcbd5e1,
+    roughness: 0.85,
+    metalness: 0.0,
+    side: THREE.BackSide
+});
+const roomGeo = new THREE.BoxGeometry(300, 280, 300);
+const room = new THREE.Mesh(roomGeo, roomMat);
+room.position.y = 80; // bottom of box sits at -60 (matching floor), top at 220
+room.receiveShadow = true;
+realisticGroup.add(room);
+
+// Soft cool overhead room light (separate from the surgical lamp)
+const overheadLight = new THREE.DirectionalLight(0xe0eaff, 0.35);
+overheadLight.position.set(20, 200, 30);
+overheadLight.target.position.set(0, 0, 0);
+realisticGroup.add(overheadLight);
+realisticGroup.add(overheadLight.target);
+
 // Operating Table (Stainless Steel Base + Mattress)
 const tableGroup = new THREE.Group();
 const tableBaseGeo = new THREE.BoxGeometry(20, 40, 40);
-const tableMetalMat = new THREE.MeshStandardMaterial({ color: 0x64748b, roughness: 0.3, metalness: 0.8 });
+const tableMetalMat = new THREE.MeshPhysicalMaterial({
+    color: 0x8a96a4,
+    roughness: 0.18,
+    metalness: 0.95,
+    clearcoat: 0.5,
+    clearcoatRoughness: 0.15,
+    envMapIntensity: 1.4
+});
 const tableBase = new THREE.Mesh(tableBaseGeo, tableMetalMat);
 tableBase.position.set(0, -40, 0);
 tableBase.castShadow = true;
@@ -159,23 +217,47 @@ realisticGroup.add(tableGroup);
 // Patient (Surgical Drape over body)
 const patientGroup = new THREE.Group();
 const drapeGeo = new THREE.BoxGeometry(36, 12, 100);
-const drapeMat = new THREE.MeshStandardMaterial({ color: 0x0f766e, roughness: 0.9 }); // Surgical Green
+// Surgical drape: cotton fabric with sheen for the fuzzy specular at grazing angles
+const drapeMat = new THREE.MeshPhysicalMaterial({
+    color: 0x0f766e,
+    roughness: 0.95,
+    sheen: 1.0,
+    sheenColor: new THREE.Color(0x2dd4bf),
+    sheenRoughness: 0.8
+});
 const patientDrape = new THREE.Mesh(drapeGeo, drapeMat);
 patientDrape.position.set(0, -10, -5); // Top of drape is around Y=-4
 patientDrape.castShadow = true;
 patientDrape.receiveShadow = true;
 patientGroup.add(patientDrape);
 
-// Surgical Wound (Visual focal point)
+// Surgical Wound (Visual focal point) - wet tissue: high specular via clearcoat
 const woundGeo = new THREE.CylinderGeometry(3, 3, 0.5, 32);
-const woundMat = new THREE.MeshStandardMaterial({ color: 0x991b1b, roughness: 0.8, metalness: 0.2 });
+const woundMat = new THREE.MeshPhysicalMaterial({
+    color: 0x7f1d1d,
+    roughness: 0.55,
+    metalness: 0.0,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.15,
+    sheen: 0.4,
+    sheenColor: new THREE.Color(0xff4444)
+});
 const wound = new THREE.Mesh(woundGeo, woundMat);
 wound.position.set(0, -3.8, 0); // slightly above the drape
 wound.receiveShadow = true;
 patientGroup.add(wound);
 
 const patientHeadGeo = new THREE.SphereGeometry(6, 32, 32);
-const skinMat = new THREE.MeshStandardMaterial({ color: 0xfcbda1, roughness: 0.6 });
+// Skin: approximated SSS via transmission + warm attenuation - cheap stand-in for true SSS
+const skinMat = new THREE.MeshPhysicalMaterial({
+    color: 0xfcbda1,
+    roughness: 0.55,
+    metalness: 0.0,
+    clearcoat: 0.25,
+    clearcoatRoughness: 0.6,
+    sheen: 0.3,
+    sheenColor: new THREE.Color(0xff8866)
+});
 const patientHead = new THREE.Mesh(patientHeadGeo, skinMat);
 patientHead.position.set(0, -8, 55); // Head at the top of the bed
 patientHead.castShadow = true;
@@ -185,7 +267,14 @@ realisticGroup.add(patientGroup);
 
 // Doctor Body (Torso and Shoulders attached to Obstacle visually)
 const doctorGroup = new THREE.Group();
-const scrubMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.9 }); // Blue Scrubs
+// Surgical scrubs: cotton fabric with sheen
+const scrubMat = new THREE.MeshPhysicalMaterial({
+    color: 0x0369a1,
+    roughness: 0.95,
+    sheen: 0.8,
+    sheenColor: new THREE.Color(0x60a5fa),
+    sheenRoughness: 0.85
+});
 const torsoGeo = new THREE.BoxGeometry(20, 24, 12);
 const torso = new THREE.Mesh(torsoGeo, scrubMat);
 torso.position.y = -18;
@@ -208,7 +297,15 @@ lampGroup.position.y = 100; // Exactly 1 meter focal length to the surgical site
 
 // Main Dome Housing (UFO shape matching 18"x3" specs)
 const housingGeo = new THREE.SphereGeometry(domeRadius, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2.5);
-const housingMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.4, metalness: 0.3, side: THREE.DoubleSide });
+const housingMat = new THREE.MeshPhysicalMaterial({
+    color: 0xe5e7eb,
+    roughness: 0.35,
+    metalness: 0.55,
+    clearcoat: 0.7,
+    clearcoatRoughness: 0.25,
+    envMapIntensity: 1.2,
+    side: THREE.DoubleSide
+});
 const housing = new THREE.Mesh(housingGeo, housingMat);
 housing.rotateX(Math.PI);
 housing.scale.set(1, 0.33, 1); // Compress height to exactly 3" (7.6 cm)
@@ -223,7 +320,17 @@ lampGroup.add(handle);
 
 // Emissive Lens Panel
 const lensGeo = new THREE.CylinderGeometry(domeRadius - 0.5, domeRadius - 0.5, 0.5, 32);
-const lensMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: lightColor, emissiveIntensity: 0.2, transparent: true, opacity: 0.6 });
+const lensMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    emissive: lightColor,
+    emissiveIntensity: 0.6,
+    roughness: 0.1,
+    metalness: 0.0,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    transparent: true,
+    opacity: 0.8
+});
 const lensPanel = new THREE.Mesh(lensGeo, lensMat);
 lensPanel.position.y = -2;
 lampGroup.add(lensPanel);
@@ -416,12 +523,14 @@ function updateSimulation3D(fullHeatmap = true) {
         realisticGroup.visible = true;
         obstacle.material = obstacleMatSolid;
         scene.background = new THREE.Color(0x020617); // Darker room
+        scene.environment = environmentTexture;
         if (uiElements3D.smartCompGroup) uiElements3D.smartCompGroup.style.display = 'block';
     } else {
         abstractGroup.visible = true;
         realisticGroup.visible = false;
         obstacle.material = obstacleMatWireframe;
         scene.background = new THREE.Color(0x0f172a);
+        scene.environment = null;
         if (uiElements3D.smartCompGroup) uiElements3D.smartCompGroup.style.display = 'none';
     }
     
