@@ -173,6 +173,20 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 8 — 複製連結按鈕 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>「📋 複製連結分享此設定」按鈕</strong>（index.html + index.css）：<br>
+          控制面板中段加入 <code>.share-row</code> 區塊，使用 Clipboard API（<code>navigator.clipboard.writeText</code>）複製目前完整 URL（含 hash）。
+          舊版 iOS Safari 使用 <code>document.execCommand('copy')</code> fallback（textarea trick）。
+          按下後顯示「✅ 已複製！」提示（opacity 過渡，2.2s 後消失）。
+          搭配 Phase 7 的 URL hash，教師可設定好特定遮擋場景，一鍵複製連結傳給學生。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 7 — URL 狀態分享 + 滑桿數值動畫 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
       <ul>
@@ -439,6 +453,17 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 8 複製連結按鈕）</div>
+        <div class="content">
+          確認 GitHub Actions 全部 ✅（Phase 7 workflow success，Pages build deploying）。<br>
+          加入 「📋 複製連結分享此設定」按鈕至控制面板。Clipboard API 優先，
+          失敗則執行 textarea execCommand fallback（iOS Safari 相容）。
+          按下後 .share-feedback 淡入「✅ 已複製！」，2.2s 後淡出。
+          搭配 Phase 7 URL hash：教師可調好遮擋參數後一鍵分享給全班學生。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 7 URL 狀態 + 數值動畫）</div>
         <div class="content">
           <strong>URL hash 分享</strong>：simulation.js 加入 encodeHash() 與 restoreFromHash()。每次 input 事件後 replaceState 更新 hash（短格式 h/ox/oy/or/n/s），頁面載入時自動還原。使用者可直接複製網址（例如：<code>…/#h=80&ox=15&oy=60&or=8&n=45&s=4</code>）分享特定遮擋場景給學生或同事。<br><br>
@@ -493,6 +518,7 @@
         <li>✅ <strong>Phase 6</strong>：切換至 3D tab 時自動捲動到畫面頂部（手機版）</li>
         <li>✅ <strong>Phase 7</strong>：URL hash 狀態編碼（分享特定模擬設定；使用 <code>replaceState</code> 不污染歷史）</li>
         <li>✅ <strong>Phase 7</strong>：滑桿數值閃光動畫（val-pulse keyframe，移動時白光提示更新）</li>
+        <li>✅ <strong>Phase 8</strong>：📋「複製連結分享此設定」按鈕（Clipboard API + iOS execCommand fallback）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
         <li>⬜ 醫生手套可拖曳遮擋物</li>
         <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>
