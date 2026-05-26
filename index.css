@@ -1148,6 +1148,12 @@ input[type="range"]:focus-visible {
         gap: 0.75rem;
     }
 
+    /* 手機版面板：隱藏 h2 標題和說明文字（toggle 按鈕已說明用途，節省約 65px 垂直空間）*/
+    .controls-panel h2,
+    .panel-desc {
+        display: none;
+    }
+
     /* 控制面板：預設收合，展開按鈕顯示，sticky 懸浮於 header 下方 */
     .panel-toggle {
         display: block;
