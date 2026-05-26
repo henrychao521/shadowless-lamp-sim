@@ -107,6 +107,7 @@
         <tr><td>GitHub Actions CI</td><td><span class="badge badge-green">✅ 正常</span></td><td>事故恢復後 workflow 成功執行</td></tr>
         <tr><td>PWA 可安裝</td><td><span class="badge badge-green">✅ Phase 17</span></td><td>manifest.json + icon.svg，Android/iOS 可加入主畫面</td></tr>
         <tr><td>手勢操作</td><td><span class="badge badge-green">✅ Phase 18</span></td><td>左右 Swipe 切換 2D/3D Tab；3D 全螢幕按鈕</td></tr>
+        <tr><td>教學預設場景</td><td><span class="badge badge-green">✅ Phase 19</span></td><td>4 個快速預設按鈕（IEC / 多燈 / 少燈 / 嚴苛），一鍵切換教學情境</td></tr>
       </tbody>
     </table>
   </section>
@@ -556,6 +557,19 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 19 快速預設場景按鈕）</div>
+        <div class="content">
+          考量教學情境，教師通常需要快速切換不同的示範場景（IEC 標準配置 vs. 多燈 vs. 少燈）。為此加入 <strong>快速場景按鈕列</strong>。<br><br>
+          四個預設定義（物件陣列形式）：<br>
+          • <code>📋 IEC標準</code>：100cm燈高、正中遮擋 X=0、Y=50、R=10.5、25顆LED、6°散射（IEC 60601-2-41 標準測試條件）<br>
+          • <code>💡 高效多燈</code>：61顆LED、4°散射、偏移遮擋 X=12 — 演示密集矩陣的最大無影效果<br>
+          • <code>🔦 少燈對比</code>：5顆LED、15°廣角 — 少燈廣角時陰影明顯，對比效果強<br>
+          • <code>⚠️ 嚴苛遮擋</code>：燈高80cm、偏移 X=18、Y=65、R=14（大型遮擋）— 壓力測試照度下降<br><br>
+          applyPreset() 透過 <code>el.dispatchEvent(new Event('input'))</code> 觸發既有的滑桿事件鏈（runSimulation + encodeHash + val-pulse + haptic），因此 URL hash 同步、3D 更新、動畫反饋一次到位。按鈕點擊後 800ms 高亮（.preset-active），1.8s 淡入/淡出提示文字。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 17 PWA Manifest）</div>
         <div class="content">
           會話壓縮後重新載入，繼續自我調速 Loop。分析剩餘優化空間後決定實作 PWA Manifest。<br><br>
@@ -675,6 +689,18 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 19 — 快速預設場景按鈕 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>4 個教學預設</strong>：IEC標準 / 高效多燈（61顆）/ 少燈廣角對比 / 嚴苛遮擋壓力測試</li>
+        <li><strong>applyPreset()</strong>：setSlider() 呼叫 dispatchEvent 觸發整條事件鏈（runSimulation + encodeHash + val-pulse + haptic）</li>
+        <li><strong>視覺反饋</strong>：.preset-active 高亮 800ms + #preset-feedback 文字提示 1.8s 淡入淡出</li>
+        <li><strong>flex-wrap 排版</strong>：4 按鈕在任意螢幕寬度自動換行，各佔相等寬度（flex:1）</li>
+        <li>教師一鍵切換場景，無需逐個調整滑桿，節省課堂示範時間</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 17 — PWA Manifest + 可安裝 App <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · icon.svg + manifest.json 新增</div>
       <ul>
@@ -746,6 +772,7 @@
         <li>✅ <strong>Phase 15</strong>：ResizeObserver 取代 window.resize（精確偵測 canvas 容器大小變化）</li>
         <li>✅ <strong>Phase 16</strong>：Three.js CDN 從 unpkg → jsDelivr（台灣/亞洲 CDN 覆蓋更佳，載入更快）</li>
         <li>✅ <strong>Phase 17</strong>：PWA Manifest（manifest.json + icon.svg + iOS meta）— 可加入手機主畫面</li>
+        <li>✅ <strong>Phase 19</strong>：快速預設場景按鈕（IEC標準 / 高效多燈 / 少燈對比 / 嚴苛遮擋，一鍵套用）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>

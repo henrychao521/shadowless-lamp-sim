@@ -113,6 +113,16 @@
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">模擬先進的 PWM 電流反饋調變。當部分光束被醫師頭部遮擋時，自動增強未遮擋側的 LED 亮度，使中心焦點照度維持恆定。</p>
             </div>
 
+            <!-- 快速預設場景 -->
+            <div class="preset-row">
+                <span class="preset-label">快速場景：</span>
+                <button class="preset-btn" id="preset-iec"    title="IEC 60601 標準測試配置">📋 IEC標準</button>
+                <button class="preset-btn" id="preset-dense"  title="密集 LED 高效無影配置">💡 高效多燈</button>
+                <button class="preset-btn" id="preset-sparse" title="少燈廣角對照實驗">🔦 少燈對比</button>
+                <button class="preset-btn" id="preset-hard"   title="嚴苛遮擋場景（壓力測試）">⚠️ 嚴苛遮擋</button>
+                <span class="share-feedback" id="preset-feedback"></span>
+            </div>
+
             <hr class="divider">
 
             <!-- 分享連結 -->
@@ -338,6 +348,58 @@
     </script>
     <script src="simulation.js?v=3"></script>
     <script type="module" src="simulation3d.js?v=3"></script>
+    <script>
+    // ── 快速預設場景按鈕 ──
+    (function() {
+        // 預設場景定義：[lampH, obsX, obsY, obsR, nLeds, spread]
+        var PRESETS = {
+            'preset-iec':    { h:100, ox:0,  oy:50, or:10.5, n:25, s:6.0,  label:'📋 IEC 標準測試' },
+            'preset-dense':  { h:100, ox:12, oy:55, or:10.5, n:61, s:4.0,  label:'💡 高效多燈（61 顆）' },
+            'preset-sparse': { h:100, ox:0,  oy:50, or:10.5, n:5,  s:15.0, label:'🔦 少燈廣角對比' },
+            'preset-hard':   { h:80,  ox:18, oy:65, or:14.0, n:25, s:6.0,  label:'⚠️ 嚴苛遮擋壓力測試' }
+        };
+
+        function applyPreset(id) {
+            var p = PRESETS[id];
+            if (!p) return;
+
+            function setSlider(elemId, val) {
+                var el = document.getElementById(elemId);
+                if (!el) return;
+                el.value = val;
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            setSlider('lamp_height',  p.h);
+            setSlider('obstacle_x',   p.ox);
+            setSlider('obstacle_y',   p.oy);
+            setSlider('obstacle_rad', p.or);
+            setSlider('num_leds',     p.n);
+            setSlider('beam_spread',  p.s);
+
+            // 短暫高亮按鈕
+            var btn = document.getElementById(id);
+            if (btn) {
+                btn.classList.add('preset-active');
+                setTimeout(function() { btn.classList.remove('preset-active'); }, 800);
+            }
+
+            // 手機版短暫提示
+            var fb = document.getElementById('preset-feedback');
+            if (fb) {
+                fb.textContent = p.label + ' 已套用';
+                fb.classList.add('visible');
+                clearTimeout(fb._t);
+                fb._t = setTimeout(function() { fb.classList.remove('visible'); }, 1800);
+            }
+        }
+
+        Object.keys(PRESETS).forEach(function(id) {
+            var btn = document.getElementById(id);
+            if (btn) btn.addEventListener('click', function() { applyPreset(id); });
+        });
+    })();
+    </script>
     <script>
     // ── 手機控制面板折疊（平滑動畫版） ──
     (function() {

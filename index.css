@@ -663,6 +663,47 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-muted);
 }
 
+/* ── 快速預設場景 ── */
+.preset-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+}
+.preset-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.preset-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 0.45rem 0.5rem;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.1s;
+    white-space: nowrap;
+    text-align: center;
+}
+.preset-btn:hover {
+    background: rgba(51, 65, 85, 0.9);
+    color: var(--text-primary);
+    border-color: var(--accent-blue);
+}
+.preset-btn:active,
+.preset-btn.preset-active {
+    background: rgba(14, 165, 233, 0.18);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    transform: scale(0.97);
+}
+
 /* ── 3D 全螢幕按鈕 ── */
 .fullscreen-btn {
     background: rgba(14, 165, 233, 0.1);
