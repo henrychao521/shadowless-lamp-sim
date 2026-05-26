@@ -114,6 +114,12 @@
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">模擬先進的 PWM 電流反饋調變。當部分光束被醫師頭部遮擋時，自動增強未遮擋側的 LED 亮度，使中心焦點照度維持恆定。</p>
             </div>
 
+            <!-- 自動演示動畫 -->
+            <div class="demo-row">
+                <button class="demo-btn" id="demo-sweep-btn" title="自動掃描遮擋物位置，觀察陰影稀釋效果">🎬 自動掃描演示</button>
+                <span class="share-feedback" id="demo-feedback"></span>
+            </div>
+
             <!-- 快速預設場景 -->
             <div class="preset-row">
                 <span class="preset-label">快速場景：</span>
@@ -499,6 +505,86 @@
             btn.textContent = '✅';
             setTimeout(function() { btn.textContent = '📸'; }, 1500);
         });
+    })();
+    </script>
+    <script>
+    // ── 自動掃描演示動畫 ──
+    (function() {
+        var btn = document.getElementById('demo-sweep-btn');
+        var fb  = document.getElementById('demo-feedback');
+        if (!btn) return;
+
+        var animId = null;
+        var isRunning = false;
+
+        // 掃描參數：obstacle_x 從 -25 → +25 → -25（一個完整來回）
+        var DEMO_DURATION = 6000; // ms（完整來回）
+        var START_TIME = 0;
+        var OX_MIN = -25, OX_MAX = 25;
+
+        function easeInOut(t) {
+            // Smooth step (ease-in-out cubic)
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+
+        function runFrame(ts) {
+            if (!isRunning) return;
+            var elapsed = ts - START_TIME;
+            var t = Math.min(elapsed / DEMO_DURATION, 1);
+            // Ping-pong: 0→1→0
+            var ping = t < 0.5 ? t * 2 : (1 - t) * 2;
+            var ox = OX_MIN + (OX_MAX - OX_MIN) * easeInOut(ping);
+
+            var slider = document.getElementById('obstacle_x');
+            if (slider) {
+                slider.value = Math.round(ox);
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            if (t < 1) {
+                animId = requestAnimationFrame(runFrame);
+            } else {
+                stopDemo();
+            }
+        }
+
+        function startDemo() {
+            isRunning = true;
+            btn.classList.add('active');
+            btn.textContent = '⏹ 停止演示';
+            if (fb) {
+                fb.textContent = '正在掃描… 拖曳滑桿可隨時接管';
+                fb.classList.add('visible');
+            }
+            animId = requestAnimationFrame(function(ts) {
+                START_TIME = ts;
+                runFrame(ts);
+            });
+        }
+
+        function stopDemo() {
+            isRunning = false;
+            if (animId) { cancelAnimationFrame(animId); animId = null; }
+            btn.classList.remove('active');
+            btn.textContent = '🎬 自動掃描演示';
+            if (fb) {
+                fb.textContent = '演示完畢';
+                clearTimeout(fb._dt);
+                fb._dt = setTimeout(function() { fb.classList.remove('visible'); }, 1800);
+            }
+        }
+
+        btn.addEventListener('click', function() {
+            if (isRunning) { stopDemo(); } else { startDemo(); }
+        });
+
+        // 使用者手動移動滑桿時中斷演示
+        var oxSlider = document.getElementById('obstacle_x');
+        if (oxSlider) {
+            oxSlider.addEventListener('pointerdown', function() {
+                if (isRunning) stopDemo();
+            });
+        }
     })();
     </script>
     <script>
