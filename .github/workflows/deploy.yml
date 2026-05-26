@@ -7,30 +7,34 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+      - name: Deploy site files to gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
+          # Inject token for authenticated push
+          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          # Copy site files to temp
+          mkdir -p /tmp/site
+          cp index.html index.css simulation.js simulation3d.js operate.js /tmp/site/
+          touch /tmp/site/.nojekyll
+
+          # Fetch and switch to gh-pages branch
+          git fetch origin gh-pages
+          git checkout gh-pages
+
+          # Update files
+          cp /tmp/site/* .
+
+          git add index.html index.css simulation.js simulation3d.js operate.js .nojekyll
+          git diff --staged --quiet && echo "No changes to deploy" || (git commit -m "deploy: sync from main [skip ci]" && git push origin gh-pages)
