@@ -396,7 +396,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Attach Event Listeners — include value-pulse animation + hash update
+    // Attach Event Listeners — include value-pulse animation + hash update + haptic
     Object.values(inputs).forEach(function(input) {
         input.addEventListener('input', function() {
             runSimulation();
@@ -407,6 +407,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 span.classList.remove('val-pulse');
                 void span.offsetWidth; // force reflow to restart animation
                 span.classList.add('val-pulse');
+            }
+            // Haptic nudge when slider hits min or max boundary (Android Chrome)
+            if (navigator.vibrate && (input.value == input.min || input.value == input.max)) {
+                navigator.vibrate(18);
             }
         });
     });
