@@ -638,6 +638,12 @@ input[type="range"]::-moz-range-thumb:active {
     cursor: pointer;
     transition: background 0.2s;
     user-select: none;
+    /* Phase 48：黏性定位，捲動時始終露出標題列，方便從文件任意位置收合區塊 */
+    position: sticky;
+    top: var(--header-height, 60px);
+    z-index: 10;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .paper-header:hover {

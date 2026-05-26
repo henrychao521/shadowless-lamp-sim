@@ -136,6 +136,7 @@
         <tr><td>Preload + 超小螢幕 + 圖表按鈕</td><td><span class="badge badge-green">✅ Phase 45</span></td><td>preload simulation.js；390px 隱藏 logo-icon；chart-expand-btn 24→32px（WCAG 觸控目標）</td></tr>
         <tr><td>Canvas ARIA + tablist orientation + resize debounce</td><td><span class="badge badge-green">✅ Phase 46</span></td><td>rayCanvas/illuminanceChart role=img + aria-label；tablist aria-orientation=horizontal；applyMode 100ms debounce</td></tr>
         <tr><td>Tablist 方向鍵導航 + T 鍵切換 Tab</td><td><span class="badge badge-green">✅ Phase 47</span></td><td>WAI-ARIA tablist ←→ 鍵自動切換 + Home/End；T 鍵全域切換 2D/3D Tab</td></tr>
+        <tr><td>Sticky 論文標題列 + manifest id 欄位</td><td><span class="badge badge-green">✅ Phase 48</span></td><td>.paper-header sticky top：捲動時始終可折疊論文區塊；manifest id 欄位確保 Chrome/Edge PWA 安裝識別</td></tr>
       </tbody>
     </table>
   </section>
@@ -581,6 +582,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 48 Sticky 論文標題列 + manifest id）</div>
+        <div class="content">
+          <strong>Sticky .paper-header</strong>：論文概覽區（關於本文章）是展開式折疊區塊。原本若使用者捲動閱讀內文，標題列會捲出視窗外，無法從文件任意位置收合。加入 <code>position: sticky; top: var(--header-height, 60px); z-index: 10; backdrop-filter: blur(8px)</code>，使標題列在捲動時黏在 App header 正下方，使用者隨時可點擊收合，不需捲回頂端。<br><br>
+          <strong>backdrop-filter: blur(8px)</strong>：sticky 標題列懸浮在內容上方時，背景文字會透過半透明背景 <code>rgba(15,23,42,0.9)</code> 顯示。加入 blur 磨砂效果，防止文字重疊造成閱讀困難，視覺上也與 App header 風格一致。<br><br>
+          <strong>manifest.json id 欄位</strong>：Web App Manifest v3 引入 <code>id</code> 欄位，用來唯一識別 PWA 的安裝識別碼。若不設定，Chrome / Edge 預設使用 <code>start_url</code> 作為識別碼，但規格建議明確設定，以確保跨瀏覽器版本更新時不會觸發「新 PWA」的安裝提示。設定 <code>"id": "/shadowless-lamp-sim/"</code> 與 <code>start_url</code> 一致，確保已安裝的 PWA 平滑升級。
         </div>
       </div>
 
@@ -1153,6 +1163,16 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 48 — Sticky 論文標題列 + manifest id 欄位 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.css + manifest.json</div>
+      <ul>
+        <li><strong>Sticky .paper-header</strong>：加入 <code>position: sticky; top: var(--header-height, 60px); z-index: 10</code>。論文折疊區的標題列在捲動時會黏在 App header 下方（sticky 容器為 <code>.paper-section</code>），使用者閱讀長文時無需捲回頂端即可點擊收合</li>
+        <li><strong>backdrop-filter: blur(8px)</strong>：sticky 懸浮時標題列背景為半透明 <code>rgba(15,23,42,0.9)</code>，內容文字可能透映。加入 blur 磨砂效果，與 App header 風格一致，並防止底層文字干擾標題可讀性。<code>-webkit-backdrop-filter</code> 保持 Safari 相容</li>
+        <li><strong>manifest.json id 欄位</strong>：依 Web App Manifest Level 3 規範，<code>"id": "/shadowless-lamp-sim/"</code> 明確宣告 PWA 識別碼，讓 Chrome / Edge 在 manifest 更新時正確識別已安裝的 PWA（避免觸發重新安裝提示）。值與 <code>start_url</code> 相同，符合最小改動原則</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 47 — WAI-ARIA Tablist 鍵盤導航 + T 鍵快捷 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.html</div>
       <ul>
@@ -1479,6 +1499,7 @@
         <li>✅ <strong>Phase 45</strong>：preload simulation.js（提前下載，縮短首次渲染）；390px 隱藏 logo-icon；圖表按鈕 32px</li>
         <li>✅ <strong>Phase 46</strong>：rayCanvas/illuminanceChart role=img aria-label；tablist aria-orientation=horizontal；applyMode 100ms debounce</li>
         <li>✅ <strong>Phase 47</strong>：WAI-ARIA tablist ←→ 鍵自動導航（ArrowLeft/Right/Up/Down/Home/End）；T 鍵全域切換 2D/3D</li>
+        <li>✅ <strong>Phase 48</strong>：.paper-header sticky top（捲動時始終可折疊）+ backdrop-filter blur；manifest id 欄位（PWA 安裝識別）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
