@@ -112,6 +112,7 @@
         <tr><td>截圖下載</td><td><span class="badge badge-green">✅ Phase 21</span></td><td>📸 按鈕合成光路圖 + 照度圖 → PNG，供學生截圖繳交作業</td></tr>
         <tr><td>鍵盤快捷鍵</td><td><span class="badge badge-green">✅ Phase 22</span></td><td>1-4 預設、F 全螢幕、? 說明；首次訪問手機引導 Toast</td></tr>
         <tr><td>3D Demo 旋轉</td><td><span class="badge badge-green">✅ Phase 24</span></td><td>▶ 自動旋轉按鈕，觸碰後自動停止，課堂投影展示用</td></tr>
+        <tr><td>掃描演示動畫</td><td><span class="badge badge-green">✅ Phase 25</span></td><td>🎬 一鍵 6s 遮擋掃描動畫（rAF + easeInOut），光路即時更新</td></tr>
       </tbody>
     </table>
   </section>
@@ -561,6 +562,17 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 25 自動掃描演示動畫）</div>
+        <div class="content">
+          在控制面板加入 <strong>🎬 自動掃描演示按鈕</strong>，一鍵觸發 6 秒來回掃描動畫。<br><br>
+          動畫邏輯：requestAnimationFrame 精確計時，<code>obstacle_x</code> 在 -25cm → +25cm → -25cm 之間以 <code>easeInOut cubic</code> 緩動曲線（smooth-step）自動移動，每幀透過 <code>slider.dispatchEvent(new Event('input'))</code> 觸發完整的模擬更新鏈（runSimulation + val-pulse + encodeHash）。<br><br>
+          使用者可隨時以 pointerdown 或再次點擊按鈕中斷演示，恢復手動控制。<br>
+          按鈕活動狀態：demo-glow 脈動光暈動畫（琥珀色），文字切換為「⏹ 停止演示」。<br><br>
+          教學效果：2D 光路圖即時反映陰影如何隨遮擋物左右移動而稀釋，結合圖表的照度曲線動態起伏，視覺衝擊力強，無需教師手動拖動。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 24 3D 自動旋轉 Demo 模式）</div>
         <div class="content">
           在 3D card header 加入 <strong>▶ 自動旋轉按鈕</strong>（<code>.autorotate-btn</code>，30px，teal 邊框）。<br><br>
@@ -750,6 +762,18 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 25 — 自動掃描演示動畫 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>🎬 自動掃描演示</strong>：6s 來回掃描 obstacle_x（-25 ↔ +25 cm），easeInOut 緩動</li>
+        <li>requestAnimationFrame 精確計時，每幀 dispatchEvent('input') 觸發完整模擬更新</li>
+        <li>pointerdown 或再次點擊可隨時中斷，恢復手動控制</li>
+        <li>.demo-btn：琥珀色主題；active 時 demo-glow 脈動光暈</li>
+        <li>教師一鍵展示陰影稀釋原理，學生可即時看到光路圖和照度曲線動態變化</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 24 — 3D 自動旋轉 Demo 模式 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · simulation3d.js + index.html + index.css</div>
       <ul>
@@ -891,6 +915,7 @@
         <li>✅ <strong>Phase 22</strong>：首次訪問引導 Toast（手機版首次造訪 → 操作提示，localStorage 記憶）</li>
         <li>✅ <strong>Phase 23</strong>：🐛 修正 keyBtn 重複 listener 堆疊 Bug（移至 IIFE 直接執行）；?v=4 強制清除快取</li>
         <li>✅ <strong>Phase 24</strong>：▶ 3D 自動旋轉 Demo 模式（OrbitControls autoRotate + 觸控自動停止 + window.sls3d API）</li>
+        <li>✅ <strong>Phase 25</strong>：🎬 自動掃描演示（rAF + easeInOut，6s 遮擋物來回掃描，pointerdown 中斷）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
