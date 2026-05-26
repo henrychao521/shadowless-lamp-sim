@@ -45,6 +45,7 @@
         <div class="header-badges">
             <span class="badge">IEC 60601-2-41</span>
             <span class="badge active">即時幾何光路追跡</span>
+            <span class="badge realistic-badge" id="realistic-mode-badge" style="display:none">✨ 真實模式</span>
         </div>
     </header>
 
@@ -396,6 +397,19 @@
             if (desk) desk.style.display = 'none';
             if (mob)  mob.style.display  = '';
         }
+    })();
+    </script>
+    <script>
+    // ── 真實模式 Badge 顯示/隱藏 ──
+    (function() {
+        var toggle = document.getElementById('realistic_mode');
+        var badge  = document.getElementById('realistic-mode-badge');
+        if (!toggle || !badge) return;
+        function syncBadge() {
+            badge.style.display = toggle.checked ? '' : 'none';
+        }
+        toggle.addEventListener('change', syncBadge);
+        syncBadge();
     })();
     </script>
     <script>
