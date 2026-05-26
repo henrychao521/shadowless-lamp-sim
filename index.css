@@ -35,6 +35,8 @@ body {
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+    /* Prevent iOS rubber-band over-scroll on main page background */
+    overscroll-behavior-y: none;
     background-image:
         radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.05), transparent 25%),
         radial-gradient(circle at 85% 30%, rgba(20, 184, 166, 0.05), transparent 25%);
