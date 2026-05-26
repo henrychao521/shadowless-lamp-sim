@@ -197,8 +197,10 @@
                         <button class="screenshot-btn" id="download-screenshot-btn" title="下載模擬截圖 (PNG)">📸</button>
                         </div>
                     </div>
-                    <div class="chart-wrapper">
+                    <div class="chart-wrapper" id="chart-wrapper">
                         <canvas id="illuminanceChart"></canvas>
+                        <!-- 手機版：點擊放大圖表 -->
+                        <button class="chart-expand-btn" id="chart-expand-btn" aria-label="切換圖表大小" title="點擊切換圖表大小">⤢</button>
                     </div>
                 </div>
             </div>
@@ -441,6 +443,27 @@
                 setTimeout(function() { if (toast.parentNode) toast.remove(); }, 300);
             }, 5000);
         }
+    })();
+    </script>
+    <script>
+    // ── 照度圖表點擊放大（手機版）──
+    (function() {
+        var wrapper = document.getElementById('chart-wrapper');
+        var expandBtn = document.getElementById('chart-expand-btn');
+        if (!wrapper || !expandBtn) return;
+        var isExpanded = false;
+        function toggle() {
+            isExpanded = !isExpanded;
+            wrapper.classList.toggle('expanded', isExpanded);
+            expandBtn.textContent = isExpanded ? '⤡' : '⤢';
+            expandBtn.title = isExpanded ? '縮小圖表' : '放大圖表';
+            // 通知 Chart.js 重新計算尺寸
+            setTimeout(function() { window.dispatchEvent(new Event('resize')); }, 50);
+        }
+        expandBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggle();
+        });
     })();
     </script>
     <script>
