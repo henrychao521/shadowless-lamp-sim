@@ -663,6 +663,39 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-muted);
 }
 
+/* ── 3D 全螢幕按鈕 ── */
+.fullscreen-btn {
+    background: rgba(14, 165, 233, 0.1);
+    border: 1px solid var(--border-highlight);
+    color: var(--accent-blue);
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+.fullscreen-btn:hover  { background: rgba(14, 165, 233, 0.22); }
+.fullscreen-btn:active { transform: scale(0.9); }
+
+/* Full-screen overlay: 3D canvas fills the viewport */
+#canvas3d:fullscreen,
+#canvas3d:-webkit-full-screen,
+#canvas3d:-moz-full-screen,
+#canvas3d:-ms-fullscreen {
+    width:  100vw !important;
+    height: 100vh !important;
+    max-height: none !important;
+    border-radius: 0;
+    background: #0f172a;
+}
+
 /* ── 減少動畫（無障礙：前庭功能敏感使用者）── */
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }

@@ -105,6 +105,8 @@
         <tr><td>URL 狀態分享</td><td><span class="badge badge-green">✅ 完成</span></td><td>滑桿參數即時編碼入 URL hash，可複製網址分享特定設定</td></tr>
         <tr><td>滑桿數值動畫</td><td><span class="badge badge-green">✅ 完成</span></td><td>移動滑桿時數值 span 短暫白光閃爍，視覺回饋清晰</td></tr>
         <tr><td>GitHub Actions CI</td><td><span class="badge badge-green">✅ 正常</span></td><td>事故恢復後 workflow 成功執行</td></tr>
+        <tr><td>PWA 可安裝</td><td><span class="badge badge-green">✅ Phase 17</span></td><td>manifest.json + icon.svg，Android/iOS 可加入主畫面</td></tr>
+        <tr><td>手勢操作</td><td><span class="badge badge-green">✅ Phase 18</span></td><td>左右 Swipe 切換 2D/3D Tab；3D 全螢幕按鈕</td></tr>
       </tbody>
     </table>
   </section>
@@ -554,6 +556,27 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 17 PWA Manifest）</div>
+        <div class="content">
+          會話壓縮後重新載入，繼續自我調速 Loop。分析剩餘優化空間後決定實作 PWA Manifest。<br><br>
+          新增 <code>manifest.json</code>（name：外科手術無影燈光學模擬器、short_name：無影燈模擬、display:standalone、background_color #0b1120、theme_color #0ea5e9、lang zh-TW、orientation any）。<br>
+          新增 <code>icon.svg</code> — 自行繪製含圓角背景、外環發光、主燈核心、支架、LED 光點的手術燈圖示。<br>
+          index.html 更新：<code>&lt;link rel="manifest"&gt;</code>、<code>&lt;link rel="apple-touch-icon"&gt;</code>、iOS standalone meta（apple-mobile-web-app-capable、status-bar-style black-translucent、title 無影燈模擬）。<br>
+          favicon 從 data URI 改為外部 <code>icon.svg</code>（不再需要 URL encoding 的超長字串）。<br>
+          deploy.yml 補上 <code>manifest.json</code> 與 <code>icon.svg</code> 兩個新部署目標。<br><br>
+          效果：Chrome 手機版顯示「新增至主畫面」提示；iOS Safari 可加入主畫面並以 standalone 模式啟動，看起來就是一個 App，不顯示瀏覽器 UI。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 18 Swipe Tabs + 全螢幕按鈕）</div>
+        <div class="content">
+          <strong>手指滑動切換 Tab</strong>：在 <code>.visualization-area</code> 加入 touchstart / touchend 偵測。閾值 55px 橫向位移、最大角度 38°（排除縱向滑動）、最長時間 400ms（排除拖動）。當觸控目標為 <code>CANVAS</code> 元素時跳過（避免干擾 OrbitControls 3D 旋轉）。左滑 → 3D、右滑 → 2D，呼叫既有 <code>switchView()</code>。<br><br>
+          <strong>3D 全螢幕按鈕</strong>：在 3D card header legend 區右端加入 <code>.fullscreen-btn ⛶</code>（30×30px，半透明藍色邊框，flex shrink 0，margin-left:auto 靠右）。JS 封裝 requestFullscreen + webkit/moz/ms 前綴、fullscreenchange 事件同步圖示（⛶ ↔ ✕）。CSS 加入 <code>#canvas3d:fullscreen</code> 規則（width/height 100vw/100vh，消除 border-radius）。若瀏覽器不支援 fullscreen API 則自動隱藏按鈕。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 16 CDN 切換）</div>
         <div class="content">
           Three.js import map 從 <code>unpkg.com</code> 換成 <code>cdn.jsdelivr.net</code>。unpkg 在台灣有時需要 500ms+ 才能取得模組；jsDelivr 使用 Cloudflare + Fastly，亞太地區 CDN PoP 較多，Three.js 模組載入通常可降至 80–200ms。相同的 three@0.160.0 版本與 API。
@@ -651,6 +674,32 @@
         </div>
       </div>
 
+    <div class="phase-card">
+      <h3>Phase 17 — PWA Manifest + 可安裝 App <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · icon.svg + manifest.json 新增</div>
+      <ul>
+        <li><strong>icon.svg</strong>：手術燈 SVG 圖示（192×192 viewBox，圓角背景 #0b1120，外環 0ea5e9，LED 光點 fbbf24，支架 14b8a6）</li>
+        <li><strong>manifest.json</strong>：name / short_name / display:standalone / background_color / theme_color / orientation:any / lang:zh-TW / categories:education</li>
+        <li><strong>index.html PWA meta</strong>：<code>rel="manifest"</code>、<code>rel="apple-touch-icon"</code>、iOS standalone 三個 meta 標籤</li>
+        <li><strong>favicon 改為外部檔案</strong>：從 data URI 改為 <code>href="icon.svg"</code>，更易維護</li>
+        <li><strong>deploy.yml 更新</strong>：manifest.json + icon.svg 加入部署清單</li>
+        <li>效果：Android Chrome 顯示「新增至主畫面」橫幅；iOS Safari 主畫面啟動隱藏 Safari UI，體驗如原生 App</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 18 — 手勢滑動換頁 + 3D 全螢幕按鈕 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css 修改</div>
+      <ul>
+        <li><strong>Swipe Tab 切換</strong>：在 <code>.visualization-area</code> 偵測 touchstart/touchend；閾值 55px、最大角度 38°、最長 400ms；Canvas 元素觸控自動略過（不干擾 OrbitControls）</li>
+        <li><strong>左滑 → 3D / 右滑 → 2D</strong>：與 switchView() 整合，包含 localStorage 記憶與手機捲動對齊</li>
+        <li><strong>⛶ 全螢幕按鈕</strong>：30px 圓角按鈕置於 3D card header 最右側；requestFullscreen 全前綴相容（webkit / moz / ms）</li>
+        <li><strong>全螢幕模式</strong>：<code>#canvas3d:fullscreen</code> CSS — 100vw × 100vh，無圓角，使 3D 場景填滿整個螢幕</li>
+        <li><strong>圖示切換</strong>：fullscreenchange 事件將圖示在 ⛶（進入）↔ ✕（離開）之間切換</li>
+        <li>不支援的舊瀏覽器自動隱藏按鈕，向後相容</li>
+      </ul>
+    </div>
+
     </div>
   </section>
 
@@ -696,6 +745,9 @@
         <li>✅ <strong>Phase 14</strong>：標題列「✨ 真實模式」badge（勾選後淡入，與模式狀態同步）</li>
         <li>✅ <strong>Phase 15</strong>：ResizeObserver 取代 window.resize（精確偵測 canvas 容器大小變化）</li>
         <li>✅ <strong>Phase 16</strong>：Three.js CDN 從 unpkg → jsDelivr（台灣/亞洲 CDN 覆蓋更佳，載入更快）</li>
+        <li>✅ <strong>Phase 17</strong>：PWA Manifest（manifest.json + icon.svg + iOS meta）— 可加入手機主畫面</li>
+        <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
+        <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
         <li>⬜ 醫生手套可拖曳遮擋物</li>
         <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>
