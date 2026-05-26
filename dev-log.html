@@ -114,6 +114,7 @@
         <tr><td>3D Demo 旋轉</td><td><span class="badge badge-green">✅ Phase 24</span></td><td>▶ 自動旋轉按鈕，觸碰後自動停止，課堂投影展示用</td></tr>
         <tr><td>掃描演示動畫</td><td><span class="badge badge-green">✅ Phase 25</span></td><td>🎬 一鍵 6s 遮擋掃描動畫（rAF + easeInOut），光路即時更新</td></tr>
         <tr><td>iOS 適配</td><td><span class="badge badge-green">✅ Phase 26</span></td><td>viewport-fit=cover + Safe Area inset，捲動提示箭頭</td></tr>
+        <tr><td>鍵盤無障礙</td><td><span class="badge badge-green">✅ Phase 27</span></td><td>Skip to content + :focus-visible 覆蓋，符合 WCAG 2.1 AA</td></tr>
       </tbody>
     </table>
   </section>
@@ -563,6 +564,16 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 27 鍵盤無障礙）</div>
+        <div class="content">
+          <strong>Skip to content link</strong>：在 &lt;body&gt; 第一個元素加入 <code>&lt;a href="#controls-panel-body" class="skip-link"&gt;跳至主內容&lt;/a&gt;</code>。平時透過 <code>top: -100%</code> 完全隱藏，鍵盤使用者按 Tab 第一個停留點時 <code>:focus</code> 使其滑入畫面（top:0）。<br><br>
+          <strong>:focus-visible 全局覆蓋</strong>：<code>:focus-visible</code> 偽類加入 <code>outline: 2px solid var(--accent-blue)</code>，確保在深色背景上一眼可見（預設的藍色可能幾乎不可見）。<code>input[type="range"]:focus-visible</code> 改為 3px / 4px offset。<br><br>
+          <strong>Print 媒體排除</strong>：skip-link 和 download-section 都加入 <code>display:none !important</code>，避免出現在列印輸出中。<br><br>
+          符合 WCAG 2.1 AA 規範中的 2.4.1（略過重複區塊）和 2.4.7（焦點可見）。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 26 iOS Safe Area + 捲動提示）</div>
         <div class="content">
           <strong>viewport-fit=cover</strong>：meta viewport 加入 <code>viewport-fit=cover</code>，啟用 CSS 環境變數 <code>env(safe-area-inset-*)</code>。<br>
@@ -772,6 +783,18 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 27 — 鍵盤無障礙（Skip Link + Focus Ring）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>Skip to content</strong>：.skip-link — 平時 top:-100% 隱藏，Tab 焦點時 top:0 滑入</li>
+        <li><code>:focus-visible { outline: 2px solid var(--accent-blue) }</code> — 深色背景可見焦點環</li>
+        <li>range input 增大：3px 焦點環、4px offset</li>
+        <li>Print media：skip-link display:none（不出現在列印稿）</li>
+        <li>符合 WCAG 2.1 AA 2.4.1（略過重複區塊）+ 2.4.7（焦點可見性）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 26 — iOS Safe Area + 捲動提示 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css</div>
       <ul>
@@ -940,6 +963,8 @@
         <li>✅ <strong>Phase 25</strong>：🎬 自動掃描演示（rAF + easeInOut，6s 遮擋物來回掃描，pointerdown 中斷）</li>
         <li>✅ <strong>Phase 26</strong>：viewport-fit=cover + iOS Safe Area（header top / paper bottom）</li>
         <li>✅ <strong>Phase 26</strong>：2D canvas 底部捲動提示「↓ 照度分佈圖」（首次手機訪問 2.5s 顯示）</li>
+        <li>✅ <strong>Phase 27</strong>：Skip to content link（鍵盤使用者 Tab 跳過 header）</li>
+        <li>✅ <strong>Phase 27</strong>：:focus-visible 全局覆蓋（深色背景可見的 2px 藍色焦點環）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
