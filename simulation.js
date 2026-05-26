@@ -82,6 +82,16 @@ document.addEventListener("DOMContentLoaded", () => {
                         borderWidth: 1.5,
                         pointRadius: 0,
                         fill: false
+                    },
+                    {
+                        // IEC 60601-2-41: shadow dilution ≥ 50% center illuminance required
+                        label: mobile ? 'IEC ≥50%' : 'IEC 60601 最低標準 (50%)',
+                        data: Array(NUM_BINS).fill(50),
+                        borderColor: '#ef4444',
+                        borderDash: [3, 6],
+                        borderWidth: mobile ? 1 : 1.5,
+                        pointRadius: 0,
+                        fill: false
                     }
                 ]
             },
