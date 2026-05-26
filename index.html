@@ -448,6 +448,33 @@
     <script src="simulation.js?v=4"></script>
     <!-- simulation3d.js は 3D tab 首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
     <script>
+    // ── ARIA Tablist 鍵盤導航（WAI-ARIA tablist pattern）──
+    (function() {
+        var tablist = document.querySelector('.view-tabs');
+        if (!tablist) return;
+        tablist.addEventListener('keydown', function(e) {
+            var tabs = Array.from(tablist.querySelectorAll('[role="tab"]'));
+            var idx  = tabs.indexOf(document.activeElement);
+            if (idx === -1) return;
+            var next = -1;
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                next = (idx + 1) % tabs.length;
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                next = (idx - 1 + tabs.length) % tabs.length;
+            } else if (e.key === 'Home') {
+                next = 0;
+            } else if (e.key === 'End') {
+                next = tabs.length - 1;
+            }
+            if (next !== -1) {
+                e.preventDefault();
+                tabs[next].focus();
+                tabs[next].click(); // 自動啟用（automatic activation）
+            }
+        });
+    })();
+    </script>
+    <script>
     // ── 鍵盤快捷鍵 ──
     (function() {
         // ⌨️ header button — wire ONCE, not inside keydown handler
@@ -486,6 +513,12 @@
                 case '4':
                     document.getElementById('preset-hard')   && document.getElementById('preset-hard').click();
                     break;
+                case 't': case 'T':
+                    // 切換 2D / 3D Tab
+                    var is2DActive = document.getElementById('view-2d').classList.contains('active');
+                    var targetTab  = document.querySelector(is2DActive ? '.tab-btn:nth-child(2)' : '.tab-btn:nth-child(1)');
+                    if (targetTab) { targetTab.click(); targetTab.focus(); }
+                    break;
                 case 'p': case 'P':
                     // 只在手機版切換面板
                     if (window.innerWidth <= 768) {
@@ -519,6 +552,7 @@
                 '<span style="color:#0ea5e9;font-family:monospace">2</span> 高效多燈 &nbsp;' +
                 '<span style="color:#0ea5e9;font-family:monospace">3</span> 少燈對比 &nbsp;' +
                 '<span style="color:#0ea5e9;font-family:monospace">4</span> 嚴苛遮擋<br>' +
+                '<span style="color:#0ea5e9;font-family:monospace">T</span> 切換 Tab &nbsp;' +
                 '<span style="color:#0ea5e9;font-family:monospace">F</span> 全螢幕 &nbsp;' +
                 '<span style="color:#0ea5e9;font-family:monospace">P</span> 開關面板 &nbsp;' +
                 '<span style="color:#0ea5e9;font-family:monospace">Esc</span> 關閉面板 &nbsp;' +
