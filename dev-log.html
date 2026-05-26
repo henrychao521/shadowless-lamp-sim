@@ -134,6 +134,7 @@
         <tr><td>橫向模式 + scroll-padding + 字型調整</td><td><span class="badge badge-green">✅ Phase 43</span></td><td>landscape 面板 78vh（原 57vh）；html scroll-padding-top 避開 sticky header；info-card 字型 0.82rem</td></tr>
         <tr><td>手機面板空間優化 + aria-live</td><td><span class="badge badge-green">✅ Phase 44</span></td><td>手機版隱藏面板 h2+說明文字（節省 ~65px）；illuminance display aria-live=polite 螢幕閱讀器相容</td></tr>
         <tr><td>Preload + 超小螢幕 + 圖表按鈕</td><td><span class="badge badge-green">✅ Phase 45</span></td><td>preload simulation.js；390px 隱藏 logo-icon；chart-expand-btn 24→32px（WCAG 觸控目標）</td></tr>
+        <tr><td>Canvas ARIA + tablist orientation + resize debounce</td><td><span class="badge badge-green">✅ Phase 46</span></td><td>rayCanvas/illuminanceChart role=img + aria-label；tablist aria-orientation=horizontal；applyMode 100ms debounce</td></tr>
       </tbody>
     </table>
   </section>
@@ -579,6 +580,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 46 Canvas ARIA + Tablist + applyMode debounce）</div>
+        <div class="content">
+          <strong>Canvas ARIA</strong>：<code>&lt;canvas&gt;</code> 元素對螢幕閱讀器預設為透明（無語義），需要手動提供 <code>role="img" aria-label="..."</code>。rayCanvas 提供完整的光路圖描述（LED、光線、遮擋物）；illuminanceChart 描述圖表軸線和三條折線的含義。VoiceOver 使用者現在能理解這兩個圖形的用途。<br><br>
+          <strong>tablist aria-orientation="horizontal"</strong>：WAI-ARIA 標準要求水平 tablist 明確標注方向，讓螢幕閱讀器告知使用者使用左右方向鍵（←/→）切換 tabs，而非上下鍵。<br><br>
+          <strong>applyMode debounce</strong>：與 Phase 40 的 syncHeaderHeight debounce 一致，applyMode 也改為 100ms debounce。在桌機拖曳視窗大小（常見開發場景）時不再密集修改 panel maxHeight 和 overflowY，減少 layout 計算次數。初始呼叫 <code>applyMode()</code> 保持立即執行（不受 debounce 影響）。
         </div>
       </div>
 
@@ -1134,6 +1144,17 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 46 — Canvas ARIA + Tablist Orientation + applyMode Debounce <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html</div>
+      <ul>
+        <li><strong>rayCanvas aria-label</strong>：<code>role="img" aria-label="二維幾何光路追跡空間：LED 陣列光源（橘點）向下方射出光線，繞過球形遮擋物（手術頭部）照射底部工作面，顯示有效光線（藍）與被遮擋光線（紅）"</code>。VoiceOver / NVDA 現在可朗讀此 Canvas 的語義描述</li>
+        <li><strong>illuminanceChart aria-label</strong>：<code>role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），三條折線分別顯示遮擋場景照度、無遮擋基準，以及 IEC 60601 50% 標準線"</code></li>
+        <li><strong>tablist aria-orientation</strong>：<code>.view-tabs</code> 加入 <code>aria-orientation="horizontal"</code>。雖然 tablist 預設為 horizontal，明確標注有助於螢幕閱讀器確認鍵盤操作方向（left/right 切換 tabs）</li>
+        <li><strong>applyMode resize debounce（100ms）</strong>：面板 toggle IIFE 中 <code>window.addEventListener('resize', applyMode)</code> 改為 <code>clearTimeout</code> + <code>setTimeout(applyMode, 100)</code>。拖曳視窗大小時不再密集觸發 DOM style 設定（maxHeight / overflowY / display）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 45 — Preload 提前下載 + 超小螢幕 + 圖表按鈕 WCAG <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.html + index.css</div>
       <ul>
@@ -1432,6 +1453,7 @@
         <li>✅ <strong>Phase 43</strong>：landscape 面板 78vh（原 57vh）；html scroll-padding-top 避開 sticky header；info-card 0.82rem</li>
         <li>✅ <strong>Phase 44</strong>：手機版隱藏面板 h2+說明文字（節省 65px，控制項更多不需捲動）；aria-live=polite 照度顯示</li>
         <li>✅ <strong>Phase 45</strong>：preload simulation.js（提前下載，縮短首次渲染）；390px 隱藏 logo-icon；圖表按鈕 32px</li>
+        <li>✅ <strong>Phase 46</strong>：rayCanvas/illuminanceChart role=img aria-label；tablist aria-orientation=horizontal；applyMode 100ms debounce</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
