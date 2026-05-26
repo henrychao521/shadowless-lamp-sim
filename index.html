@@ -724,23 +724,38 @@
 
         function isMobile() { return window.innerWidth <= 768; }
 
+        // 手機版：面板高度上限 = 57vh（避免面板過高把視覺化區域推到螢幕外）
+        function mobileCap() { return Math.floor(window.innerHeight * 0.57); }
+
         // 使用 scrollHeight 測量實際高度，避免 max-height:9999px 造成的「瞬彈」
         function openPanel() {
             panel.classList.add('open');
-            panel.style.maxHeight = panel.scrollHeight + 'px';
-            // 動畫結束後解除固定高度限制（允許面板內容增減）
+            var mobile = isMobile();
+            var cap    = mobile ? mobileCap() : Infinity;
+            var target = Math.min(panel.scrollHeight, cap);
+            panel.style.maxHeight = target + 'px';
+            // 動畫結束後：手機版保持 cap 並允許內部捲動；桌機版解除高度限制
             panel.addEventListener('transitionend', function onEnd(e) {
                 if (e.propertyName !== 'max-height') return;
                 panel.removeEventListener('transitionend', onEnd);
-                if (panel.classList.contains('open')) panel.style.maxHeight = 'none';
+                if (panel.classList.contains('open')) {
+                    if (mobile) {
+                        panel.style.maxHeight = cap + 'px';
+                        panel.style.overflowY = 'auto';
+                    } else {
+                        panel.style.maxHeight = 'none';
+                        panel.style.overflowY = '';
+                    }
+                }
             });
             btn.setAttribute('aria-expanded', 'true');
             btn.classList.remove('collapsed');
         }
 
         function closePanel() {
-            // 先固定當前高度，下一幀再歸零（確保 transition 正確觸發）
-            panel.style.maxHeight = panel.scrollHeight + 'px';
+            // 先固定當前可見高度（offsetHeight 而非 scrollHeight，避免 overflow:auto 內捲動高度問題）
+            panel.style.overflowY = '';
+            panel.style.maxHeight = panel.offsetHeight + 'px';
             panel.classList.remove('open');
             requestAnimationFrame(function() {
                 requestAnimationFrame(function() {
@@ -756,11 +771,17 @@
                 btn.style.display = 'block';
                 if (!panel.classList.contains('open')) {
                     panel.style.maxHeight = '0';
+                    panel.style.overflowY = '';
+                } else {
+                    // 視窗改變（旋轉）時重新計算 cap
+                    panel.style.maxHeight = mobileCap() + 'px';
+                    panel.style.overflowY = 'auto';
                 }
             } else {
                 btn.style.display = 'none';
                 panel.classList.add('open');
                 panel.style.maxHeight = 'none';
+                panel.style.overflowY = '';
             }
         }
 
