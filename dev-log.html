@@ -138,6 +138,7 @@
         <tr><td>Tablist 方向鍵導航 + T 鍵切換 Tab</td><td><span class="badge badge-green">✅ Phase 47</span></td><td>WAI-ARIA tablist ←→ 鍵自動切換 + Home/End；T 鍵全域切換 2D/3D Tab</td></tr>
         <tr><td>Sticky 論文標題列 + manifest id 欄位</td><td><span class="badge badge-green">✅ Phase 48</span></td><td>.paper-header sticky top：捲動時始終可折疊論文區塊；manifest id 欄位確保 Chrome/Edge PWA 安裝識別</td></tr>
         <tr><td>PWA 安裝提示條 + accent-color + smooth scroll</td><td><span class="badge badge-green">✅ Phase 49</span></td><td>beforeinstallprompt 捕捉顯示安裝條；accent-color 品牌藍；scroll-behavior smooth + prefers-reduced-motion 降級</td></tr>
+        <tr><td>CSS 包含 + overscroll 防鏈結 + PWA 安全區域</td><td><span class="badge badge-green">✅ Phase 50</span></td><td>visualization-area contain:layout style；controls-panel overscroll-behavior:contain；PWA bar safe-area-inset-bottom</td></tr>
       </tbody>
     </table>
   </section>
@@ -583,6 +584,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 50 CSS 包含 + overscroll 防鏈結 + PWA 安全區域）</div>
+        <div class="content">
+          <strong>CSS 包含（contain: layout style）on .visualization-area</strong>：CSS Containment Level 2 的 <code>contain: layout style</code> 告知瀏覽器，此元素的佈局計算和樣式作用範圍完全自封閉。好處：Canvas 模擬每幀 redraw 時，瀏覽器不需要重新計算文件其他部分（控制面板、論文區、頁尾）的 layout，減少 reflow 範圍。<code>style</code> containment 防止 CSS counter / CSS inheritance 的副作用溢出。<br><br>
+          <strong>overscroll-behavior: contain on .controls-panel</strong>：手機面板展開後（<code>overflow-y: auto</code>），當使用者捲動到面板底部繼續往下滑，預設行為是觸發父層（body）的 pull-to-refresh 或頁面捲動（捲動鏈結）。<code>overscroll-behavior: contain</code> 阻斷此傳播：面板內捲動在邊界停止，不再傳遞至 body，防止誤觸頁面捲動。<br><br>
+          <strong>PWA install bar safe-area-inset</strong>：Phase 49 的安裝提示條固定在頁面底部，在 iPhone X+ / iPhone 16 系列（有 Home Indicator）的 PWA standalone 模式下，底部 34px 的 Home Indicator 會遮住按鈕。改用 <code>padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px))</code> 並加入左右安全邊距（<code>max(1rem, env(safe-area-inset-left))</code>），確保安裝條在所有 iPhone 機型的安全區域內完整顯示。
         </div>
       </div>
 
@@ -1173,6 +1183,16 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 50 — CSS 包含 + overscroll 防鏈結 + PWA 安全區域 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.css</div>
+      <ul>
+        <li><strong>contain: layout style on .visualization-area</strong>：CSS Containment Level 2，告知瀏覽器模擬區的佈局和樣式是自封閉的。Canvas 每幀重繪不觸發控制面板或論文區的 reflow，縮短主線程繪製耗時。Chrome 85+ / Firefox 69+ / Safari 15.4+ 支援</li>
+        <li><strong>overscroll-behavior: contain on .controls-panel（mobile）</strong>：面板在 <code>overflow-y: auto</code> 狀態下，捲動到邊界時原本會傳遞到 body 觸發 pull-to-refresh 或頁面捲動。<code>contain</code> 值阻斷捲動鏈結，讓面板滾動行為自我完結</li>
+        <li><strong>PWA install bar safe-area padding</strong>：Phase 49 安裝提示條加入 <code>env(safe-area-inset-bottom)</code>（底部）和 <code>max(1rem, env(safe-area-inset-left/right))</code>（左右），確保 iPhone notch / Dynamic Island / Home Indicator 機型在 PWA standalone 模式的完整顯示</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 49 — PWA 安裝提示條 + accent-color + smooth scroll <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.html + index.css</div>
       <ul>
@@ -1522,6 +1542,7 @@
         <li>✅ <strong>Phase 47</strong>：WAI-ARIA tablist ←→ 鍵自動導航（ArrowLeft/Right/Up/Down/Home/End）；T 鍵全域切換 2D/3D</li>
         <li>✅ <strong>Phase 48</strong>：.paper-header sticky top（捲動時始終可折疊）+ backdrop-filter blur；manifest id 欄位（PWA 安裝識別）</li>
         <li>✅ <strong>Phase 49</strong>：PWA 安裝提示條（beforeinstallprompt → 自訂底部 bar → prompt()）；accent-color 品牌藍 checkbox；scroll-behavior smooth + prefers-reduced-motion 降級</li>
+        <li>✅ <strong>Phase 50</strong>：visualization-area contain:layout style（reflow 隔離）；controls-panel overscroll-behavior:contain（防捲動鏈結）；PWA bar safe-area-inset 安全邊距</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
