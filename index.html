@@ -270,32 +270,60 @@
     <script src="simulation.js?v=2"></script>
     <script type="module" src="simulation3d.js?v=2"></script>
     <script>
-    // ── 手機控制面板折疊 ──
+    // ── 手機控制面板折疊（平滑動畫版） ──
     (function() {
         var btn  = document.getElementById('panel-toggle-btn');
-        var body = document.getElementById('controls-panel-body');
-        if (!btn || !body) return;
+        var panel = document.getElementById('controls-panel-body');
+        if (!btn || !panel) return;
 
         function isMobile() { return window.innerWidth <= 768; }
+
+        // 使用 scrollHeight 測量實際高度，避免 max-height:9999px 造成的「瞬彈」
+        function openPanel() {
+            panel.classList.add('open');
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+            // 動畫結束後解除固定高度限制（允許面板內容增減）
+            panel.addEventListener('transitionend', function onEnd(e) {
+                if (e.propertyName !== 'max-height') return;
+                panel.removeEventListener('transitionend', onEnd);
+                if (panel.classList.contains('open')) panel.style.maxHeight = 'none';
+            });
+            btn.setAttribute('aria-expanded', 'true');
+            btn.classList.remove('collapsed');
+        }
+
+        function closePanel() {
+            // 先固定當前高度，下一幀再歸零（確保 transition 正確觸發）
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+            panel.classList.remove('open');
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    panel.style.maxHeight = '0';
+                });
+            });
+            btn.setAttribute('aria-expanded', 'false');
+            btn.classList.add('collapsed');
+        }
 
         function applyMode() {
             if (isMobile()) {
                 btn.style.display = 'block';
-                // 預設收合
-                if (!body.classList.contains('open')) {
-                    body.style.maxHeight = '0';
+                if (!panel.classList.contains('open')) {
+                    panel.style.maxHeight = '0';
                 }
             } else {
                 btn.style.display = 'none';
-                body.classList.add('open');
-                body.style.maxHeight = '';
+                panel.classList.add('open');
+                panel.style.maxHeight = 'none';
             }
         }
 
         btn.addEventListener('click', function() {
-            var isOpen = body.classList.toggle('open');
-            btn.setAttribute('aria-expanded', isOpen);
-            btn.classList.toggle('collapsed', !isOpen);
+            if (panel.classList.contains('open')) {
+                closePanel();
+            } else {
+                openPanel();
+            }
         });
 
         window.addEventListener('resize', applyMode);

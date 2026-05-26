@@ -58,23 +58,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function initChart() {
+        var mobile = window.innerWidth < 768;
         illuminanceChart = new Chart(chartCtx, {
             type: 'line',
             data: {
                 labels: Array(NUM_BINS).fill(''),
                 datasets: [
                     {
-                        label: '實際相對照度 (%)',
+                        label: mobile ? '照度 (%)' : '實際相對照度 (%)',
                         data: [],
                         borderColor: '#0ea5e9',
                         backgroundColor: 'rgba(14, 165, 233, 0.2)',
                         fill: true,
                         tension: 0.4,
-                        borderWidth: 2,
+                        borderWidth: mobile ? 1.5 : 2,
                         pointRadius: 0
                     },
                     {
-                        label: '無遮擋基準',
+                        label: mobile ? '基準 (100%)' : '無遮擋基準',
                         data: Array(NUM_BINS).fill(100),
                         borderColor: '#10b981',
                         borderDash: [5, 5],
@@ -87,22 +88,48 @@ document.addEventListener("DOMContentLoaded", () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: { padding: mobile ? { left: 4, right: 8 } : {} },
                 scales: {
                     x: {
-                        title: { display: true, text: '工作平面水平位置 (cm)', color: '#94a3b8' },
+                        title: {
+                            display: !mobile,
+                            text: '工作平面水平位置 (cm)',
+                            color: '#94a3b8',
+                            font: { size: 11 }
+                        },
                         grid: { color: 'rgba(51, 65, 85, 0.1)' },
-                        ticks: { color: '#94a3b8', maxTicksLimit: 10 }
+                        ticks: {
+                            color: '#94a3b8',
+                            maxTicksLimit: mobile ? 5 : 10,
+                            font: { size: mobile ? 10 : 11 }
+                        }
                     },
                     y: {
                         min: 0,
                         max: 120,
-                        title: { display: true, text: '相對照度 (%)', color: '#94a3b8' },
+                        title: {
+                            display: !mobile,
+                            text: '相對照度 (%)',
+                            color: '#94a3b8',
+                            font: { size: 11 }
+                        },
                         grid: { color: 'rgba(51, 65, 85, 0.1)' },
-                        ticks: { color: '#94a3b8' }
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { size: mobile ? 10 : 11 },
+                            maxTicksLimit: mobile ? 5 : 7
+                        }
                     }
                 },
                 plugins: {
-                    legend: { labels: { color: '#f8fafc' } }
+                    legend: {
+                        labels: {
+                            color: '#f8fafc',
+                            font: { size: mobile ? 10 : 12 },
+                            boxWidth: mobile ? 12 : 16,
+                            padding: mobile ? 8 : 12
+                        }
+                    }
                 }
             }
         });

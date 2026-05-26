@@ -171,6 +171,30 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 5 — 動畫精確化 + 圖表手機響應式 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>控制面板動畫精確化</strong>（index.html JS）：<br>
+          取代 <code>max-height:9999px</code> 反模式，改用 <code>panel.scrollHeight</code> 動態測量實際高度，
+          展開時設精確目標值 + <code>transitionend</code> 後解除限制；
+          收合時雙 <code>requestAnimationFrame</code> 確保瀏覽器正確執行 max-height 0 的過渡。
+          easing 從 <code>ease</code> 改為 <code>cubic-bezier(0.4,0,0.2,1)</code>（Material Design 標準）。
+        </li>
+        <li>
+          <strong>Chart.js 手機響應式</strong>（simulation.js）：
+          <ul>
+            <li>偵測 <code>window.innerWidth &lt; 768</code></li>
+            <li>手機：隱藏 X/Y 軸標題（節省高度），字型縮至 10px</li>
+            <li>手機：X 軸 tick 限制 5 個，Y 軸 5 個</li>
+            <li>手機：縮短 dataset 標籤（避免圖例過長截斷）</li>
+            <li>手機：legend boxWidth 縮至 12、padding 8</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 4 — CSS Cascade 修正 + 行動 GPU 效能 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · 自動 Loop 繼續 · commit <span class="commit-hash">（本次）</span></div>
       <p>發現並修正 Phase 3 中潛藏的 CSS 架構 Bug，同時加入行動裝置 3D 效能優化。</p>
@@ -371,6 +395,17 @@
         </div>
       </div>
 
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 5 動畫精確化 + 圖表優化）</div>
+        <div class="content">
+          <strong>控制面板動畫升級</strong>（index.html）：<br>
+          <code>max-height: 9999px</code> 是 CSS 動畫的反模式 — 瀏覽器需要從 0 補間到 9999px，即使實際內容只有 400px，導致開頭一段時間沒有動畫效果，最後瞬間「彈出」。<br>
+          新方法：JS 使用 <code>panel.scrollHeight</code> 測量實際高度，openPanel() 設定精確目標高度，transitionend 事件後清除固定值（允許面板內容變化）；closePanel() 先固定高度再雙幀歸零，確保過渡動畫正確觸發。easing 改為 cubic-bezier Material Design 曲線。<br><br>
+          <strong>Chart.js 手機響應式</strong>（simulation.js）：<br>
+          偵測 window.innerWidth &lt; 768，對手機套用：隱藏 X/Y 軸標題（節省空間）、縮小字型至 10px、tick 數量減至 5、圖例字型 10px / boxWidth 12、縮短 dataset 標籤（「實際相對照度 (%)」→「照度 (%)」）。
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -393,10 +428,11 @@
         <li>✅ 行動裝置 SSAO 停用 + pixelRatio 限制</li>
         <li>✅ iOS touch-action: none（防止 pinch-zoom 被頁面 scroll 搶奪）</li>
         <li>✅ 手機橫向（landscape）斷點</li>
+        <li>✅ <strong>Phase 5</strong>：控制面板 scrollHeight 精確動畫（取代 max-height:9999px 閃現問題）</li>
+        <li>✅ <strong>Phase 5</strong>：Chart.js 手機響應式（隱藏軸標題、縮小字型、減少 tick、短標籤）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
         <li>⬜ 醫生手套可拖曳遮擋物</li>
         <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>
-        <li>⬜ Phase 5：2D 圖表手機優化（chart.js responsive）</li>
       </ul>
     </div>
   </section>

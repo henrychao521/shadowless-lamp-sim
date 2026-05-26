@@ -618,11 +618,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
         gap: 0;
         overflow: hidden;
         max-height: 0;
-        transition: max-height 0.35s ease, padding 0.35s ease;
+        /* max-height 由 JS scrollHeight 動態設定，transition 負責動畫 */
+        transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
+                    padding 0.38s cubic-bezier(0.4, 0, 0.2, 1);
         border-radius: 12px;
     }
     .controls-panel.open {
-        max-height: 9999px;
+        /* max-height 由 JS 設定為實際 scrollHeight，不再用 9999px */
         padding: 1rem;
         gap: 1rem;
     }
