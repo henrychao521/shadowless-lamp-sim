@@ -61,7 +61,8 @@
     <main class="app-container">
         <!-- 手機版折疊按鈕（桌機隱藏） -->
         <button class="panel-toggle collapsed" id="panel-toggle-btn" aria-expanded="false" aria-controls="controls-panel-body">
-            ⚙️ 模擬參數控制面板
+            ⚙️ 模擬參數
+            <span class="toggle-metric" id="toggle-metric-badge"></span>
             <span class="toggle-arrow">›</span>
         </button>
 
@@ -380,6 +381,23 @@
                 // (switchView 已在 2D 預設時呼叫，但此處確保 panel class 正確)
             } catch(e) {}
         })();
+    </script>
+    <script>
+    // ── 動態量測 header 高度（供 panel-toggle sticky top 使用）──
+    (function() {
+        function syncHeaderHeight() {
+            var h = document.querySelector('.app-header');
+            if (h) {
+                document.documentElement.style.setProperty('--header-height', h.offsetHeight + 'px');
+            }
+        }
+        syncHeaderHeight();
+        window.addEventListener('resize', syncHeaderHeight);
+        // 字型載入後重測（Inter 可能讓 header 高度略有變化）
+        if (document.fonts) {
+            document.fonts.ready.then(syncHeaderHeight);
+        }
+    })();
     </script>
     <script src="simulation.js?v=4"></script>
     <script type="module" src="simulation3d.js?v=4"></script>

@@ -385,6 +385,15 @@ document.addEventListener("DOMContentLoaded", () => {
             mmbBadge.className   = 'iec-badge ' + (iecPass ? 'iec-pass' : 'iec-fail');
         }
 
+        // ── 面板折疊按鈕即時照度指示（只在手機版可見）──
+        const toggleMetric = document.getElementById('toggle-metric-badge');
+        if (toggleMetric) {
+            toggleMetric.textContent = centerDilution.toFixed(0) + '% ' + (iecPass ? '✅' : '❌');
+            toggleMetric.style.color = centerDilution < 50 ? '#ef4444'
+                                     : centerDilution < 80 ? '#fbbf24'
+                                     : '#14b8a6';
+        }
+
         // ── IEC 閾值穿越觸覺反饋（Android Chrome 支援 Vibration API）──
         if (prevIECPass !== null && iecPass !== prevIECPass && navigator.vibrate) {
             // IEC PASS 達標：輕快雙振；IEC FAIL 跌破：重-短-重

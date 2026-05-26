@@ -120,6 +120,7 @@
         <tr><td>手機浮動指標條</td><td><span class="badge badge-green">✅ Phase 30</span></td><td>調整滑桿時視覺化區頂端永遠顯示當前照度 + IEC 狀態，無需捲動</td></tr>
         <tr><td>IEC 閾值觸覺反饋</td><td><span class="badge badge-green">✅ Phase 30</span></td><td>IEC 閾值（50%）穿越時觸發差異化震動型態（達標雙振 / 跌破重短重）</td></tr>
         <tr><td>觸控延遲消除</td><td><span class="badge badge-green">✅ Phase 31</span></td><td>touch-action:manipulation 消除按鈕 300ms 延遲，44px 最小觸控目標（WCAG 2.5.5）</td></tr>
+        <tr><td>Sticky 控制面板按鈕</td><td><span class="badge badge-green">✅ Phase 32</span></td><td>面板折疊按鈕 position:sticky，捲動時永遠貼在 header 下方，按鈕顯示即時照度值</td></tr>
       </tbody>
     </table>
   </section>
@@ -569,6 +570,18 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 32 Sticky 控制面板按鈕）</div>
+        <div class="content">
+          觀察到手機使用者捲動到 3D Canvas 或照度圖後，面板折疊按鈕滾出視窗，無法在不捲回頂部的情況下開關控制面板或查看當前照度。<br><br>
+          <strong>解決方案</strong>：<br>
+          1. JS 動態量測 <code>.app-header.offsetHeight</code>，寫入 CSS 自定義屬性 <code>--header-height</code>（在 DOMContentLoaded / resize / fonts.ready 三個時機同步）。<br>
+          2. 手機版 .panel-toggle 加入 <code>position: sticky; top: var(--header-height); z-index: 90;</code>，使其黏附在 sticky header 下方，跟隨使用者捲動時始終可見。<br>
+          3. 按鈕加入 <code>.toggle-metric</code> span，simulation.js 在每次 updateChart() 時同步更新「XX% ✅/❌」，顏色隨 IEC 閾值即時變色。<br>
+          4. 視覺：sticky 模式下增加 backdrop-blur 和深色背景（避免下方內容透出）；面板展開時圓角調整（按鈕底部改為直角，與面板頂部無縫銜接）。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 31 觸控延遲 + 44px 觸控目標）</div>
         <div class="content">
           <strong>touch-action: manipulation</strong>：在 CSS 全局層（緊跟 * 重置之後）加入規則，讓所有 button、input[type="range"]、input[type="checkbox"]、a、label[for]、[role="button"]、[tabindex] 元素啟用 manipulation 模式。<br>
@@ -984,6 +997,20 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 32 — Sticky 控制面板按鈕 + 即時照度指示 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css + simulation.js</div>
+      <ul>
+        <li><strong>問題</strong>：使用者捲動到 3D canvas 或照度圖表區域後，控制面板折疊按鈕不在視窗內，無法快速返回調整參數</li>
+        <li><strong>Sticky 面板按鈕</strong>：@media (max-width:768px) 下加入 <code>position: sticky; top: var(--header-height)</code>（z-index:90，低於 header 的 100）</li>
+        <li><strong>動態 --header-height CSS 變數</strong>：JS 在 DOMContentLoaded + resize + fonts.ready 時量測 .app-header.offsetHeight 並寫入 <code>document.documentElement.style</code>，確保 Dynamic Island / 一般 iPhone 均正確定位</li>
+        <li><strong>視覺升級</strong>：sticky 狀態下 background 改為 rgba(11,17,32,0.92) + backdrop-filter:blur(8px)，底部圓角改為 0 0 10px 10px（與 header 接觸面方正）；展開時改為 10px 10px 0 0（與面板融合）</li>
+        <li><strong>.toggle-metric 即時照度</strong>：按鈕內加入 <code>&lt;span class="toggle-metric" id="toggle-metric-badge"&gt;</code></li>
+        <li>simulation.js updateChart() 同步更新：顯示「XX% ✅/❌」，顏色隨閾值（teal/amber/red）即時切換</li>
+        <li>效果：捲動到任何位置都能在 header 下方看到當前照度並一鍵重開面板</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 31 — 觸控延遲消除 + 44px 觸控目標 + 捲動隔離 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.css · commit 待提交</div>
       <ul>
@@ -1080,6 +1107,8 @@
         <li>✅ <strong>Phase 31</strong>：touch-action:manipulation 全局（消除 300ms tap delay，保留頁面縮放）</li>
         <li>✅ <strong>Phase 31</strong>：WCAG 2.5.5 — 44px 最小觸控目標（preset-btn / demo-btn / share-btn）</li>
         <li>✅ <strong>Phase 31</strong>：overscroll-behavior-y:contain 控制面板（防止捲動傳導至頁面）</li>
+        <li>✅ <strong>Phase 32</strong>：Sticky 面板折疊按鈕（position:sticky + --header-height CSS 變數，捲動時永遠可見）</li>
+        <li>✅ <strong>Phase 32</strong>：按鈕即時照度指示（toggle-metric badge，顯示 XX% ✅/❌）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
