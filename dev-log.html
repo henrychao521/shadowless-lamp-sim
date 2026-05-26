@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>開發紀錄 — shadowless-lamp-sim</title>
+<meta name="description" content="shadowless-lamp-sim 開發紀錄 — 3D 無影燈模擬器的設計過程、手機優化與對話逐字稿">
+<meta name="theme-color" content="#0b1120">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='14' r='8' fill='%230ea5e9' opacity='.9'/%3E%3Ccircle cx='16' cy='14' r='5' fill='%23fff' opacity='.95'/%3E%3Crect x='14.5' y='22' width='3' height='6' rx='1.5' fill='%2314b8a6'/%3E%3Cellipse cx='16' cy='14' rx='12' ry='12' fill='none' stroke='%230ea5e9' stroke-width='1.5' opacity='.35'/%3E%3C/svg%3E">
 <style>
   :root {
     --bg: #0b1120; --panel: rgba(15,23,42,0.9); --card: rgba(30,41,59,0.7);
@@ -169,6 +172,29 @@
         <li><strong>Tab 全寬</strong>：flex:1 分配，觸控目標高度加大</li>
         <li><strong>觸控提示</strong>：偵測觸控裝置切換「🖱️ 拖曳」→「👆 單指・雙指縮放」</li>
         <li><strong>超小螢幕（≤390px）</strong>：字型縮小、隱藏 badge、canvas 高度 60vw</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 10 — 部署修正 + Favicon <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>deploy.yml 修正</strong>：原工作流程漏掉了 <code>dev-log.html</code> 與 <code>手術無影燈光學設計與模擬.docx</code>，移除了不需部署的 <code>operate.js</code>（Puppeteer 自動化腳本）。現在使用個別 <code>cp</code> 複製（替代 <code>cp /tmp/site/*</code>），避免萬用字元意外複製多餘檔案。
+        </li>
+        <li>
+          <strong>SVG Favicon</strong>（內嵌 Data URI）：無需額外 .ico 檔，手術燈圖示（藍色圓圈 + 白色核心 + 青色支柱 + 外圈暈光）直接寫入 <code>link[rel=icon]</code> 的 href data URL。同時加入 index.html 和 dev-log.html。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 9 — SEO Meta + 完整 URL Hash + 無障礙動畫 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li><strong>Meta tags</strong>：og:title / og:description / og:url / og:type / twitter:card / meta description / theme-color #0b1120。改善社群分享預覽與 PWA 外觀。</li>
+        <li><strong>URL hash 補完</strong>：encodeHash() 加入 <code>oz</code>（obstacle_z）和 <code>rm</code>（realistic_mode）。simulation.js DOMContentLoaded 內直接附加 obstacle_z / realistic_mode / smart_compensation 的 input/change listener 呼叫 encodeHash，避免閉包外存取問題。restoreFromHash() 還原後 dispatch events 以觸發 simulation3d.js 的監聽器。</li>
+        <li><strong>prefers-reduced-motion</strong>：<code>@media (prefers-reduced-motion: reduce)</code> 設定所有 animation/transition duration 為 0.001ms，停用 .loading-ring 旋轉和 .val-pulse 閃爍，保護前庭功能敏感使用者。</li>
       </ul>
     </div>
 
@@ -453,6 +479,23 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 10 部署修正 + Favicon）</div>
+        <div class="content">
+          發現 deploy.yml 漏掉 dev-log.html — 用戶無法在 Pages 看到開發紀錄！也漏掉 .docx 下載檔案。修正 workflow，改用個別 cp 指令，加入 dev-log.html 和 .docx，移除 operate.js（Puppeteer 腳本不需公開部署）。<br>
+          同時加入 SVG 內嵌 favicon（data URI）到 index.html 和 dev-log.html，不需額外 .ico 資源請求。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 9 SEO + URL hash 補完 + 無障礙）</div>
+        <div class="content">
+          加入完整 Open Graph / Twitter Card meta tags，改善社群連結預覽。<br>
+          URL hash 補上 obstacle_z 和 realistic_mode（在 DOMContentLoaded 閉包內附加監聽器，避免閉包外存取問題）。<br>
+          加入 prefers-reduced-motion CSS — 保護前庭功能敏感使用者。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 8 複製連結按鈕）</div>
         <div class="content">
           確認 GitHub Actions 全部 ✅（Phase 7 workflow success，Pages build deploying）。<br>
@@ -519,6 +562,11 @@
         <li>✅ <strong>Phase 7</strong>：URL hash 狀態編碼（分享特定模擬設定；使用 <code>replaceState</code> 不污染歷史）</li>
         <li>✅ <strong>Phase 7</strong>：滑桿數值閃光動畫（val-pulse keyframe，移動時白光提示更新）</li>
         <li>✅ <strong>Phase 8</strong>：📋「複製連結分享此設定」按鈕（Clipboard API + iOS execCommand fallback）</li>
+        <li>✅ <strong>Phase 9</strong>：SEO meta tags（og:title / og:description / twitter:card / theme-color）</li>
+        <li>✅ <strong>Phase 9</strong>：URL hash 補完 obstacle_z 和 realistic_mode（完整狀態序列化）</li>
+        <li>✅ <strong>Phase 9</strong>：prefers-reduced-motion 無障礙 CSS（前庭功能敏感使用者）</li>
+        <li>✅ <strong>Phase 10</strong>：deploy.yml 修正（補上 dev-log.html + .docx，移除 operate.js）</li>
+        <li>✅ <strong>Phase 10</strong>：SVG favicon（內嵌手術燈圖示，主頁 + dev-log）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
         <li>⬜ 醫生手套可拖曳遮擋物</li>
         <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>

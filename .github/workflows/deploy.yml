@@ -26,7 +26,11 @@ jobs:
 
           # Copy site files to temp
           mkdir -p /tmp/site
-          cp index.html index.css simulation.js simulation3d.js operate.js /tmp/site/
+          cp index.html index.css simulation.js simulation3d.js dev-log.html /tmp/site/
+          # Copy docx if it exists (referenced by download link in index.html)
+          if [ -f "手術無影燈光學設計與模擬.docx" ]; then
+            cp "手術無影燈光學設計與模擬.docx" /tmp/site/
+          fi
           touch /tmp/site/.nojekyll
 
           # Fetch and switch to gh-pages branch
@@ -34,7 +38,21 @@ jobs:
           git checkout gh-pages
 
           # Update files
-          cp /tmp/site/* .
+          cp /tmp/site/index.html .
+          cp /tmp/site/index.css .
+          cp /tmp/site/simulation.js .
+          cp /tmp/site/simulation3d.js .
+          cp /tmp/site/dev-log.html .
+          cp /tmp/site/.nojekyll .
+          if [ -f "/tmp/site/手術無影燈光學設計與模擬.docx" ]; then
+            cp "/tmp/site/手術無影燈光學設計與模擬.docx" .
+          fi
 
-          git add index.html index.css simulation.js simulation3d.js operate.js .nojekyll
-          git diff --staged --quiet && echo "No changes to deploy" || (git commit -m "deploy: sync from main [skip ci]" && git push origin gh-pages)
+          git add index.html index.css simulation.js simulation3d.js dev-log.html .nojekyll
+          # Add docx if present (git handles binary files fine)
+          git ls-files --error-unmatch "手術無影燈光學設計與模擬.docx" 2>/dev/null && \
+            git add "手術無影燈光學設計與模擬.docx" || \
+            git add "手術無影燈光學設計與模擬.docx" 2>/dev/null || true
+
+          git diff --staged --quiet && echo "No changes to deploy" || \
+            (git commit -m "deploy: sync from main [skip ci]" && git push origin gh-pages)
