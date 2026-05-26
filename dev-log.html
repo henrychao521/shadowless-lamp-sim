@@ -565,6 +565,26 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 28 補丁：smart_comp_group + 最終彙整）</div>
+        <div class="content">
+          發現 <code>smart_comp_group</code> 未加入 <code>.control-3d-only</code>，若使用者在 3D 模式勾選 realistic_mode 顯示 smart_comp 後切回 2D，該控制項不會跟著淡化。補上 class 修正。<br><br>
+          <strong>本 Loop 完整彙整（Phase 17–28）</strong>：<br>
+          17：PWA Manifest（可加入主畫面）<br>
+          18：Swipe 換 Tab + 全螢幕按鈕<br>
+          19：4 個快速教學預設<br>
+          20：IEC 合規徽章 + 列印樣式<br>
+          21：截圖下載（合成 PNG）<br>
+          22：鍵盤快捷鍵 + 首次訪問引導<br>
+          23：🐛 修正 keyBtn listener 重複堆疊<br>
+          24：▶ 3D 自動旋轉 Demo 模式<br>
+          25：🎬 遮擋物掃描動畫（rAF + easeInOut）<br>
+          26：iOS Safe Area + 照度圖捲動提示<br>
+          27：WCAG 無障礙（skip link + focus-visible）<br>
+          28：3D-only 控制項情境感知淡化
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 28 3D-Only 控制項智慧淡化）</div>
         <div class="content">
           觀察到 obstacle_z 和 realistic_mode 等控制項在 2D tab 下其實無效，但 UI 沒有任何提示，容易讓使用者困惑（移動 Z 軸滑桿但 2D 畫面沒有反應）。<br><br>
