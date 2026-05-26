@@ -558,15 +558,17 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .paper-content {
     padding: 0 1.5rem;
-    max-height: 2000px;
-    transition: max-height 0.4s ease-in-out, padding 0.4s ease-in-out, opacity 0.4s ease-in-out;
+    /* max-height is managed by JS (scrollHeight) for accurate animation */
+    max-height: none;
+    transition: max-height 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.35s ease;
     opacity: 1;
     overflow: hidden;
     color: var(--text-secondary);
 }
 
 .paper-content.collapsed {
-    max-height: 0;
+    max-height: 0 !important;
     padding: 0 1.5rem;
     opacity: 0;
 }
