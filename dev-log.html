@@ -126,6 +126,7 @@
         <tr><td>ARIA Tab 模式 + 懶載入 3D</td><td><span class="badge badge-green">✅ Phase 35</span></td><td>正確 role="tablist/tab/tabpanel" + 首次點擊 3D tab 才動態 import() Three.js bundle</td></tr>
         <tr><td>Service Worker 離線快取</td><td><span class="badge badge-green">✅ Phase 36</span></td><td>sw.js 快取本地資產（cache-first），重複訪問秒開，2D 模擬完全離線可用</td></tr>
         <tr><td>深色模式系統整合 + ESC + Slider Active</td><td><span class="badge badge-green">✅ Phase 37</span></td><td>color-scheme:dark + ESC 關閉面板 + 滑桿 :active 放大 + overscroll-behavior:none 兩軸</td></tr>
+        <tr><td>手機面板點外關閉（Backdrop 遮罩）</td><td><span class="badge badge-green">✅ Phase 38</span></td><td>半透明遮罩 z-index 層次設計；點擊面板外側區域收合面板，符合手機 UI 慣例</td></tr>
       </tbody>
     </table>
   </section>
@@ -571,6 +572,18 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 38 手機面板 Backdrop 遮罩）</div>
+        <div class="content">
+          <strong>問題識別</strong>：手機版控制面板展開後只能透過頂部 toggle 按鈕收合，不符合手機 App 「點擊外部關閉彈出層」的普遍 UX 慣例。在面板佔螢幕 57vh 時，使用者自然反應是點下方視覺化區域，但這樣不會關閉面板。<br><br>
+          <strong>Backdrop 遮罩實作</strong>：<br>
+          HTML：在 <code>.app-container</code> 內最前方加入 <code>&lt;div class="panel-backdrop"&gt;</code>（<code>aria-hidden="true"</code>）。<br>
+          CSS：<code>position:fixed; inset:0; z-index:88; opacity:0; pointer-events:none</code>，加入 .active 後 fade-in 到 opacity:1（0.28s ease）。<br>
+          Z-index 層次：backdrop(88) &lt; controls-panel(89) &lt; panel-toggle(90)，確保面板可見且可互動，遮罩只覆蓋視覺化區域。<br>
+          JS：openPanel() 在手機模式顯示遮罩；closePanel() 隱藏遮罩；applyMode() 切換到桌機自動清除；backdrop click → closePanel() + vibrate(8ms)。
         </div>
       </div>
 
@@ -1053,6 +1066,23 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 38 — 手機面板 Backdrop 遮罩（點外關閉）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.css + index.html</div>
+      <ul>
+        <li><strong>問題</strong>：手機版控制面板展開後，若要收合只能點擊頂部的折疊按鈕，與手機 App 的「點面板外側關閉」慣例不符，尤其是在面板佔 57vh 時，使用者自然傾向點下方視覺化區域</li>
+        <li><strong>HTML</strong>：在 <code>.app-container</code> 最前方新增 <code>&lt;div class="panel-backdrop" id="panel-backdrop" aria-hidden="true"&gt;&lt;/div&gt;</code></li>
+        <li><strong>CSS 遮罩樣式</strong>：<code>position:fixed; inset:0; background:rgba(0,0,0,0.32); z-index:88</code>，預設 <code>opacity:0; pointer-events:none</code>（不影響正常操作），加入 <code>.active</code> class 後 opacity:1 + pointer-events:auto（0.28s ease 淡入）</li>
+        <li><strong>CSS z-index 層次設計</strong>：<br>
+          ① <code>.controls-panel</code> 在 <code>@media 768px</code> 加入 <code>position:relative; z-index:89</code>（高於遮罩，面板內容可見且可互動）<br>
+          ② <code>.panel-backdrop</code>：<code>z-index:88</code>（遮蓋視覺化區 z-index:auto，但低於面板）<br>
+          ③ <code>.panel-toggle</code>：已有 <code>z-index:90</code>（最高層，始終可點擊）</li>
+        <li><strong>JS 整合</strong>：<code>openPanel()</code> 在手機版時加入 <code>backdrop.classList.add('active')</code>；<code>closePanel()</code> 先移除 <code>active</code>；<code>applyMode()</code> 切換到桌機時自動清除遮罩</li>
+        <li><strong>點擊遮罩關閉</strong>：backdrop 的 click 事件呼叫 <code>closePanel()</code>，同時觸發短暫 8ms 震動提供觸覺確認</li>
+        <li>效果：任何在面板外側的點擊（視覺化區、Canvas、圖表）都會收合面板，符合 iOS/Android 的 Sheet/Modal 關閉慣例</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 37 — 深色模式系統整合 + ESC 關閉面板 + 滑桿 :active 反饋 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.css + index.html</div>
       <ul>
@@ -1250,6 +1280,7 @@
         <li>✅ <strong>Phase 37</strong>：ESC 關閉手機面板（keydown 最前攔截，INPUT 焦點下也生效）</li>
         <li>✅ <strong>Phase 37</strong>：滑桿 :active scale(1.4) + 光暈（觸控拖曳時視覺放大反饋）</li>
         <li>✅ <strong>Phase 37</strong>：overscroll-behavior:none 雙軸（防止 iOS 橫向 rubber-band 彈跳）</li>
+        <li>✅ <strong>Phase 38</strong>：面板 Backdrop 遮罩（點外關閉，z-index 88/89/90 層次，fadeIn 動畫）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
