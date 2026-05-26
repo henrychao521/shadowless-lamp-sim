@@ -677,6 +677,38 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-muted);
 }
 
+/* ── Skip to content link（鍵盤 / 螢幕閱讀器）── */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    background: var(--accent-blue);
+    color: #fff;
+    padding: 0.6rem 1.2rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 0 0 8px 0;
+    text-decoration: none;
+    z-index: 9999;
+    transition: top 0.2s;
+}
+.skip-link:focus {
+    top: 0;
+}
+
+/* ── 鍵盤焦點環（keyboard :focus-visible）── */
+/* 覆蓋瀏覽器預設，確保在深色背景上清晰可見 */
+:focus-visible {
+    outline: 2px solid var(--accent-blue) !important;
+    outline-offset: 3px !important;
+    border-radius: 4px !important;
+}
+/* 滑桿的焦點環改為更大 */
+input[type="range"]:focus-visible {
+    outline: 3px solid var(--accent-blue) !important;
+    outline-offset: 4px !important;
+}
+
 /* ── iOS Safe Area（iPhone notch / 底部 Home indicator）── */
 .paper-reference-container {
     /* 確保最底層內容不被 iPhone Home Indicator 遮擋 */
@@ -1166,8 +1198,9 @@ input[type="range"]::-webkit-slider-thumb:hover {
     .paper-content h2, .paper-content h3 { color: #111 !important; }
     .paper-content p, .paper-content li   { color: #333 !important; }
 
-    /* 下載按鈕：隱藏 */
+    /* 下載按鈕、skip link：隱藏 */
     .download-section { display: none !important; }
+    .skip-link { display: none !important; }
 
     /* 頁面分隔 */
     .paper-reference-container { page-break-before: always; }
