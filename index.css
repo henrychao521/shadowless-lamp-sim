@@ -1235,6 +1235,13 @@ input[type="range"]:focus-visible {
         aspect-ratio: 2 / 1;
     }
 
+    /* 圖表放大按鈕：加大觸控目標（WCAG 2.5.5）*/
+    .chart-expand-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
     /* Card header：允許換行 */
     .card-header {
         flex-wrap: wrap;
@@ -1321,6 +1328,7 @@ input[type="range"]:focus-visible {
 @media (max-width: 390px) {
     .app-header h1 { font-size: 0.9rem; }
     .header-badges { display: none; }
+    .logo-icon { display: none; } /* 節省橫向空間 */
     .tab-btn { font-size: 0.75rem; padding: 0.75rem 0.25rem; }
     .canvas-3d { height: 60vw; min-height: 240px; }
 }

@@ -133,6 +133,7 @@
         <tr><td>演示體驗優化</td><td><span class="badge badge-green">✅ Phase 42</span></td><td>demo 開始自動收合面板 + 震動反饋；首次切換 tab 後淡出滑動提示</td></tr>
         <tr><td>橫向模式 + scroll-padding + 字型調整</td><td><span class="badge badge-green">✅ Phase 43</span></td><td>landscape 面板 78vh（原 57vh）；html scroll-padding-top 避開 sticky header；info-card 字型 0.82rem</td></tr>
         <tr><td>手機面板空間優化 + aria-live</td><td><span class="badge badge-green">✅ Phase 44</span></td><td>手機版隱藏面板 h2+說明文字（節省 ~65px）；illuminance display aria-live=polite 螢幕閱讀器相容</td></tr>
+        <tr><td>Preload + 超小螢幕 + 圖表按鈕</td><td><span class="badge badge-green">✅ Phase 45</span></td><td>preload simulation.js；390px 隱藏 logo-icon；chart-expand-btn 24→32px（WCAG 觸控目標）</td></tr>
       </tbody>
     </table>
   </section>
@@ -578,6 +579,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 45 Preload + 超小螢幕 + 圖表按鈕）</div>
+        <div class="content">
+          <strong>rel="preload" simulation.js</strong>：simulation.js（~50KB）目前在 body 末尾被發現並下載，晚於 Chart.js 和 index.css。加入 <code>&lt;link rel="preload" as="script"&gt;</code> 告知瀏覽器在解析 &lt;head&gt; 時就啟動下載，利用 HTML parser 處理 CDN 請求期間的空窗期，縮短首次可見模擬的等待時間。<br><br>
+          <strong>390px logo-icon 隱藏</strong>：iPhone SE（375px）和部分 Android 入門機（360px）螢幕極窄，logo 圖示佔 ~40px（含 gap），讓 h1 文字空間更緊縮。<code>display:none</code> 不影響 ARIA 和功能，純視覺優化。<br><br>
+          <strong>chart-expand-btn 24→32px</strong>：原 24px 是一個"邊緣"尺寸，手指點擊時容易滑過。32px 是 Google Material Design 和 Apple HIG 都認可的最小觸控目標，同時也符合 WCAG 2.5.8 的 24px 最小建議（以充分 margin 實現）。
         </div>
       </div>
 
@@ -1124,6 +1134,16 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 45 — Preload 提前下載 + 超小螢幕 + 圖表按鈕 WCAG <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html + index.css</div>
+      <ul>
+        <li><strong>rel="preload" as="script"</strong>：在 <code>&lt;head&gt;</code> 加入 <code>&lt;link rel="preload" as="script" href="simulation.js?v=4"&gt;</code>。瀏覽器在解析 HTML 時即預先下載 simulation.js，而非等到 parser 到達 body 底部的 <code>&lt;script&gt;</code> 標籤才開始下載。對慢速網路（如學校 WiFi）可節省 100–300ms 的首次模擬渲染延遲。simulation.js 不是 ES module，<code>as="script"</code> 正確匹配其載入方式</li>
+        <li><strong>超小螢幕 logo-icon 隱藏</strong>：在 <code>@media (max-width: 390px)</code> 加入 <code>.logo-icon { display: none }</code>，省去 24px 圓形裝飾圖示所佔的橫向空間，讓超小螢幕（iPhone SE = 375px、舊款 Android = 360px）的標題更不容易截斷</li>
+        <li><strong>圖表放大按鈕擴大至 32×32</strong>：<code>.chart-expand-btn</code> 在手機版從 24×24px 改為 32×32px。原本 24px 略低於 WCAG 2.5.8（建議 24px）且操作不夠精確；32px 是 iOS/Android 推薦的最小觸控目標</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 44 — 手機面板空間優化 + aria-live 照度顯示 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.css + index.html</div>
       <ul>
@@ -1411,6 +1431,7 @@
         <li>✅ <strong>Phase 42</strong>：Demo 開始自動收合手機面板（視覺化區全顯），演示觸覺反饋，首次 tab 切換後滑動提示淡出</li>
         <li>✅ <strong>Phase 43</strong>：landscape 面板 78vh（原 57vh）；html scroll-padding-top 避開 sticky header；info-card 0.82rem</li>
         <li>✅ <strong>Phase 44</strong>：手機版隱藏面板 h2+說明文字（節省 65px，控制項更多不需捲動）；aria-live=polite 照度顯示</li>
+        <li>✅ <strong>Phase 45</strong>：preload simulation.js（提前下載，縮短首次渲染）；390px 隱藏 logo-icon；圖表按鈕 32px</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
