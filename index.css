@@ -789,6 +789,37 @@ input[type="range"]::-webkit-slider-thumb:hover {
     transform: scale(0.97);
 }
 
+/* ── 3D 自動旋轉按鈕 ── */
+.autorotate-btn {
+    background: rgba(20, 184, 166, 0.1);
+    border: 1px solid rgba(20, 184, 166, 0.3);
+    color: var(--accent-teal);
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+}
+.autorotate-btn:hover   { background: rgba(20, 184, 166, 0.2); }
+.autorotate-btn:active  { transform: scale(0.9); }
+.autorotate-btn.active  {
+    background: rgba(20, 184, 166, 0.25);
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 8px rgba(20, 184, 166, 0.4);
+    animation: rotate-pulse 2s linear infinite;
+}
+@keyframes rotate-pulse {
+    0%   { box-shadow: 0 0 6px rgba(20, 184, 166, 0.4); }
+    50%  { box-shadow: 0 0 14px rgba(20, 184, 166, 0.7); }
+    100% { box-shadow: 0 0 6px rgba(20, 184, 166, 0.4); }
+}
+
 /* ── 3D 全螢幕按鈕 ── */
 .fullscreen-btn {
     background: rgba(14, 165, 233, 0.1);
