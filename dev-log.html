@@ -137,6 +137,7 @@
         <tr><td>Canvas ARIA + tablist orientation + resize debounce</td><td><span class="badge badge-green">✅ Phase 46</span></td><td>rayCanvas/illuminanceChart role=img + aria-label；tablist aria-orientation=horizontal；applyMode 100ms debounce</td></tr>
         <tr><td>Tablist 方向鍵導航 + T 鍵切換 Tab</td><td><span class="badge badge-green">✅ Phase 47</span></td><td>WAI-ARIA tablist ←→ 鍵自動切換 + Home/End；T 鍵全域切換 2D/3D Tab</td></tr>
         <tr><td>Sticky 論文標題列 + manifest id 欄位</td><td><span class="badge badge-green">✅ Phase 48</span></td><td>.paper-header sticky top：捲動時始終可折疊論文區塊；manifest id 欄位確保 Chrome/Edge PWA 安裝識別</td></tr>
+        <tr><td>PWA 安裝提示條 + accent-color + smooth scroll</td><td><span class="badge badge-green">✅ Phase 49</span></td><td>beforeinstallprompt 捕捉顯示安裝條；accent-color 品牌藍；scroll-behavior smooth + prefers-reduced-motion 降級</td></tr>
       </tbody>
     </table>
   </section>
@@ -582,6 +583,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 49 PWA 安裝提示條 + accent-color + smooth scroll）</div>
+        <div class="content">
+          <strong>beforeinstallprompt PWA 安裝提示條</strong>：Chrome Android / Edge 在 PWA 符合安裝條件時會觸發 <code>beforeinstallprompt</code> 事件。呼叫 <code>e.preventDefault()</code> 阻止預設的迷你資訊欄，改為顯示自訂的 <code>.pwa-install-bar</code>（固定在畫面底部）。使用者點「安裝應用程式」後呼叫 <code>deferredPrompt.prompt()</code>，再等候 <code>userChoice</code> Promise 決定後清除 prompt。<code>appinstalled</code> 事件也會關閉提示條，防止已安裝時再次顯示。<br><br>
+          <strong>accent-color</strong>：在 <code>:root</code> 加入 <code>accent-color: #0ea5e9</code>。Chrome 93+ / Safari 15.4+ 支援此屬性，讓原生表單控制項（checkbox ✓ 填充、radio 選取點、range thumb、progress bar）自動呈現品牌藍，無需另行覆寫 <code>::-webkit-</code> 偽元素樣式。模擬器中的「真實光學模式」和「智慧補償模式」checkbox 立即受惠。<br><br>
+          <strong>scroll-behavior: smooth</strong>：加入 <code>html { scroll-behavior: smooth; }</code>，讓 CSS 錨點導航（如點擊 <code>&lt;a href="#..."&gt;</code>）和 JS <code>scrollIntoView()</code>（未明確指定 behavior 時）使用平滑捲動。在 <code>@media (prefers-reduced-motion: reduce)</code> 區塊加入 <code>html { scroll-behavior: auto; }</code> 降級為即時跳轉，符合前庭功能無障礙規範。
         </div>
       </div>
 
@@ -1163,6 +1173,17 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 49 — PWA 安裝提示條 + accent-color + smooth scroll <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html + index.css</div>
+      <ul>
+        <li><strong>PWA 安裝提示條（beforeinstallprompt）</strong>：攔截 Chrome/Edge 的 PWA 安裝觸發事件，顯示自訂底部安裝條（<code>.pwa-install-bar</code>，z-index:100）。包含說明文字、「安裝應用程式」按鈕（呼叫 <code>deferredPrompt.prompt()</code>）和「✕」關閉按鈕。<code>appinstalled</code> 事件自動隱藏提示條。iOS Safari 不支援此 API，但不顯示提示條，不影響功能</li>
+        <li><strong>accent-color</strong>：<code>:root { accent-color: #0ea5e9 }</code>（品牌藍），無需覆寫 <code>::-webkit-</code> 偽元素即可讓「真實光學模式」和「智慧補償模式」checkbox 呈現品牌色彩。Chrome 93+、Safari 15.4+、Firefox 92+ 均支援</li>
+        <li><strong>scroll-behavior: smooth</strong>：<code>html { scroll-behavior: smooth }</code> 啟用 CSS 平滑捲動（錨點導航 + 無明確 behavior 的 scrollIntoView）。在 <code>@media (prefers-reduced-motion: reduce)</code> 中補加 <code>html { scroll-behavior: auto }</code> 確保前庭功能敏感使用者不受影響</li>
+        <li><strong>pwa-slide-up 動畫</strong>：安裝條出現時從底部滑入（<code>@keyframes pwa-slide-up</code> translateY(100%)→(0)）。此動畫受既有 <code>prefers-reduced-motion: reduce</code> 的 <code>animation-duration: 0.001ms !important</code> 約束，自動縮短為即現</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 48 — Sticky 論文標題列 + manifest id 欄位 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.css + manifest.json</div>
       <ul>
@@ -1500,6 +1521,7 @@
         <li>✅ <strong>Phase 46</strong>：rayCanvas/illuminanceChart role=img aria-label；tablist aria-orientation=horizontal；applyMode 100ms debounce</li>
         <li>✅ <strong>Phase 47</strong>：WAI-ARIA tablist ←→ 鍵自動導航（ArrowLeft/Right/Up/Down/Home/End）；T 鍵全域切換 2D/3D</li>
         <li>✅ <strong>Phase 48</strong>：.paper-header sticky top（捲動時始終可折疊）+ backdrop-filter blur；manifest id 欄位（PWA 安裝識別）</li>
+        <li>✅ <strong>Phase 49</strong>：PWA 安裝提示條（beforeinstallprompt → 自訂底部 bar → prompt()）；accent-color 品牌藍 checkbox；scroll-behavior smooth + prefers-reduced-motion 降級</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>

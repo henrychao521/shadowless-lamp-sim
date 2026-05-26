@@ -1,5 +1,6 @@
 :root {
     color-scheme: dark; /* 告知瀏覽器本站為深色，系統滾動條、表單控制項自動套用深色主題 */
+    accent-color: #0ea5e9; /* Phase 49：原生表單控制項（checkbox / radio）自動套用品牌藍 */
     --bg-main: #0b1120;
     --bg-panel: rgba(15, 23, 42, 0.75);
     --bg-card: rgba(30, 41, 59, 0.6);
@@ -28,8 +29,10 @@
 }
 
 /* ── scroll-padding-top：錨點導航 / scrollIntoView 自動避開 sticky header ── */
+/* ── scroll-behavior smooth（Phase 49，僅在使用者未設定「減少動態效果」時啟用）── */
 html {
     scroll-padding-top: calc(var(--header-height, 60px) + 0.75rem);
+    scroll-behavior: smooth;
 }
 
 /* ── 觸控優化：消除 300ms tap delay，不阻止頁面縮放 ── */
@@ -893,6 +896,60 @@ input[type="range"]:focus-visible {
     transform: translateX(-50%) translateY(0);
 }
 
+/* ── Phase 49：PWA 安裝提示條 ── */
+.pwa-install-bar {
+    display: none; /* 預設隱藏；beforeinstallprompt 觸發後加 .visible */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(15, 23, 42, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(14, 165, 233, 0.35);
+    padding: 0.75rem 1rem;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    animation: pwa-slide-up 0.3s ease;
+}
+.pwa-install-bar.visible { display: flex; }
+.pwa-install-bar p {
+    flex: 1;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    min-width: 180px;
+}
+.pwa-btn {
+    padding: 0.45rem 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    touch-action: manipulation;
+    white-space: nowrap;
+    transition: background 0.2s, transform 0.1s;
+}
+.pwa-btn:active { transform: scale(0.95); }
+.pwa-btn-install {
+    background: var(--accent-blue);
+    color: #fff;
+}
+.pwa-btn-install:hover { background: var(--accent-blue-hover); }
+.pwa-btn-dismiss {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border-color);
+}
+.pwa-btn-dismiss:hover { color: var(--text-primary); }
+
+@keyframes pwa-slide-up {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
 /* ── 截圖下載按鈕 ── */
 .screenshot-btn {
     background: rgba(20, 184, 166, 0.1);
@@ -1110,6 +1167,7 @@ input[type="range"]:focus-visible {
 /* ── 減少動畫（無障礙：前庭功能敏感使用者）── */
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    html { scroll-behavior: auto; } /* Phase 49：取消平滑捲動，使用即時跳轉 */
     .loading-ring { animation: none; border-top-color: var(--accent-blue); }
     .val-pulse { animation: none; }
 }

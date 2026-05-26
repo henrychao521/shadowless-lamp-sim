@@ -1149,5 +1149,51 @@
         }
     })();
     </script>
+
+    <!-- Phase 49：PWA 安裝提示條（beforeinstallprompt 觸發後顯示） -->
+    <div class="pwa-install-bar" id="pwa-install-bar" role="complementary" aria-label="安裝應用程式">
+        <p>📲 將無影燈模擬器加入主畫面，支援完整離線使用</p>
+        <button class="pwa-btn pwa-btn-install" id="pwa-install-btn">安裝應用程式</button>
+        <button class="pwa-btn pwa-btn-dismiss" id="pwa-dismiss-btn" aria-label="關閉安裝提示">✕</button>
+    </div>
+
+    <script>
+    // Phase 49：PWA 安裝提示條
+    (function() {
+        var deferredPrompt = null;
+        var bar        = document.getElementById('pwa-install-bar');
+        var installBtn = document.getElementById('pwa-install-btn');
+        var dismissBtn = document.getElementById('pwa-dismiss-btn');
+
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (bar) { bar.classList.add('visible'); }
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', function() {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function() {
+                    deferredPrompt = null;
+                    if (bar) { bar.classList.remove('visible'); }
+                });
+            });
+        }
+
+        if (dismissBtn) {
+            dismissBtn.addEventListener('click', function() {
+                if (bar) { bar.classList.remove('visible'); }
+                deferredPrompt = null;
+            });
+        }
+
+        window.addEventListener('appinstalled', function() {
+            if (bar) { bar.classList.remove('visible'); }
+            deferredPrompt = null;
+        });
+    })();
+    </script>
 </body>
 </html>
