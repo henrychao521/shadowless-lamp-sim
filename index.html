@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外科手術無影燈 - 光學設計與陰影稀釋模擬器</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Three.js ESM Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="logo">
+            <div class="logo-icon"></div>
+            <h1>外科手術無影燈光學模擬 <span>(Shadowless Lamp Optical Simulator)</span></h1>
+        </div>
+        <div class="header-badges">
+            <span class="badge">IEC 60601-2-41</span>
+            <span class="badge active">即時幾何光路追跡</span>
+        </div>
+    </header>
+
+    <main class="app-container">
+        <!-- 側邊控制面板 -->
+        <aside class="controls-panel">
+            <h2>模擬參數控制面板</h2>
+            <p class="panel-desc">即時調整無影燈陣列與遮擋物參數，觀察本影與半影的光子分佈變化。</p>
+
+            <div class="control-group">
+                <label for="lamp_height">無影燈高度 (Y: <span id="val_lamp_height">100</span> cm)</label>
+                <input type="range" id="lamp_height" min="60" max="150" step="1" value="100">
+                <div class="range-labels"><span>60cm</span><span>100cm</span><span>150cm</span></div>
+            </div>
+
+            <div class="control-group">
+                <label for="obstacle_x">遮擋物水平位置 (X: <span id="val_obstacle_x">0</span> cm)</label>
+                <input type="range" id="obstacle_x" min="-30" max="30" step="1" value="0">
+                <div class="range-labels"><span>-30cm</span><span>0cm</span><span>+30cm</span></div>
+            </div>
+
+            <div class="control-group">
+                <label for="obstacle_y">遮擋物高度 (Y: <span id="val_obstacle_y">50</span> cm)</label>
+                <input type="range" id="obstacle_y" min="20" max="90" step="1" value="50">
+                <div class="range-labels"><span>20cm</span><span>50cm</span><span>90cm</span></div>
+            </div>
+
+            <div class="control-group">
+                <label for="obstacle_z">遮擋物前後深度 (Z: <span id="val_obstacle_z">0</span> cm) <small>[僅限 3D]</small></label>
+                <input type="range" id="obstacle_z" min="-30" max="30" step="1" value="0">
+                <div class="range-labels"><span>-30cm</span><span>0cm</span><span>+30cm</span></div>
+            </div>
+
+            <div class="control-group">
+                <label for="obstacle_rad">遮擋物半徑 (R: <span id="val_obstacle_rad">10.5</span> cm)</label>
+                <input type="range" id="obstacle_rad" min="2" max="25" step="0.5" value="10.5">
+                <div class="range-labels"><span>2cm</span><span>10.5cm (IEC標準頭部)</span><span>25cm</span></div>
+            </div>
+
+            <div class="control-group" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--accent-teal); font-weight: 600;">
+                    <input type="checkbox" id="realistic_mode" style="width: 18px; height: 18px; cursor: pointer;">
+                    切換 3D 真實手術環境模式
+                </label>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">開啟後將顯示 Low-Poly 手術檯、實體模型與真實陰影效果，並隱藏抽象幾何光束。</p>
+            </div>
+
+            <div class="control-group" id="smart_comp_group" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1); display: none;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--accent-amber); font-weight: 600;">
+                    <input type="checkbox" id="smart_compensation" style="width: 18px; height: 18px; cursor: pointer;">
+                    啟用智慧光照補償 (Smart Compensation)
+                </label>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">模擬先進的 PWM 電流反饋調變。當部分光束被醫師頭部遮擋時，自動增強未遮擋側的 LED 亮度，使中心焦點照度維持恆定。</p>
+            </div>
+
+            <hr class="divider">
+
+            <div class="control-group">
+                <label for="num_leds">LED 發光單元數量 (<span id="val_num_leds">25</span>)</label>
+                <input type="range" id="num_leds" min="5" max="61" step="2" value="25">
+                <div class="range-labels"><span>5 顆</span><span>稀疏 ↔ 密集</span><span>61 顆</span></div>
+            </div>
+
+            <div class="control-group">
+                <label for="beam_spread">透鏡準直發散角 (<span id="val_beam_spread">6.0</span>°)</label>
+                <input type="range" id="beam_spread" min="1" max="15" step="0.5" value="6.0">
+                <div class="range-labels"><span>1° (極窄)</span><span>6°</span><span>15° (泛光)</span></div>
+            </div>
+
+            <div class="info-card">
+                <h3>臨床物理意義</h3>
+                <p>當遮擋物（醫生頭部）介入光路時，邊緣以大張角投射的光束能繞過障礙物，將焦點處的本影稀釋。中心照度若能維持在 <strong>50%</strong> 以上，即具備良好的無影效能。</p>
+            </div>
+        </aside>
+
+        <!-- 視覺化展示區 -->
+        <section class="visualization-area">
+            
+            <div class="view-tabs">
+                <button class="tab-btn active" onclick="switchView('2d', this)">2D 幾何剖面分析</button>
+                <button class="tab-btn" onclick="switchView('3d', this)">3D 空間模擬與熱圖</button>
+            </div>
+
+            <!-- 2D 視圖區域 -->
+            <div id="view-2d" class="view-content active">
+                <div class="view-card canvas-container">
+                    <div class="card-header">
+                        <h3>二維幾何光路追跡空間 (Ray-Tracing Space)</h3>
+                        <div class="legend">
+                            <span class="legend-item"><span class="dot led"></span>LED 光源</span>
+                            <span class="legend-item"><span class="dot ray-valid"></span>有效光線</span>
+                            <span class="legend-item"><span class="dot ray-blocked"></span>被攔截光線</span>
+                        </div>
+                    </div>
+                    <canvas id="rayCanvas" width="1600" height="800"></canvas>
+                </div>
+
+                <div class="view-card chart-container">
+                    <div class="card-header">
+                        <h3>手術工作平面相對照度分佈 (Shadow Dilution / Relative Illuminance)</h3>
+                        <div class="metric-highlight" id="center-illuminance-display">
+                            中心殘餘照度: <span id="center-illuminance-val">--%</span>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="illuminanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3D 視圖區域 -->
+            <div id="view-3d" class="view-content">
+                <div class="view-card canvas-container 3d-container">
+                    <div class="card-header">
+                        <h3>三維空間無影燈物理模擬 (3D Physical Simulation)</h3>
+                        <div class="legend" style="align-items: center;">
+                            <span class="legend-item">🖱️ 拖曳可旋轉視角、滾輪縮放</span>
+                            <span class="legend-item heatmap-legend-wrapper">
+                                <span style="margin-right: 6px;">相對照度:</span>
+                                <span class="heatmap-label">弱</span>
+                                <div class="heatmap-bar"></div>
+                                <span class="heatmap-label">強</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div id="canvas3d" class="canvas-3d"></div>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+
+    <!-- 參考文獻區塊 -->
+    <section class="paper-reference-container">
+        <div class="paper-header" onclick="document.getElementById('paper-content').classList.toggle('collapsed')">
+            <h2>📄 參考文獻與理論基礎：外科手術無影燈技術報告 <span>(點擊展開/收合閱讀完整報告)</span></h2>
+        </div>
+        <article id="paper-content" class="paper-content collapsed">
+            <h2>外科手術無影燈之光學與機械設計原理、國際標準規範及計算機模擬技術報告</h2>
+            <p>在現代臨床手術室中，手術照明系統並非僅是單純提供光線的通用照明工具，而是一項攸關手術精準度、病患安全及醫生視覺疲勞控制的精密醫療儀器。外科手術無影燈的主要功能在於為手術部位提供高強度、無色差、溫度可控且均勻的照明。在手術操作期間，主刀醫師的頭部、雙手、助理的肢體以及各種手術器械，會頻繁且不可避免地進入光源與手術創口之間，從而產生阻擋光線的障礙。</p>
+            <p>傳統的單一光源在此情況下會於目標區域形成深暗的「本影（Umbra）」，導致切口深處視野受阻，增加手術風險。無影燈光學系統的核心任務在於，透過多點幾何光源的配置與波前調控技術，將原本清晰黑暗的本影極大限度地稀釋為幾乎不可察覺的「半影（Penumbra）」，進而維持術野的連續高亮可視性。</p>
+
+            <h3>機械結構與流體力學設計</h3>
+            <p>手術無影燈的優異表現不僅依賴其內部精密的光學組件，亦仰賴其複雜的外部機械結構與環境適應性設計。在無菌手術室環境中，燈頭（Dome）與吊臂系統必須在保證極高穩定性的前提下，提供極具彈性的多軸自由度定位能力。</p>
+            <ul>
+                <li><strong>多軸懸吊與定位機構：</strong>旋轉懸臂可圍繞天花板中心軸進行 360° 的水平旋轉。彈簧臂負責垂直方向的重力平衡，使重達數十公斤的燈頭在任意高度皆能達成完美的靜力平衡。</li>
+                <li><strong>無菌與層流兼容設計：</strong>外殼多設計為光滑流線圓盤或多葉片瓣狀結構，以避免破壞垂直層流（Laminar Flow）的淨化效果。防護等級通常達到 IP54 甚至更高。</li>
+                <li><strong>雙燈頭互補架構：</strong>主燈（Main Light）負責切口的核心高強度照明，副燈（Auxiliary Light）用於補償盲區及充當備用應急光源。</li>
+            </ul>
+
+            <h3>光學設計核心原理與幾何物理機制</h3>
+            <p>隨著半導體技術進步，手術無影燈已全面從「熱能轉化」的鹵素燈時代跨入「電光轉換」的 LED 矩陣時代。其光學架構主要分為折射準直矩陣系統與多焦疊加反射式系統。</p>
+            <ul>
+                <li><strong>矩陣式多點光源交會系統：</strong>採用由數十至上百個獨立 LED 組成的陣列。為了抑制「重影」現象，工程師採用微型非球面準直透鏡，將大張角光束壓縮為窄平行光束，並在工作距離處（通常為 100cm）精確交會。</li>
+                <li><strong>反射式多焦疊加系統：</strong>基於非共軸多層橢圓曲線反射面。自第一焦點射出的光線經反射後必通過第二焦點，採用多層不同曲線段疊加，使反射光能有效繞過遮擋物。</li>
+            </ul>
+
+            <div class="faq-section" style="background: rgba(14, 165, 233, 0.05); padding: 1.5rem; border-left: 4px solid var(--accent-blue); border-radius: 4px; margin: 1.5rem 0;">
+                <h3 style="margin-top: 0; color: var(--accent-teal);">💡 核心觀念探討：無影燈真的完全無影嗎？弧形設計的意義為何？</h3>
+                
+                <p><strong>無影燈其實無法「完全消滅」陰影，而是極度「稀釋」了陰影。</strong></p>
+                <p>從幾何光學來說，只要有物體擋住光線，就一定會有陰影。無影燈的真正原理是透過大量分散的光源從不同角度照射。當部分光線被醫生的頭部擋住產生深暗的「本影（Umbra）」時，其他角度的光會剛好填補進這個暗區，將本影打散成人類視覺幾乎難以察覺的微弱「半影（Penumbra）」。在我們的模擬器中，只要殘餘的相對照度維持在 50% 以上（符合 IEC 國際標準），視覺上就不會覺得暗。</p>
+                
+                <p style="margin-top: 1rem;"><strong>具備光學基礎的「弧形」設計，是減輕明暗差異的絕對關鍵：</strong></p>
+                <ul style="margin-bottom: 0;">
+                    <li><strong>巨觀的弧形（立體燈頭排列）：</strong> 如同我們 3D 模擬器中呈現的，LED 不能排列在平面上，必須排列在一個<strong>半球面的凹弧形（Dome）</strong>上。這確保所有光線都能精準指向一個共同的「空間焦點（手術創口）」，讓光束從四面八方交會，極大地強化了繞過障礙物補光的能力。</li>
+                    <li><strong>微觀的弧形（光學透鏡與反射面）：</strong> 一般 LED 光線會四散發散，導致焦距不夠深。工程師會在每顆 LED 前方加上「<strong>非球面弧形透鏡（Aspheric Lens）</strong>」將發散光壓縮成高強度的窄光柱；或採用「<strong>多焦橢圓曲線反射面</strong>」，利用弧形反光鏡將光線折射到目標區。這能大幅減少雜散光，讓明暗分佈變得極度均勻且集中。</li>
+                </ul>
+            </div>
+
+            <h3>顯色生理學與熱量控制調控機制</h3>
+            <ul>
+                <li><strong>顯色指數（CRI）與深紅還原度（R9）：</strong>在手術中，核心視覺物體多由鮮紅血液與組織構成。若 R9 過低會導致紅色發灰，容易引發誤判。因此國際標準要求 R9 > 90。</li>
+                <li><strong>相關色溫（CCT）調諧：</strong>不同的手術類型偏好不同的色溫。為解決混光時可能產生的陰影邊界色分離（條紋），現代透鏡表面刻有微結構（Micro-structured surface）進行波段混頻。</li>
+                <li><strong>熱輻射抑制：</strong>LED 為冷光源，發光光譜不含紅外線。總輻照度（Total Irradiance）受 IEC 規範限制，必須嚴格維持在 1000 W/m² 以下以保護患者組織不被灼傷。</li>
+            </ul>
+
+            <h3>國際標準規範與性能指標 (IEC 60601-2-41)</h3>
+            <ul>
+                <li><strong>中心照度 (Ec)：</strong> 40,000 至 160,000 lx</li>
+                <li><strong>光斑直徑 (D10 / D50)：</strong> D50 至少應達 D10 的 50%</li>
+                <li><strong>一般顯色指數 (Ra)：</strong> 85 至 100</li>
+                <li><strong>單遮罩陰影稀釋：</strong> 模擬單人頭部阻擋時（直徑 21cm），要求殘餘照度至少維持 50% 以上。</li>
+            </ul>
+
+            <h3>智慧自適應補償技術</h3>
+            <p>新型智慧無影燈整合了微控制器偵測反饋迴路：</p>
+            <ul>
+                <li><strong>障礙物空間感測與主動調變 (PWM)：</strong>使用超音波或 ToF 雷達偵測遮擋物。當偵測到特定區段被嚴重遮擋時，微控制器會關閉或調暗該區域 LED 避免強光直射醫生頭部，同時調高其餘未受遮擋方向的電流，實時補償焦點平面的照度。</li>
+                <li><strong>全景融合技術：</strong>在燈頭邊緣呈環形集成多個微型相機模組，自動挑選未遮擋視角進行實時圖像拼接與畫面穩定處理，生成無阻擋的教學錄像流。</li>
+            </ul>
+
+            <h3>🔗 引用的文獻與真實連結</h3>
+            <ul class="literature-list">
+                <li><a href="https://clearvulighting.com/healthcare" target="_blank">Healthcare & Surgical LED Lighting — orLED</a></li>
+                <li><a href="https://en.mplent.com/news/mplent-news-318.html" target="_blank">Under the shadowless surgical lamp: The "artificial sun" that illuminates the miracle of life</a></li>
+                <li><a href="https://www.yigomed.com/news/industry-news/shadowless-lamp-vs-regular-lamp-key-differences-explained.html" target="_blank">Shadowless Lamp vs Regular Lamp: Key Differences Explained</a></li>
+                <li><a href="https://www.slideshare.net/slideshow/surgical-shadowless-lamp-advanced-operating-room-lighting-solution-pptx/283891814" target="_blank">Surgical shadowless lamp advanced operating room lighting solution</a></li>
+                <li><a href="https://www.asahi-optics.com/news/new-products-release/medical-light-lens-manufacturer-optics-for-surgical-dental-applications.html" target="_blank">Medical Light Lens Manufacturer: Optics for Surgical & Dental Applications</a></li>
+                <li><a href="https://loran.ua/en-gb/articles/Shadowless-operating-lamps-principle-of-operation" target="_blank">Shadowless operating lamps: principle of operation</a></li>
+                <li><a href="https://www.medillum.com/wp-content/uploads/2025/10/1003362-Rev.-N-MI-LINE-Manual.pdf" target="_blank">INSTALLATION AND SERVICE MANUAL - Medical Illumination (PDF)</a></li>
+                <li><a href="https://www.researchgate.net/publication/285700784_Design_of_Elliptic_Reflective_LED_Surgical_Shadowless_Lamps_Using_Mathematical_Optical_Tracing_Algorithms" target="_blank">Design of Elliptic Reflective LED Surgical Shadowless Lamps Using Mathematical Optical Tracing Algorithms</a></li>
+                <li><a href="https://honjulens.com/medical-lighting-lens/" target="_blank">Medical LED Lens for Hospitals and Clinics</a></li>
+                <li><a href="https://www2.nsysu.edu.tw/MSE/papers/Paper%20in%20PDF/297%20Optik%20Ag%20TFMG%20lamp.pdf" target="_blank">Study of reflection-typed LED surgical shadowless lamp with thin film Ag-based metallic glass (PDF)</a></li>
+                <li><a href="https://www.lisungroup.com/standards/iec-60601-2-41.html" target="_blank">IEC 60601-2-41 Medical electrical equipment</a></li>
+                <li><a href="https://www.getinge.com/dam/hospital/documents/english/guide_maquet_surgical_lights_ultimate_guide-89961-en.pdf" target="_blank">Surgical Lights The ultimate guide - Getinge (PDF)</a></li>
+                <li><a href="https://oak.go.kr/central/journallist/journaldetail.do?article_seq=15912" target="_blank">Design and Verification of Hybrid Optical System for LED Surgical Light</a></li>
+                <li><a href="https://pyoptools.readthedocs.io/en/latest/notebooks/basic/00-Intro.html" target="_blank">Introduction to pyOpTools</a></li>
+                <li><a href="https://www.diva-portal.org/smash/get/diva2:1954231/FULLTEXT01.pdf" target="_blank">Comparative Analysis of Programming Libraries for Simulation of Optical Systems (PDF)</a></li>
+                <li><a href="https://ceur-ws.org/Vol-3314/PAPER_01.pdf" target="_blank">Smart Intensity Compensation in Surgical lights to enhance Shadowlessness (PDF)</a></li>
+                <li><a href="https://arxiv.org/abs/2512.08577" target="_blank">[2512.08577] Disturbance-Free Surgical Video Generation from Multi-Camera Shadowless Lamps for Open Surgery</a></li>
+            </ul>
+
+            <div class="download-section">
+                <a href="./手術無影燈光學設計與模擬.docx" download class="download-btn">📥 下載完整系統原始報告 (DOCX 格式)</a>
+                <p class="download-note">註：原檔為 DOCX 格式，因此提供原始檔下載，可保留完整的數學公式與排版格式。</p>
+            </div>
+        </article>
+    </section>
+
+    <script>
+        function switchView(viewName, btnElement) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.view-content').forEach(view => view.classList.remove('active'));
+            
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+            document.getElementById('view-' + viewName).classList.add('active');
+            
+            // Trigger resize event to fix canvas rendering sizes
+            window.dispatchEvent(new Event('resize'));
+        }
+    </script>
+    <script src="simulation.js?v=2"></script>
+    <script type="module" src="simulation3d.js?v=2"></script>
+</body>
+</html>

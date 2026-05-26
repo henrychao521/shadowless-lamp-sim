@@ -1,0 +1,23 @@
+# Node
+node_modules/
+package-lock.json.bak
+
+# 廠商 / 版權檔案（本機保留，不進 git）
+*.pdf
+*.ies
+
+# 自動測試輸出（每次跑都會重產）
+debug_screenshot*.png
+
+# macOS
+.DS_Store
+._*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# 暫存
+*.log
+.cache/
