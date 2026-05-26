@@ -179,7 +179,7 @@
                 <span class="mmb-hint">← 左右滑動切換視圖 →</span>
             </div>
 
-            <div class="view-tabs" role="tablist" aria-label="模擬視圖">
+            <div class="view-tabs" role="tablist" aria-label="模擬視圖" aria-orientation="horizontal">
                 <button class="tab-btn active" id="tab-2d" role="tab" aria-selected="true" aria-controls="view-2d" onclick="switchView('2d', this)">2D 幾何剖面分析</button>
                 <button class="tab-btn" id="tab-3d" role="tab" aria-selected="false" aria-controls="view-3d" onclick="switchView('3d', this)">3D 空間模擬與熱圖</button>
             </div>
@@ -195,7 +195,7 @@
                             <span class="legend-item"><span class="dot ray-blocked"></span>被攔截光線</span>
                         </div>
                     </div>
-                    <canvas id="rayCanvas" width="1600" height="800"></canvas>
+                    <canvas id="rayCanvas" width="1600" height="800" role="img" aria-label="二維幾何光路追跡空間：LED 陣列光源（橘點）向下方射出光線，繞過球形遮擋物（手術頭部）照射底部工作面，顯示有效光線（藍）與被遮擋光線（紅）"></canvas>
                     <!-- 手機版：引導向下捲動查看照度圖 -->
                     <div class="scroll-hint" id="scroll-hint-chart" aria-hidden="true">↓ 照度分佈圖</div>
                 </div>
@@ -212,7 +212,7 @@
                         </div>
                     </div>
                     <div class="chart-wrapper" id="chart-wrapper">
-                        <canvas id="illuminanceChart"></canvas>
+                        <canvas id="illuminanceChart" role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），三條折線分別顯示遮擋場景照度、無遮擋基準，以及 IEC 60601 50% 標準線"></canvas>
                         <!-- 手機版：點擊放大圖表 -->
                         <button class="chart-expand-btn" id="chart-expand-btn" aria-label="切換圖表大小" title="點擊切換圖表大小">⤢</button>
                     </div>
@@ -889,8 +889,13 @@
             });
         }
 
-        window.addEventListener('resize', applyMode);
-        applyMode();
+        // Debounce resize（100ms）避免視窗拖曳時密集觸發 DOM style 更新
+        var _amTimer = null;
+        window.addEventListener('resize', function() {
+            clearTimeout(_amTimer);
+            _amTimer = setTimeout(applyMode, 100);
+        });
+        applyMode(); // 立即執行一次（不等 debounce）
 
         // ── 觸控裝置偵測：顯示正確提示 ──
         if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
