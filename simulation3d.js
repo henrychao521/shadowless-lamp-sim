@@ -811,6 +811,22 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     });
 });
 
+// ── 自動旋轉 Demo 模式（供外部按鈕呼叫）──
+controls.autoRotateSpeed = 0.75;
+// 使用者手動互動時停止自動旋轉並同步按鈕狀態
+controls.addEventListener('start', () => {
+    if (controls.autoRotate) {
+        controls.autoRotate = false;
+        const btn = document.getElementById('auto-rotate-btn');
+        if (btn) btn.classList.remove('active');
+    }
+});
+// 暴露給頁面腳本（simulation3d.js 是 ES module，無法直接存取）
+window.sls3d = window.sls3d || {};
+window.sls3d.setAutoRotate = (enabled) => {
+    controls.autoRotate = enabled;
+};
+
 // Initialize
 setTimeout(() => updateSimulation3D(true), 500);
 animate();

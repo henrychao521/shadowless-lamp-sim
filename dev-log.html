@@ -111,6 +111,7 @@
         <tr><td>IEC 合規指示</td><td><span class="badge badge-green">✅ Phase 20</span></td><td>中心照度旁即時 PASS/FAIL 徽章；@media print 列印教材樣式</td></tr>
         <tr><td>截圖下載</td><td><span class="badge badge-green">✅ Phase 21</span></td><td>📸 按鈕合成光路圖 + 照度圖 → PNG，供學生截圖繳交作業</td></tr>
         <tr><td>鍵盤快捷鍵</td><td><span class="badge badge-green">✅ Phase 22</span></td><td>1-4 預設、F 全螢幕、? 說明；首次訪問手機引導 Toast</td></tr>
+        <tr><td>3D Demo 旋轉</td><td><span class="badge badge-green">✅ Phase 24</span></td><td>▶ 自動旋轉按鈕，觸碰後自動停止，課堂投影展示用</td></tr>
       </tbody>
     </table>
   </section>
@@ -560,6 +561,16 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 24 3D 自動旋轉 Demo 模式）</div>
+        <div class="content">
+          在 3D card header 加入 <strong>▶ 自動旋轉按鈕</strong>（<code>.autorotate-btn</code>，30px，teal 邊框）。<br><br>
+          <strong>simulation3d.js 側</strong>：在初始化末尾加入 <code>controls.autoRotateSpeed = 0.75</code> 和 <code>controls.addEventListener('start', ...)</code> 事件（使用者手動互動後自動停止旋轉並同步按鈕狀態）。透過 <code>window.sls3d.setAutoRotate(enabled)</code> 暴露 API（因為 ES module 的 controls 變數無法從外部腳本直接訪問）。<br><br>
+          <strong>index.html 側</strong>：click listener 呼叫 <code>window.sls3d.setAutoRotate(isActive)</code>，按鈕切換 ▶ ↔ ⏹ 圖示，active 狀態顯示 teal 脈動光暈動畫（rotate-pulse keyframes）。<br><br>
+          適用場景：課堂投影、展示時開啟自動旋轉，讓學生從各角度觀察 3D 無影燈幾何結構；觸摸/拖曳後自動停止，恢復手動控制。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 23 Phase 22 Bug 修正）</div>
         <div class="content">
           讀取 Phase 22 的程式碼後發現 <strong>Event Listener 堆疊 Bug</strong>：<br>
@@ -739,6 +750,19 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 24 — 3D 自動旋轉 Demo 模式 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · simulation3d.js + index.html + index.css</div>
+      <ul>
+        <li><strong>▶ 按鈕</strong>：3D card header 右側（.autorotate-btn，teal 配色）</li>
+        <li>active 狀態：rotate-pulse 脈動光暈動畫，按鈕變 ⏹</li>
+        <li><strong>simulation3d.js</strong>：<code>controls.autoRotateSpeed = 0.75</code>；OrbitControls start 事件自動停止；<code>window.sls3d.setAutoRotate()</code> API 暴露</li>
+        <li>ES module 隔離問題用 window.sls3d 橋接，外部腳本可在模組載入後呼叫</li>
+        <li>使用者觸碰 3D canvas 後自動停止旋轉（OrbitControls start 事件），按鈕狀態同步</li>
+        <li>適合課堂投影、展示場景，讓學生從各角度觀察燈具幾何</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 22 — 鍵盤快捷鍵 + 首次訪問引導 Toast <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css</div>
       <ul>
@@ -866,6 +890,7 @@
         <li>✅ <strong>Phase 22</strong>：鍵盤快捷鍵（1-4 預設、F 全螢幕、P 面板、? 說明 Toast）</li>
         <li>✅ <strong>Phase 22</strong>：首次訪問引導 Toast（手機版首次造訪 → 操作提示，localStorage 記憶）</li>
         <li>✅ <strong>Phase 23</strong>：🐛 修正 keyBtn 重複 listener 堆疊 Bug（移至 IIFE 直接執行）；?v=4 強制清除快取</li>
+        <li>✅ <strong>Phase 24</strong>：▶ 3D 自動旋轉 Demo 模式（OrbitControls autoRotate + 觸控自動停止 + window.sls3d API）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>

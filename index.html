@@ -207,6 +207,8 @@
                                 <div class="heatmap-bar"></div>
                                 <span class="heatmap-label">強</span>
                             </span>
+                            <!-- 3D 自動旋轉 Demo 按鈕 -->
+                            <button class="autorotate-btn" id="auto-rotate-btn" title="自動旋轉 Demo 模式（適合課堂投影）" aria-label="切換自動旋轉">▶</button>
                             <!-- 3D 全螢幕切換按鈕 -->
                             <button class="fullscreen-btn" id="fullscreen-3d-btn" title="全螢幕模式" aria-label="切換全螢幕">⛶</button>
                         </div>
@@ -709,6 +711,22 @@
                 switchView('2d', btn2d);    // 右滑 → 2D
             }
         }, { passive: true });
+    })();
+    </script>
+    <script>
+    // ── 3D 自動旋轉 Demo 模式 ──
+    (function() {
+        var btn = document.getElementById('auto-rotate-btn');
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+            var isActive = btn.classList.toggle('active');
+            btn.textContent = isActive ? '⏹' : '▶';
+            btn.title = isActive ? '停止自動旋轉' : '自動旋轉 Demo 模式（適合課堂投影）';
+            // 呼叫 simulation3d.js 暴露的 API（ES module 無法直接讀取）
+            if (window.sls3d && window.sls3d.setAutoRotate) {
+                window.sls3d.setAutoRotate(isActive);
+            }
+        });
     })();
     </script>
     <script>
