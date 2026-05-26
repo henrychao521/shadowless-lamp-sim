@@ -132,6 +132,7 @@
         <tr><td>2D Canvas aspect-ratio 修正</td><td><span class="badge badge-green">✅ Phase 41</span></td><td>手機版 .canvas-container 改用 aspect-ratio:2/1，消除 object-fit:contain 的上下 92px 留白</td></tr>
         <tr><td>演示體驗優化</td><td><span class="badge badge-green">✅ Phase 42</span></td><td>demo 開始自動收合面板 + 震動反饋；首次切換 tab 後淡出滑動提示</td></tr>
         <tr><td>橫向模式 + scroll-padding + 字型調整</td><td><span class="badge badge-green">✅ Phase 43</span></td><td>landscape 面板 78vh（原 57vh）；html scroll-padding-top 避開 sticky header；info-card 字型 0.82rem</td></tr>
+        <tr><td>手機面板空間優化 + aria-live</td><td><span class="badge badge-green">✅ Phase 44</span></td><td>手機版隱藏面板 h2+說明文字（節省 ~65px）；illuminance display aria-live=polite 螢幕閱讀器相容</td></tr>
       </tbody>
     </table>
   </section>
@@ -577,6 +578,14 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 44 手機面板空間 + aria-live）</div>
+        <div class="content">
+          <strong>面板 h2/說明隱藏</strong>：分析面板展開時的垂直空間使用。h2「模擬參數控制面板」佔 ~20px，p「即時調整無影燈陣列與遮擋物參數，觀察本影與半影的光子分佈變化。」多行約 45px，合計 ~65px。toggle 按鈕文字「⚙️ 模擬參數」已充分說明面板功能，在受限的 57vh（手機）或 78vh（橫向）高度中，這 65px 可以讓 1–2 個控制群組完整顯示而無需捲動。一行 CSS 修正：<code>.controls-panel h2, .panel-desc { display: none; }</code>。<br><br>
+          <strong>aria-live 照度顯示</strong>：<code>#center-illuminance-display</code> 是用戶操作後最重要的反饋元素，但沒有 live region 標記，螢幕閱讀器不會主動朗讀其變化。加入 <code>aria-live="polite"</code>（等當前朗讀完成再報告）和 <code>aria-atomic="true"</code>（整個元素一起朗讀，包括 badge），讓視覺障礙使用者調整滑桿後能聽到「中心殘餘照度: 72.3% ✅ IEC PASS」。
         </div>
       </div>
 
@@ -1115,6 +1124,16 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 44 — 手機面板空間優化 + aria-live 照度顯示 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.css + index.html</div>
+      <ul>
+        <li><strong>手機面板 h2/說明文字隱藏</strong>：在 <code>@media (max-width: 768px)</code> 加入 <code>.controls-panel h2, .panel-desc { display: none; }</code>。<br>
+          背景：面板 h2「模擬參數控制面板」（10字）和 p「即時調整無影燈陣列…」（24字）在手機上佔約 65px，但面板 toggle 按鈕文字「⚙️ 模擬參數」已提供足夠的識別線索。隱藏後控制群組可在有限的 57/78vh 內顯示更多條目，減少 panel 內部捲動</li>
+        <li><strong>aria-live 照度顯示</strong>：<code>#center-illuminance-display</code> 加入 <code>aria-live="polite" aria-atomic="true"</code>，螢幕閱讀器（NVDA / VoiceOver）在調整滑桿後會以「禮貌（polite）」模式（不中斷當前發聲）朗讀照度值變化，提升鍵盤盲用使用者體驗</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 43 — 橫向模式面板高度 + scroll-padding + 字型微調 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.html + index.css</div>
       <ul>
@@ -1391,6 +1410,7 @@
         <li>✅ <strong>Phase 41</strong>：手機 2D canvas aspect-ratio:2/1（消除 92px letterbox 留白，節省垂直空間）</li>
         <li>✅ <strong>Phase 42</strong>：Demo 開始自動收合手機面板（視覺化區全顯），演示觸覺反饋，首次 tab 切換後滑動提示淡出</li>
         <li>✅ <strong>Phase 43</strong>：landscape 面板 78vh（原 57vh）；html scroll-padding-top 避開 sticky header；info-card 0.82rem</li>
+        <li>✅ <strong>Phase 44</strong>：手機版隱藏面板 h2+說明文字（節省 65px，控制項更多不需捲動）；aria-live=polite 照度顯示</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
