@@ -647,6 +647,13 @@ input[type="range"]::-webkit-slider-thumb:hover {
     color: var(--text-muted);
 }
 
+/* ── 減少動畫（無障礙：前庭功能敏感使用者）── */
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    .loading-ring { animation: none; border-top-color: var(--accent-blue); }
+    .val-pulse { animation: none; }
+}
+
 /* ═══════════════════════════════════════
    響應式斷點 — 必須放在所有基礎樣式之後
    (CSS 層疊：後定義的同優先級規則勝出)

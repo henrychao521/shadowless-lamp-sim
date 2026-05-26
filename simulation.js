@@ -349,15 +349,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // ── URL Hash State (shareable simulation configurations) ──
-    // Format: #h=100&ox=0&oy=50&or=10.5&n=25&s=6.0
+    // Format: #h=100&ox=0&oy=50&oz=0&or=10.5&n=25&s=6.0&rm=0
     function encodeHash() {
+        var ozEl = document.getElementById('obstacle_z');
+        var rmEl = document.getElementById('realistic_mode');
         var hash = [
             'h='  + inputs.lampHeight.value,
             'ox=' + inputs.obstacleX.value,
             'oy=' + inputs.obstacleY.value,
+            'oz=' + (ozEl ? ozEl.value : '0'),
             'or=' + inputs.obstacleRad.value,
             'n='  + inputs.numLeds.value,
-            's='  + inputs.beamSpread.value
+            's='  + inputs.beamSpread.value,
+            'rm=' + (rmEl && rmEl.checked ? '1' : '0')
         ].join('&');
         // replaceState to avoid polluting browser history on every slider move
         if (window.history && window.history.replaceState) {
@@ -379,6 +383,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (params.or && inputs.obstacleRad) inputs.obstacleRad.value = params.or;
         if (params.n  && inputs.numLeds)     inputs.numLeds.value     = params.n;
         if (params.s  && inputs.beamSpread)  inputs.beamSpread.value  = params.s;
+        // 3D-specific: obstacle_z and realistic_mode
+        var ozEl = document.getElementById('obstacle_z');
+        if (params.oz && ozEl) { ozEl.value = params.oz; ozEl.dispatchEvent(new Event('input')); }
+        var rmEl = document.getElementById('realistic_mode');
+        if (params.rm && rmEl) {
+            var shouldBeChecked = params.rm === '1';
+            if (rmEl.checked !== shouldBeChecked) {
+                rmEl.checked = shouldBeChecked;
+                rmEl.dispatchEvent(new Event('change'));
+            }
+        }
     }
 
     // Attach Event Listeners — include value-pulse animation + hash update
@@ -394,6 +409,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 span.classList.add('val-pulse');
             }
         });
+    });
+
+    // 3D-specific sliders / toggles: also update URL hash on change
+    var extraHashEls = ['obstacle_z', 'realistic_mode', 'smart_compensation'];
+    extraHashEls.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var evt = (el.type === 'checkbox') ? 'change' : 'input';
+        el.addEventListener(evt, encodeHash);
     });
 
     // Initialize — restore hash params first, then run
