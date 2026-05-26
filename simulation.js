@@ -450,10 +450,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // ── rAF 防抖：每個動畫幀最多執行一次 runSimulation，避免手機高速拖曳時掉幀 ──
+    var _simRafId = null;
+    function scheduleSimulation() {
+        if (_simRafId !== null) cancelAnimationFrame(_simRafId);
+        _simRafId = requestAnimationFrame(function() {
+            _simRafId = null;
+            runSimulation();
+        });
+    }
+
     // Attach Event Listeners — include value-pulse animation + hash update + haptic
     Object.values(inputs).forEach(function(input) {
         input.addEventListener('input', function() {
-            runSimulation();
+            // 低成本操作立即執行（不等 rAF）
             encodeHash();
             // Flash the corresponding value display span
             var span = document.getElementById('val_' + input.id);
@@ -466,6 +476,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (navigator.vibrate && (input.value == input.min || input.value == input.max)) {
                 navigator.vibrate(18);
             }
+            // 高成本渲染（Canvas + Chart.js）延至下一個 rAF，合併同幀內的多次輸入
+            scheduleSimulation();
         });
     });
 

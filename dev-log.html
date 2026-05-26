@@ -122,6 +122,7 @@
         <tr><td>觸控延遲消除</td><td><span class="badge badge-green">✅ Phase 31</span></td><td>touch-action:manipulation 消除按鈕 300ms 延遲，44px 最小觸控目標（WCAG 2.5.5）</td></tr>
         <tr><td>Sticky 控制面板按鈕</td><td><span class="badge badge-green">✅ Phase 32</span></td><td>面板折疊按鈕 position:sticky，捲動時永遠貼在 header 下方，按鈕顯示即時照度值</td></tr>
         <tr><td>面板高度限制 + 捲動</td><td><span class="badge badge-green">✅ Phase 33</span></td><td>手機版面板上限 57vh 可內部捲動，視覺化區域不再被推至螢幕外；中間標尺標籤隱藏</td></tr>
+        <tr><td>rAF 防抖渲染</td><td><span class="badge badge-green">✅ Phase 34</span></td><td>slider input 事件將 Canvas + Chart.js 渲染延至 rAF，同幀內多次輸入合併為單次繪製</td></tr>
       </tbody>
     </table>
   </section>
@@ -571,6 +572,16 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 34 rAF 防抖渲染）</div>
+        <div class="content">
+          觀察到 simulation.js 在每個 <code>input</code> 事件中同步執行 <code>runSimulation()</code>，包含 Canvas 光路圖繪製和 Chart.js 圖表更新。在低端手機上快速拖曳滑桿可能導致掉幀。<br><br>
+          新增 <code>scheduleSimulation()</code> 函式：使用 <code>requestAnimationFrame</code> 調度渲染，若前一個 rAF 還未執行就取消並重排，確保同一個動畫幀內的多次 <code>input</code> 事件只觸發一次 <code>runSimulation()</code>。<br>
+          低成本的即時操作（<code>encodeHash()</code>、val-pulse 重啟動畫、boundary vibrate）仍在 <code>input</code> 事件中同步執行，確保使用者立即看到數值更新和動畫。<br>
+          這是一個精確的效能優化：不改變渲染邏輯，只改變呼叫時機。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 33 面板高度限制 + 捲動隔離）</div>
         <div class="content">
           觀察到手機版控制面板展開後高度 ~970px，在 667px 手機上把視覺化區域推到 300px 以下，使用者每次調整參數後都要大幅捲動才能看到光路圖。<br><br>
@@ -1009,6 +1020,18 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 34 — rAF 防抖渲染（滑桿拖曳效能優化）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · simulation.js</div>
+      <ul>
+        <li><strong>問題</strong>：滑桿快速拖曳時，<code>input</code> 事件每幀可能觸發多次（取決於瀏覽器），但每次都執行 Canvas 重繪 + Chart.js 更新（各約 5–15ms），在低端手機可能造成掉幀</li>
+        <li><strong>解決</strong>：將昂貴的 runSimulation()（Canvas drawCanvas + Chart.js update）延至 <code>requestAnimationFrame</code></li>
+        <li>實作 <code>scheduleSimulation()</code>：若上次 rAF 尚未執行則 <code>cancelAnimationFrame()</code> 取消並重排，確保同幀內的多次 input 事件合併為單次渲染</li>
+        <li>低成本操作（<code>encodeHash()</code>、val-pulse 動畫、vibrate）仍立即在 input 事件執行，保持視覺回饋即時性</li>
+        <li>理論效能提升：60fps 下拖曳滑桿時，runSimulation() 最多執行 60 次/秒（每幀一次），而非舊版可能的多次/幀</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 33 — 面板高度限制 + 內部捲動 + 標尺清理 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css</div>
       <ul>
@@ -1139,6 +1162,7 @@
         <li>✅ <strong>Phase 33</strong>：手機版面板高度限制 57vh + 內部 overflow-y:auto（視覺化區不再被推太遠）</li>
         <li>✅ <strong>Phase 33</strong>：closePanel 用 offsetHeight 取代 scrollHeight（修正 overflow:auto 下動畫起點問題）</li>
         <li>✅ <strong>Phase 33</strong>：.range-labels 中間標籤手機版隱藏（減少控制群組視覺雜訊）</li>
+        <li>✅ <strong>Phase 34</strong>：rAF 防抖渲染（scheduleSimulation — 同幀多次 input 合併為單次繪製，行動 60fps）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
