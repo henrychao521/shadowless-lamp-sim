@@ -7,36 +7,30 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          fetch-depth: 0
+          path: .
 
-      - name: Deploy site files to gh-pages
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Stage site files to a temp location
-          mkdir -p /tmp/site
-          cp index.html index.css simulation.js simulation3d.js operate.js /tmp/site/
-          touch /tmp/site/.nojekyll
-
-          # Switch to gh-pages branch (already exists)
-          git checkout gh-pages
-
-          # Copy and commit updated files
-          cp /tmp/site/index.html .
-          cp /tmp/site/index.css .
-          cp /tmp/site/simulation.js .
-          cp /tmp/site/simulation3d.js .
-          cp /tmp/site/operate.js .
-          cp /tmp/site/.nojekyll .
-
-          git add index.html index.css simulation.js simulation3d.js operate.js .nojekyll
-          git diff --staged --quiet && echo "No changes" || git commit -m "deploy: sync from main [skip ci]"
-          git push origin gh-pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
