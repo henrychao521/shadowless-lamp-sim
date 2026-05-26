@@ -174,13 +174,13 @@
                 <span class="mmb-hint">← 左右滑動切換視圖 →</span>
             </div>
 
-            <div class="view-tabs">
-                <button class="tab-btn active" onclick="switchView('2d', this)">2D 幾何剖面分析</button>
-                <button class="tab-btn" onclick="switchView('3d', this)">3D 空間模擬與熱圖</button>
+            <div class="view-tabs" role="tablist" aria-label="模擬視圖">
+                <button class="tab-btn active" id="tab-2d" role="tab" aria-selected="true" aria-controls="view-2d" onclick="switchView('2d', this)">2D 幾何剖面分析</button>
+                <button class="tab-btn" id="tab-3d" role="tab" aria-selected="false" aria-controls="view-3d" onclick="switchView('3d', this)">3D 空間模擬與熱圖</button>
             </div>
 
             <!-- 2D 視圖區域 -->
-            <div id="view-2d" class="view-content active">
+            <div id="view-2d" class="view-content active" role="tabpanel" aria-labelledby="tab-2d" tabindex="0">
                 <div class="view-card canvas-container">
                     <div class="card-header">
                         <h3>二維幾何光路追跡空間 (Ray-Tracing Space)</h3>
@@ -215,7 +215,7 @@
             </div>
 
             <!-- 3D 視圖區域 -->
-            <div id="view-3d" class="view-content">
+            <div id="view-3d" class="view-content" role="tabpanel" aria-labelledby="tab-3d" tabindex="0">
                 <div class="view-card canvas-container 3d-container">
                     <div class="card-header">
                         <h3>三維空間無影燈物理模擬 (3D Physical Simulation)</h3>
@@ -337,13 +337,26 @@
 
     <script>
         function switchView(viewName, btnElement) {
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
             document.querySelectorAll('.view-content').forEach(view => view.classList.remove('active'));
 
             if (btnElement) {
                 btnElement.classList.add('active');
+                btnElement.setAttribute('aria-selected', 'true');
             }
             document.getElementById('view-' + viewName).classList.add('active');
+
+            // ── 懶載入 3D 模組（首次切換至 3D tab 才下載 Three.js bundle）──
+            if (viewName === '3d' && !window._sls3dLoading) {
+                window._sls3dLoading = true;
+                import('./simulation3d.js?v=4').catch(function(e) {
+                    console.warn('[sls] 3D module load failed:', e);
+                    window._sls3dLoading = false; // 允許重試
+                });
+            }
 
             // 3D-only 控制項：切換到 3D 時清晰顯示，2D 時淡化提示
             var panel = document.getElementById('controls-panel-body');
@@ -400,7 +413,7 @@
     })();
     </script>
     <script src="simulation.js?v=4"></script>
-    <script type="module" src="simulation3d.js?v=4"></script>
+    <!-- simulation3d.js は 3D tab 首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
     <script>
     // ── 鍵盤快捷鍵 ──
     (function() {

@@ -123,6 +123,7 @@
         <tr><td>Sticky 控制面板按鈕</td><td><span class="badge badge-green">✅ Phase 32</span></td><td>面板折疊按鈕 position:sticky，捲動時永遠貼在 header 下方，按鈕顯示即時照度值</td></tr>
         <tr><td>面板高度限制 + 捲動</td><td><span class="badge badge-green">✅ Phase 33</span></td><td>手機版面板上限 57vh 可內部捲動，視覺化區域不再被推至螢幕外；中間標尺標籤隱藏</td></tr>
         <tr><td>rAF 防抖渲染</td><td><span class="badge badge-green">✅ Phase 34</span></td><td>slider input 事件將 Canvas + Chart.js 渲染延至 rAF，同幀內多次輸入合併為單次繪製</td></tr>
+        <tr><td>ARIA Tab 模式 + 懶載入 3D</td><td><span class="badge badge-green">✅ Phase 35</span></td><td>正確 role="tablist/tab/tabpanel" + 首次點擊 3D tab 才動態 import() Three.js bundle</td></tr>
       </tbody>
     </table>
   </section>
@@ -568,6 +569,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 35 ARIA Tab + 懶載入 3D）</div>
+        <div class="content">
+          <strong>ARIA 無障礙 Tab 模式</strong>：<code>.view-tabs</code> 加入 <code>role="tablist"</code>，兩個按鈕加入 <code>role="tab"、aria-selected、aria-controls</code>，兩個 tabpanel 加入 <code>role="tabpanel"、aria-labelledby、tabindex="0"</code>。switchView() 同步維護 aria-selected。螢幕閱讀器現在可正確辨識 tab 介面模式。<br><br>
+          <strong>懶載入 3D 模組</strong>：移除靜態 <code>&lt;script type="module" src="simulation3d.js?v=4"&gt;</code>（原本頁面載入時就立刻執行），改為在 switchView('3d') 首次呼叫時執行 <code>import('./simulation3d.js?v=4')</code>。<br>
+          效果：只使用 2D 模式的手機使用者（多數首次訪問者）不再下載 Three.js（~600KB gzip），節省初始頁面載入流量。首次切換到 3D 時，canvas-loading spinner 顯示，Three.js 載入完成後場景初始化，spinner 自動消失，行為與原版一致。
         </div>
       </div>
 
@@ -1020,6 +1030,23 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 35 — ARIA Tab 無障礙模式 + 懶載入 3D 模組 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html</div>
+      <ul>
+        <li><strong>ARIA Tab 模式</strong>：.view-tabs 加入 <code>role="tablist" aria-label="模擬視圖"</code></li>
+        <li>兩個 tab 按鈕：<code>id="tab-2d/tab-3d"、role="tab"、aria-selected="true/false"、aria-controls="view-2d/view-3d"</code></li>
+        <li>兩個 tabpanel：<code>role="tabpanel"、aria-labelledby="tab-2d/tab-3d"、tabindex="0"</code>（使 tabpanel 可直接聚焦）</li>
+        <li>switchView() 更新：同步更新 aria-selected（active tab = true，其他 = false）</li>
+        <li>效果：螢幕閱讀器可正確朗讀「目前第 1 個分頁，共 2 個，2D 幾何剖面分析（已選）」</li>
+        <li><strong>懶載入 3D 模組</strong>：移除 <code>&lt;script type="module" src="simulation3d.js?v=4"&gt;</code> 靜態載入</li>
+        <li>改為在 switchView() 首次切換到 3D 時執行 <code>import('./simulation3d.js?v=4')</code>（動態 import）</li>
+        <li><code>window._sls3dLoading = true</code> 確保只載入一次（後續切換不重複 import）</li>
+        <li>效能影響：只使用 2D 的使用者（包括大多數手機首次訪問）不下載 Three.js bundle（jsDelivr 的 three@0.160.0 約 600KB gzip）</li>
+        <li>降級處理：若 import 失敗（網路問題），catch 重設 <code>window._sls3dLoading</code> 允許下次重試，canvas-loading spinner 持續顯示提醒使用者</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 34 — rAF 防抖渲染（滑桿拖曳效能優化）<span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · simulation.js</div>
       <ul>
@@ -1163,6 +1190,8 @@
         <li>✅ <strong>Phase 33</strong>：closePanel 用 offsetHeight 取代 scrollHeight（修正 overflow:auto 下動畫起點問題）</li>
         <li>✅ <strong>Phase 33</strong>：.range-labels 中間標籤手機版隱藏（減少控制群組視覺雜訊）</li>
         <li>✅ <strong>Phase 34</strong>：rAF 防抖渲染（scheduleSimulation — 同幀多次 input 合併為單次繪製，行動 60fps）</li>
+        <li>✅ <strong>Phase 35</strong>：ARIA tab 模式（role=tablist/tab/tabpanel + aria-selected + aria-controls，螢幕閱讀器相容）</li>
+        <li>✅ <strong>Phase 35</strong>：懶載入 3D 模組（switchView → dynamic import()，首次訪問不下載 Three.js ~600KB）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
