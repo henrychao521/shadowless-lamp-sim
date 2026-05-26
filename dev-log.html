@@ -176,6 +176,39 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 15 — ResizeObserver 精確 Canvas 尺寸 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>ResizeObserver 取代 window.resize</strong>（simulation3d.js）：<br>
+          原本 <code>window.addEventListener('resize', ...)</code> 只在視窗大小改變時觸發，無法偵測「控制面板展開/收合」或「旁邊欄改變寬度」導致的 canvas 容器尺寸變化。
+          改用 <code>ResizeObserver</code> 監聽 <code>#canvas3d</code> 容器本身，可即時回應任何容器尺寸變化並重設 renderer / composer 大小。
+          同時加入 <code>if (w === 0 || h === 0) return</code> 防止 div 為零尺寸時觸發無效計算。
+          不支援 ResizeObserver 的舊瀏覽器回退到 window.resize。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 14 — IEC 閾值線 + 真實模式 Badge <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
+      <ul>
+        <li>
+          <strong>IEC 60601-2-41 閾值線</strong>（simulation.js Chart.js）：<br>
+          新增第三條 dataset，固定 y=50 的紅色虛線（<code>borderDash: [3,6]</code>），
+          標籤「IEC 60601 最低標準 (50%)」。學生可即時看出照度是否符合國際標準，
+          遮擋面積過大時紅線在實際照度曲線之上，清楚標示「不合格」。
+        </li>
+        <li>
+          <strong>✨ 真實模式 Badge</strong>（index.html + CSS）：<br>
+          勾選「切換 3D 真實手術環境模式」後，標題列出現琥珀色徽章「✨ 真實模式」，
+          採用 badge-appear 動畫（scale 0.8 → 1, opacity 0 → 1）。
+          取消時隱藏。讓使用者在任何捲動位置都能確認目前渲染模式。
+        </li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 13 — 效能預連線 + 過捲動行為 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · 自動 Loop 繼續</div>
       <ul>
@@ -521,6 +554,20 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 15 ResizeObserver）</div>
+        <div class="content">
+          simulation3d.js 中將 <code>window.addEventListener('resize')</code> 替換為 <code>new ResizeObserver(handleCanvasResize).observe(container)</code>。ResizeObserver 直接監聽 #canvas3d DOM 節點，能正確偵測面板開合、sidebar 大小變化等非 window 的容器尺寸改變，確保 Three.js renderer 始終正確填充容器。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 14 IEC 閾值 + Badge）</div>
+        <div class="content">
+          圖表加入 IEC 60601 50% 紅虛線（第三 dataset），讓學生一眼看出是否符合標準。標題列加入「✨ 真實模式」琥珀 badge，勾選 realistic_mode 時淡入顯示。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 13 效能 + 過捲動）</div>
         <div class="content">
           加入四個 <code>rel="preconnect"</code>（fonts.googleapis.com、fonts.gstatic.com crossorigin、unpkg.com、cdn.jsdelivr.net），讓瀏覽器提前建立 Three.js CDN 和字型連線。body 加入 <code>overscroll-behavior-y: none</code> 消除 iOS 橡皮筋回彈，讓 App 質感更佳。
@@ -638,6 +685,9 @@
         <li>✅ <strong>Phase 12</strong>：參考文獻折疊改用 scrollHeight 動畫（同控制面板）+ ARIA 鍵盤操作</li>
         <li>✅ <strong>Phase 13</strong>：rel="preconnect" 提前建立連線（fonts / unpkg / cdn.jsdelivr.net）</li>
         <li>✅ <strong>Phase 13</strong>：overscroll-behavior-y: none（消除 iOS 橡皮筋回彈）</li>
+        <li>✅ <strong>Phase 14</strong>：IEC 60601 50% 閾值線加入圖表（紅色虛線，可視化是否達標）</li>
+        <li>✅ <strong>Phase 14</strong>：標題列「✨ 真實模式」badge（勾選後淡入，與模式狀態同步）</li>
+        <li>✅ <strong>Phase 15</strong>：ResizeObserver 取代 window.resize（精確偵測 canvas 容器大小變化）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
         <li>⬜ 醫生手套可拖曳遮擋物</li>
         <li>⬜ 亮度等級 emissive 面板（真實 MI-1000 觸控環）</li>

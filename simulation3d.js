@@ -71,20 +71,31 @@ composer.addPass(bloomPass);
 const outputPass = new OutputPass();
 composer.addPass(outputPass);
 
-// Window resize handling
-window.addEventListener('resize', () => {
+// Canvas resize — use ResizeObserver for accurate detection
+// (catches panel open/close, orientation change, desktop sidebar resize)
+function handleCanvasResize() {
     if (!document.getElementById('view-3d').classList.contains('active')) return;
-    camera.aspect = container.clientWidth / container.clientHeight;
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    if (w === 0 || h === 0) return;
+    camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    composer.setSize(container.clientWidth, container.clientHeight);
-});
+    renderer.setSize(w, h);
+    composer.setSize(w, h);
+}
+
+if (window.ResizeObserver) {
+    new ResizeObserver(handleCanvasResize).observe(container);
+} else {
+    // Fallback for browsers without ResizeObserver
+    window.addEventListener('resize', handleCanvasResize);
+}
 
 // Tab switch event
 document.querySelector('.view-tabs').addEventListener('click', (e) => {
     if (e.target.classList.contains('tab-btn')) {
         setTimeout(() => {
-            window.dispatchEvent(new Event('resize'));
+            handleCanvasResize();
         }, 50);
     }
 });
