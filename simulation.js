@@ -348,12 +348,56 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Attach Event Listeners
-    Object.values(inputs).forEach(input => {
-        input.addEventListener('input', runSimulation);
+    // ── URL Hash State (shareable simulation configurations) ──
+    // Format: #h=100&ox=0&oy=50&or=10.5&n=25&s=6.0
+    function encodeHash() {
+        var hash = [
+            'h='  + inputs.lampHeight.value,
+            'ox=' + inputs.obstacleX.value,
+            'oy=' + inputs.obstacleY.value,
+            'or=' + inputs.obstacleRad.value,
+            'n='  + inputs.numLeds.value,
+            's='  + inputs.beamSpread.value
+        ].join('&');
+        // replaceState to avoid polluting browser history on every slider move
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', '#' + hash);
+        }
+    }
+
+    function restoreFromHash() {
+        var raw = window.location.hash.replace(/^#/, '');
+        if (!raw) return;
+        var params = {};
+        raw.split('&').forEach(function(pair) {
+            var kv = pair.split('=');
+            if (kv.length === 2) params[kv[0]] = kv[1];
+        });
+        if (params.h  && inputs.lampHeight)  inputs.lampHeight.value  = params.h;
+        if (params.ox && inputs.obstacleX)   inputs.obstacleX.value   = params.ox;
+        if (params.oy && inputs.obstacleY)   inputs.obstacleY.value   = params.oy;
+        if (params.or && inputs.obstacleRad) inputs.obstacleRad.value = params.or;
+        if (params.n  && inputs.numLeds)     inputs.numLeds.value     = params.n;
+        if (params.s  && inputs.beamSpread)  inputs.beamSpread.value  = params.s;
+    }
+
+    // Attach Event Listeners — include value-pulse animation + hash update
+    Object.values(inputs).forEach(function(input) {
+        input.addEventListener('input', function() {
+            runSimulation();
+            encodeHash();
+            // Flash the corresponding value display span
+            var span = document.getElementById('val_' + input.id);
+            if (span) {
+                span.classList.remove('val-pulse');
+                void span.offsetWidth; // force reflow to restart animation
+                span.classList.add('val-pulse');
+            }
+        });
     });
 
-    // Initialize
+    // Initialize — restore hash params first, then run
+    restoreFromHash();
     initChart();
     runSimulation();
 });
