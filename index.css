@@ -1217,9 +1217,11 @@ input[type="range"]:focus-visible {
         max-height: 480px;
     }
 
-    /* 2D Canvas 也縮短 */
+    /* 2D Canvas：用 aspect-ratio 取代 min-height，消除 object-fit:contain 的上下留白 */
+    /* rayCanvas 的 buffer 是 1600×800（2:1），容器也設 2:1 → canvas 精確填充，無 letterbox */
     .canvas-container {
-        min-height: 260px;
+        min-height: 0;
+        aspect-ratio: 2 / 1;
     }
 
     /* Card header：允許換行 */
