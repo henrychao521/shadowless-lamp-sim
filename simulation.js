@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Chart setup
     const chartCtx = document.getElementById('illuminanceChart').getContext('2d');
     let illuminanceChart = null;
+    let prevIECPass = null; // IEC 閾值穿越追蹤（觸覺反饋用）
 
     // UI Elements
     const inputs = {
@@ -358,9 +359,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // IEC 60601-2-41 Pass/Fail badge
+        const iecPass = centerDilution >= 50;
         const iecBadge = document.getElementById('iec-compliance-badge');
         if (iecBadge) {
-            if (centerDilution >= 50) {
+            if (iecPass) {
                 iecBadge.textContent = '✅ IEC PASS';
                 iecBadge.className = 'iec-badge iec-pass';
             } else {
@@ -368,6 +370,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 iecBadge.className = 'iec-badge iec-fail';
             }
         }
+
+        // ── 手機版浮動指標條同步 ──
+        const mmbVal   = document.getElementById('mmb-center-val');
+        const mmbBadge = document.getElementById('mmb-iec-badge');
+        if (mmbVal) {
+            mmbVal.textContent = centerDilution.toFixed(1) + '%';
+            mmbVal.style.color = centerDilution < 50 ? '#ef4444'
+                               : centerDilution < 80 ? '#fbbf24'
+                               : '#14b8a6';
+        }
+        if (mmbBadge) {
+            mmbBadge.textContent = iecPass ? '✅ IEC PASS' : '❌ IEC FAIL';
+            mmbBadge.className   = 'iec-badge ' + (iecPass ? 'iec-pass' : 'iec-fail');
+        }
+
+        // ── IEC 閾值穿越觸覺反饋（Android Chrome 支援 Vibration API）──
+        if (prevIECPass !== null && iecPass !== prevIECPass && navigator.vibrate) {
+            // IEC PASS 達標：輕快雙振；IEC FAIL 跌破：重-短-重
+            navigator.vibrate(iecPass ? [25, 20, 50] : [70, 25, 35]);
+        }
+        prevIECPass = iecPass;
     }
 
     // ── URL Hash State (shareable simulation configurations) ──

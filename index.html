@@ -164,7 +164,15 @@
 
         <!-- 視覺化展示區 -->
         <section class="visualization-area">
-            
+
+            <!-- 手機版浮動指標條：不論面板是否展開，均顯示當前照度（只在手機上顯示）-->
+            <div class="mobile-metric-bar" id="mobile-metric-bar" aria-live="polite" aria-atomic="true">
+                <span class="mmb-label">中心照度</span>
+                <span class="mmb-val" id="mmb-center-val">--%</span>
+                <span class="iec-badge" id="mmb-iec-badge"></span>
+                <span class="mmb-hint">← 左右滑動切換視圖 →</span>
+            </div>
+
             <div class="view-tabs">
                 <button class="tab-btn active" onclick="switchView('2d', this)">2D 幾何剖面分析</button>
                 <button class="tab-btn" onclick="switchView('3d', this)">3D 空間模擬與熱圖</button>

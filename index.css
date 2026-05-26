@@ -1001,6 +1001,41 @@ input[type="range"]:focus-visible {
     background: #0f172a;
 }
 
+/* ── 手機版浮動指標條 ── */
+.mobile-metric-bar {
+    display: none; /* 桌機不顯示，mobile breakpoint 改為 flex */
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.85rem;
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    flex-wrap: wrap;
+}
+.mmb-label {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+.mmb-val {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--accent-teal);
+    transition: color 0.3s;
+}
+.mmb-hint {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    margin-left: auto;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
 /* ── 減少動畫（無障礙：前庭功能敏感使用者）── */
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
@@ -1145,6 +1180,9 @@ input[type="range"]:focus-visible {
 
     /* 捲動提示：手機版才顯示 */
     .scroll-hint { display: block; }
+
+    /* 浮動指標條：手機版才顯示 */
+    .mobile-metric-bar { display: flex; }
 }
 
 /* ── 超小螢幕（iPhone SE 等 390px 以下）── */

@@ -117,6 +117,8 @@
         <tr><td>鍵盤無障礙</td><td><span class="badge badge-green">✅ Phase 27</span></td><td>Skip to content + :focus-visible 覆蓋，符合 WCAG 2.1 AA</td></tr>
         <tr><td>控制項情境感知</td><td><span class="badge badge-green">✅ Phase 28</span></td><td>3D-only 控制項切換 2D tab 時自動淡化，避免使用者困惑</td></tr>
         <tr><td>圖表放大</td><td><span class="badge badge-green">✅ Phase 29</span></td><td>⤢ 按鈕切換 220px ↔ 380px（動畫過渡），手機閱讀更清晰</td></tr>
+        <tr><td>手機浮動指標條</td><td><span class="badge badge-green">✅ Phase 30</span></td><td>調整滑桿時視覺化區頂端永遠顯示當前照度 + IEC 狀態，無需捲動</td></tr>
+        <tr><td>IEC 閾值觸覺反饋</td><td><span class="badge badge-green">✅ Phase 30</span></td><td>IEC 閾值（50%）穿越時觸發差異化震動型態（達標雙振 / 跌破重短重）</td></tr>
       </tbody>
     </table>
   </section>
@@ -566,6 +568,16 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 30 手機浮動指標條 + IEC 觸覺反饋）</div>
+        <div class="content">
+          會話壓縮後恢復，優先完成 Phase 29 未 commit 的圖表放大功能，push 到 main。<br><br>
+          <strong>Phase 30 — 手機浮動指標條</strong>：觀察到手機使用者在面板折疊後調整滑桿，無法即時看到照度變化（需要捲動到下方圖表）。在 <code>.visualization-area</code> 頂部（view-tabs 之前）加入 <code>.mobile-metric-bar</code>，顯示「中心照度 XX% ✅ IEC PASS」。桌機 display:none，手機才顯示。<br>
+          simulation.js updateChart() 除更新原有的 <code>#center-illuminance-val</code> 和 <code>#iec-compliance-badge</code>，同步更新新的 <code>#mmb-center-val</code> 和 <code>#mmb-iec-badge</code>。<br><br>
+          <strong>IEC 閾值觸覺反饋</strong>：新增 <code>prevIECPass</code> 變數追蹤前一次 IEC 狀態。穿越 50% 閾值時（PASS↔FAIL 任意方向）呼叫 <code>navigator.vibrate()</code>，型態差異化：達標用輕快雙振 <code>[25, 20, 50]</code>，跌破用警示重振 <code>[70, 25, 35]</code>。第一次渲染（prevIECPass=null）不震動，避免頁面載入觸發。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 29 圖表點擊放大）</div>
         <div class="content">
           照度分佈圖表在手機上固定 220px 高度，密集的三條折線（實際照度 / 基準 / IEC 閾值）在小螢幕上難以閱讀。加入 <strong>⤢ 放大按鈕</strong>（圖表右下角，24×24px 絕對定位）。<br><br>
@@ -960,6 +972,23 @@
       </ul>
     </div>
 
+    <div class="phase-card">
+      <h3>Phase 30 — 手機浮動指標條 + IEC 閾值觸覺反饋 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css + simulation.js · commit 待提交</div>
+      <ul>
+        <li><strong>問題</strong>：手機版面板折疊後調整滑桿時，使用者需要捲動到下方照度圖才能看到當前 IEC 狀態，操作流程斷裂</li>
+        <li><strong>.mobile-metric-bar</strong>：視覺化區域頂端（view-tabs 上方）加入淡藍色指標條</li>
+        <li>顯示：「中心照度」標籤 + 數值（monospace，顏色隨閾值 teal/amber/red 變化）+ IEC PASS/FAIL badge + 「← 左右滑動切換視圖 →」提示</li>
+        <li>桌機：<code>display: none</code>；手機（≤768px）：<code>display: flex</code>，backdrop-filter blur</li>
+        <li><strong>simulation.js 同步</strong>：updateChart() 每次計算後同時更新 <code>#mmb-center-val</code> 和 <code>#mmb-iec-badge</code>，資料來源與主顯示完全一致</li>
+        <li><strong>IEC 閾值觸覺反饋</strong>：<code>prevIECPass</code> 變數追蹤上一次計算的 IEC 狀態</li>
+        <li>PASS → FAIL（照度跌破 50%）：<code>navigator.vibrate([70, 25, 35])</code>（長-短-中，警示型態）</li>
+        <li>FAIL → PASS（照度回升 ≥50%）：<code>navigator.vibrate([25, 20, 50])</code>（短-短-長，成功型態）</li>
+        <li>初始化時 prevIECPass = null 不震動，避免頁面載入時誤觸發</li>
+        <li>Android Chrome 支援 Vibration API；iOS Safari 靜默忽略（graceful degradation）</li>
+      </ul>
+    </div>
+
     </div>
   </section>
 
@@ -1021,6 +1050,8 @@
         <li>✅ <strong>Phase 27</strong>：:focus-visible 全局覆蓋（深色背景可見的 2px 藍色焦點環）</li>
         <li>✅ <strong>Phase 28</strong>：3D-only 控制項在 2D tab 下淡化（opacity 0.45 + pointer-events:none）</li>
         <li>✅ <strong>Phase 29</strong>：⤢ 圖表放大按鈕（220px ↔ 380px 動態高度，Chart.js resize 同步）</li>
+        <li>✅ <strong>Phase 30</strong>：手機浮動指標條（調整滑桿時實時顯示照度 + IEC 狀態，無需捲動圖表）</li>
+        <li>✅ <strong>Phase 30</strong>：IEC 50% 閾值觸覺反饋（達標/跌破差異化震動型態，Android Chrome）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
