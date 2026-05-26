@@ -61,6 +61,8 @@
 
     <main class="app-container">
         <!-- 手機版折疊按鈕（桌機隱藏） -->
+        <!-- 手機版：控制面板背景遮罩（展開時顯示，點擊遮罩可收合面板）-->
+        <div class="panel-backdrop" id="panel-backdrop" aria-hidden="true"></div>
         <button class="panel-toggle collapsed" id="panel-toggle-btn" aria-expanded="false" aria-controls="controls-panel-body">
             ⚙️ 模擬參數
             <span class="toggle-metric" id="toggle-metric-badge"></span>
@@ -758,8 +760,9 @@
     <script>
     // ── 手機控制面板折疊（平滑動畫版） ──
     (function() {
-        var btn  = document.getElementById('panel-toggle-btn');
-        var panel = document.getElementById('controls-panel-body');
+        var btn      = document.getElementById('panel-toggle-btn');
+        var panel    = document.getElementById('controls-panel-body');
+        var backdrop = document.getElementById('panel-backdrop');
         if (!btn || !panel) return;
 
         function isMobile() { return window.innerWidth <= 768; }
@@ -770,6 +773,8 @@
         // 使用 scrollHeight 測量實際高度，避免 max-height:9999px 造成的「瞬彈」
         function openPanel() {
             panel.classList.add('open');
+            // 手機版：顯示遮罩
+            if (isMobile() && backdrop) { backdrop.classList.add('active'); }
             var mobile = isMobile();
             var cap    = mobile ? mobileCap() : Infinity;
             var target = Math.min(panel.scrollHeight, cap);
@@ -793,6 +798,8 @@
         }
 
         function closePanel() {
+            // 隱藏遮罩
+            if (backdrop) { backdrop.classList.remove('active'); }
             // 先固定當前可見高度（offsetHeight 而非 scrollHeight，避免 overflow:auto 內捲動高度問題）
             panel.style.overflowY = '';
             panel.style.maxHeight = panel.offsetHeight + 'px';
@@ -822,6 +829,8 @@
                 panel.classList.add('open');
                 panel.style.maxHeight = 'none';
                 panel.style.overflowY = '';
+                // 切換到桌機：清除遮罩
+                if (backdrop) { backdrop.classList.remove('active'); }
             }
         }
 
@@ -832,6 +841,14 @@
                 openPanel();
             }
         });
+
+        // 點擊遮罩關閉面板（手機版使用者常見操作）
+        if (backdrop) {
+            backdrop.addEventListener('click', function() {
+                if (navigator.vibrate) { navigator.vibrate(8); }
+                closePanel();
+            });
+        }
 
         window.addEventListener('resize', applyMode);
         applyMode();
