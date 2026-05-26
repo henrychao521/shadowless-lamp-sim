@@ -383,6 +383,14 @@
 
             // 記憶偏好 tab（下次造訪自動恢復）
             try { localStorage.setItem('sls_preferredTab', viewName); } catch(e) {}
+
+            // 首次切換 tab 後隱藏浮動指標條的滑動提示（使用者已知曉手勢）
+            var mmbHint = document.querySelector('.mmb-hint');
+            if (mmbHint) {
+                mmbHint.style.transition = 'opacity 0.4s ease';
+                mmbHint.style.opacity = '0';
+                setTimeout(function() { mmbHint.style.display = 'none'; }, 420);
+            }
         }
 
         // 恢復上次偏好的 tab
@@ -676,6 +684,16 @@
         }
 
         function startDemo() {
+            // 手機版：開始演示前自動收合控制面板，讓視覺化區完整呈現
+            if (window.innerWidth <= 768) {
+                var demoPanel = document.getElementById('controls-panel-body');
+                if (demoPanel && demoPanel.classList.contains('open')) {
+                    var demoToggle = document.getElementById('panel-toggle-btn');
+                    if (demoToggle) { demoToggle.click(); }
+                }
+            }
+            // 觸覺反饋：演示開始
+            if (navigator.vibrate) { navigator.vibrate([10, 40, 10]); }
             isRunning = true;
             btn.classList.add('active');
             btn.textContent = '⏹ 停止演示';
@@ -694,6 +712,7 @@
             if (animId) { cancelAnimationFrame(animId); animId = null; }
             btn.classList.remove('active');
             btn.textContent = '🎬 自動掃描演示';
+            if (navigator.vibrate) { navigator.vibrate(8); }
             if (fb) {
                 fb.textContent = '演示完畢';
                 clearTimeout(fb._dt);
