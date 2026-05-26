@@ -109,6 +109,7 @@
         <tr><td>手勢操作</td><td><span class="badge badge-green">✅ Phase 18</span></td><td>左右 Swipe 切換 2D/3D Tab；3D 全螢幕按鈕</td></tr>
         <tr><td>教學預設場景</td><td><span class="badge badge-green">✅ Phase 19</span></td><td>4 個快速預設按鈕（IEC / 多燈 / 少燈 / 嚴苛），一鍵切換教學情境</td></tr>
         <tr><td>IEC 合規指示</td><td><span class="badge badge-green">✅ Phase 20</span></td><td>中心照度旁即時 PASS/FAIL 徽章；@media print 列印教材樣式</td></tr>
+        <tr><td>截圖下載</td><td><span class="badge badge-green">✅ Phase 21</span></td><td>📸 按鈕合成光路圖 + 照度圖 → PNG，供學生截圖繳交作業</td></tr>
       </tbody>
     </table>
   </section>
@@ -558,6 +559,20 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 21 截圖下載按鈕）</div>
+        <div class="content">
+          在照度圖表的 card-header 加入 📸 截圖按鈕（<code>.screenshot-btn</code>）。<br><br>
+          點擊後 JS 建立一個 1600×(800+400+60) px 的合成畫布：<br>
+          • 深色背景 <code>#0b1120</code><br>
+          • 頂部標題「外科手術無影燈光學模擬器」+ 網址字樣<br>
+          • <code>c.drawImage(rayCanvas)</code> 繪製 2D 幾何光路圖<br>
+          • <code>c.drawImage(chartCanvas)</code> 繪製照度分佈圖<br>
+          合成後 <code>canvas.toDataURL('image/png')</code> 生成 PNG，動態建立 &lt;a download&gt; 並點擊觸發下載。<br><br>
+          按鈕按下後 1.5s 內顯示 ✅ 確認反饋。學生可下載截圖提交作業、教師可存檔課堂紀錄。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 20 IEC 徽章 + 列印樣式）</div>
         <div class="content">
           <strong>IEC PASS/FAIL 徽章</strong>：在 <code>.metric-highlight</code> 內的中心照度值右側加入 <code>.iec-badge</code> span。simulation.js 的 updateChart() 函式在每次計算後同步更新：≥50% 顯示 <code>✅ IEC PASS</code>（teal 邊框），&lt;50% 顯示 <code>❌ IEC FAIL</code>（red 邊框）。學生立即明白目前配置是否符合 IEC 60601-2-41 標準。<br><br>
@@ -703,6 +718,17 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 21 — 截圖下載按鈕 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>📸 按鈕</strong>：位於照度圖表 card-header 右側（.screenshot-btn，30px，teal 邊框）</li>
+        <li><strong>合成畫布</strong>：1600×(800+400+60) px，深色背景 + 標題 + 光路圖 + 照度圖</li>
+        <li><code>canvas.toDataURL('image/png')</code> → 動態 &lt;a download&gt; → 觸發下載</li>
+        <li>按下後 1.5s 顯示 ✅ 確認；可供學生截圖交作業、教師存課堂紀錄</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 20 — IEC 合規徽章 + 列印樣式 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · simulation.js + index.html + index.css</div>
       <ul>
@@ -802,6 +828,7 @@
         <li>✅ <strong>Phase 19</strong>：快速預設場景按鈕（IEC標準 / 高效多燈 / 少燈對比 / 嚴苛遮擋，一鍵套用）</li>
         <li>✅ <strong>Phase 20</strong>：IEC PASS/FAIL 即時徽章（中心照度旁，≥50% teal / &lt;50% red）</li>
         <li>✅ <strong>Phase 20</strong>：@media print 列印樣式（隱藏互動 UI、展開文獻、保留彩色圖表）</li>
+        <li>✅ <strong>Phase 21</strong>：📸 截圖下載按鈕（合成 1600px 光路圖 + 照度圖表 → PNG 下載）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
