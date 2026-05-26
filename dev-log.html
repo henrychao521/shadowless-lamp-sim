@@ -129,6 +129,7 @@
         <tr><td>手機面板點外關閉（Backdrop 遮罩）</td><td><span class="badge badge-green">✅ Phase 38</span></td><td>半透明遮罩 z-index 層次設計；點擊面板外側區域收合面板，符合手機 UI 慣例</td></tr>
         <tr><td>Web Share API 原生分享</td><td><span class="badge badge-green">✅ Phase 39</span></td><td>手機偵測 navigator.share → 系統分享表單（LINE/訊息/AirDrop 等）；桌機仍為剪貼簿複製</td></tr>
         <tr><td>焦點管理 + 防抖 resize + 預設震動</td><td><span class="badge badge-green">✅ Phase 40</span></td><td>ESC/backdrop 關閉後焦點返回按鈕；syncHeaderHeight resize 防抖 150ms；預設場景 12ms 觸覺確認</td></tr>
+        <tr><td>2D Canvas aspect-ratio 修正</td><td><span class="badge badge-green">✅ Phase 41</span></td><td>手機版 .canvas-container 改用 aspect-ratio:2/1，消除 object-fit:contain 的上下 92px 留白</td></tr>
       </tbody>
     </table>
   </section>
@@ -574,6 +575,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 41 2D Canvas aspect-ratio 修正）</div>
+        <div class="content">
+          <strong>發現問題</strong>：rayCanvas buffer 是 1600×800（2:1），手機版容器 <code>min-height: 260px</code>，在 ~337px 寬的手機上容器比例 ≈ 1.3:1，<code>object-fit:contain</code> 造成 2:1 內容的上下各 ~46px 黑色留白，合計浪費 ~92px 的垂直空間。<br><br>
+          <strong>修正</strong>：在 <code>@media (max-width: 768px)</code> 中 <code>.canvas-container { min-height: 0; aspect-ratio: 2/1; }</code>。容器高度 = 寬度 / 2，canvas 100%×100% 無縫填充，零 letterbox。390px 寬手機節省約 92px 垂直空間，讓照度圖更快進入視野。<br>
+          <code>aspect-ratio</code> 在 2021 年後的主流瀏覽器（Chrome 88+、Safari 15+、FF 89+）均原生支援，無需 padding-bottom hack。
         </div>
       </div>
 
@@ -1085,6 +1095,17 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 41 — 2D Canvas Aspect-Ratio 修正（消除 Letterbox 留白）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.css</div>
+      <ul>
+        <li><strong>問題</strong>：rayCanvas 的內部 buffer 是 1600×800（2:1 比例），但手機版 <code>.canvas-container</code> 設定 <code>min-height: 260px</code>，在寬度 ~337px 的手機上容器比例為 337:260（≈1.3:1），而非 2:1。<code>object-fit: contain</code> 將畫面內容按 2:1 填入容器，造成上下各約 46px 的黑色 letterbox 留白，浪費約 92px 垂直空間</li>
+        <li><strong>修正</strong>：在 <code>@media (max-width: 768px)</code> 中改 <code>.canvas-container { min-height: 0; aspect-ratio: 2 / 1; }</code></li>
+        <li>效果：容器自動跟隨寬度計算高度（width ÷ 2），canvas 以 100%×100% 精確填充容器，完全無 letterbox。390px 寬手機上 canvas 容器由 260px 縮至 ~168px，節省 ~92px 垂直空間供圖表使用</li>
+        <li><code>aspect-ratio</code> 支援：Chrome 88+、Safari 15+、Firefox 89+（2021 年後所有主流瀏覽器）。舊版瀏覽器降級為 <code>min-height: 0</code>（無 letterbox 約束但仍可正常顯示）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 40 — 焦點管理 + Resize 防抖 + 預設場景觸覺反饋 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html</div>
       <ul>
@@ -1327,6 +1348,7 @@
         <li>✅ <strong>Phase 40</strong>：ESC/backdrop 關閉後焦點返回 toggle 按鈕（WAI-ARIA Disclosure Pattern）</li>
         <li>✅ <strong>Phase 40</strong>：syncHeaderHeight resize 150ms 防抖（減少強制 reflow 次數）</li>
         <li>✅ <strong>Phase 40</strong>：預設場景套用觸覺反饋 12ms（與 IEC 閾值震動型態區分）</li>
+        <li>✅ <strong>Phase 41</strong>：手機 2D canvas aspect-ratio:2/1（消除 92px letterbox 留白，節省垂直空間）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
