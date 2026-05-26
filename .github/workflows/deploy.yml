@@ -13,11 +13,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Publish to gh-pages branch
-        uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
-          publish_branch: gh-pages
-          exclude_assets: '.github,node_modules,*.pdf,*.docx,*.ies,*.txt,debug_*.png,step*.png,test_*.js,package*.json'
+          fetch-depth: 0
+
+      - name: Deploy site files to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stage site files to a temp location
+          mkdir -p /tmp/site
+          cp index.html index.css simulation.js simulation3d.js operate.js /tmp/site/
+          touch /tmp/site/.nojekyll
+
+          # Switch to gh-pages branch (already exists)
+          git checkout gh-pages
+
+          # Copy and commit updated files
+          cp /tmp/site/index.html .
+          cp /tmp/site/index.css .
+          cp /tmp/site/simulation.js .
+          cp /tmp/site/simulation3d.js .
+          cp /tmp/site/operate.js .
+          cp /tmp/site/.nojekyll .
+
+          git add index.html index.css simulation.js simulation3d.js operate.js .nojekyll
+          git diff --staged --quiet && echo "No changes" || git commit -m "deploy: sync from main [skip ci]"
+          git push origin gh-pages
