@@ -178,9 +178,12 @@
                 <div class="view-card chart-container">
                     <div class="card-header">
                         <h3>手術工作平面相對照度分佈 (Shadow Dilution / Relative Illuminance)</h3>
+                        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
                         <div class="metric-highlight" id="center-illuminance-display">
                             中心殘餘照度: <span id="center-illuminance-val">--%</span>
                             <span class="iec-badge" id="iec-compliance-badge"></span>
+                        </div>
+                        <button class="screenshot-btn" id="download-screenshot-btn" title="下載模擬截圖 (PNG)">📸</button>
                         </div>
                     </div>
                     <div class="chart-wrapper">
@@ -349,6 +352,60 @@
     </script>
     <script src="simulation.js?v=3"></script>
     <script type="module" src="simulation3d.js?v=3"></script>
+    <script>
+    // ── 截圖下載（合成 Ray Canvas + 照度圖表）──
+    (function() {
+        var btn = document.getElementById('download-screenshot-btn');
+        if (!btn) return;
+        btn.addEventListener('click', function() {
+            var rayCanvas   = document.getElementById('rayCanvas');
+            var chartCanvas = document.getElementById('illuminanceChart');
+            if (!rayCanvas || !chartCanvas) return;
+
+            // 合成畫布：上方光路圖 + 下方照度圖表
+            var W = 1600;
+            var rH = 800;
+            var cH = 400;
+            var PAD = 20;
+            var out = document.createElement('canvas');
+            out.width  = W;
+            out.height = rH + cH + PAD * 3 + 60; // extra for title bar
+            var c = out.getContext('2d');
+
+            // 背景
+            c.fillStyle = '#0b1120';
+            c.fillRect(0, 0, out.width, out.height);
+
+            // 標題
+            c.fillStyle = '#f8fafc';
+            c.font = 'bold 28px "Inter", sans-serif';
+            c.textAlign = 'center';
+            c.fillText('外科手術無影燈光學模擬器', W / 2, PAD + 24);
+            c.font = '18px "Inter", sans-serif';
+            c.fillStyle = '#94a3b8';
+            c.fillText('henrychao521.github.io/shadowless-lamp-sim', W / 2, PAD + 50);
+
+            // 光路圖
+            var titleH = PAD + 60;
+            c.drawImage(rayCanvas, 0, titleH, W, rH);
+
+            // 照度圖表
+            c.drawImage(chartCanvas, 0, titleH + rH + PAD, W, cH);
+
+            // 下載
+            var a = document.createElement('a');
+            a.href = out.toDataURL('image/png');
+            a.download = 'shadowless-lamp-sim-' + Date.now() + '.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            // 短暫反饋
+            btn.textContent = '✅';
+            setTimeout(function() { btn.textContent = '📸'; }, 1500);
+        });
+    })();
+    </script>
     <script>
     // ── 快速預設場景按鈕 ──
     (function() {
