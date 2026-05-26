@@ -131,6 +131,7 @@
         <tr><td>焦點管理 + 防抖 resize + 預設震動</td><td><span class="badge badge-green">✅ Phase 40</span></td><td>ESC/backdrop 關閉後焦點返回按鈕；syncHeaderHeight resize 防抖 150ms；預設場景 12ms 觸覺確認</td></tr>
         <tr><td>2D Canvas aspect-ratio 修正</td><td><span class="badge badge-green">✅ Phase 41</span></td><td>手機版 .canvas-container 改用 aspect-ratio:2/1，消除 object-fit:contain 的上下 92px 留白</td></tr>
         <tr><td>演示體驗優化</td><td><span class="badge badge-green">✅ Phase 42</span></td><td>demo 開始自動收合面板 + 震動反饋；首次切換 tab 後淡出滑動提示</td></tr>
+        <tr><td>橫向模式 + scroll-padding + 字型調整</td><td><span class="badge badge-green">✅ Phase 43</span></td><td>landscape 面板 78vh（原 57vh）；html scroll-padding-top 避開 sticky header；info-card 字型 0.82rem</td></tr>
       </tbody>
     </table>
   </section>
@@ -576,6 +577,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 43 橫向模式 + scroll-padding + 字型）</div>
+        <div class="content">
+          <strong>橫向模式面板高度</strong>：<code>mobileCap()</code> 新增 <code>window.innerWidth &gt; window.innerHeight</code> 判斷。iPhone 橫向高度約 390px，原本 57vh = 222px 只能顯示約 3 個控制群組，需要大量內部捲動。改為 landscape 時 78vh = 304px，可顯示更多控制項，體驗明顯改善。<br><br>
+          <strong>scroll-padding-top</strong>：在 CSS <code>html</code> 元素加入 <code>scroll-padding-top: calc(var(--header-height, 60px) + 0.75rem)</code>。所有 scrollIntoView({ block:'start' }) 和 <code>#hash</code> 錨點導航都會自動計算 sticky header 偏移，目標元素不再被 header 蓋住。var(--header-height) 由 JS 動態更新，scroll-padding 也自動同步。<br><br>
+          <strong>info-card 字型 0.82rem</strong>：微調臨床物理意義卡片的說明文字，從 0.8rem 提升至 0.82rem，在 Mobile 320–390px 螢幕上更清晰。
         </div>
       </div>
 
@@ -1105,6 +1115,16 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 43 — 橫向模式面板高度 + scroll-padding + 字型微調 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html + index.css</div>
+      <ul>
+        <li><strong>橫向（landscape）模式面板高度</strong>：<code>mobileCap()</code> 加入方向判斷：<code>window.innerWidth &gt; window.innerHeight</code> 時（landscape）返回 <code>innerHeight × 0.78</code>，否則維持 <code>innerHeight × 0.57</code>。背景：iPhone landscape 高度約 390px，57% 僅 222px 對 8 個控制群組極度擁擠；78% = 304px 仍可捲動但明顯改善</li>
+        <li><strong>scroll-padding-top</strong>：在 CSS 的 <code>html</code> 元素加入 <code>scroll-padding-top: calc(var(--header-height, 60px) + 0.75rem)</code>。瀏覽器錨點導航（<code>#id</code>）和 <code>scrollIntoView</code> 都會自動避開 sticky header 的高度，不再被 header 遮蓋目標元素</li>
+        <li><strong>info-card 字型</strong>：<code>.info-card p</code> 從 0.8rem 微調至 0.82rem，提高行動裝置閱讀舒適度</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 42 — 演示體驗優化：面板自動收合 + 滑動提示淡出 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.html</div>
       <ul>
@@ -1370,6 +1390,7 @@
         <li>✅ <strong>Phase 40</strong>：預設場景套用觸覺反饋 12ms（與 IEC 閾值震動型態區分）</li>
         <li>✅ <strong>Phase 41</strong>：手機 2D canvas aspect-ratio:2/1（消除 92px letterbox 留白，節省垂直空間）</li>
         <li>✅ <strong>Phase 42</strong>：Demo 開始自動收合手機面板（視覺化區全顯），演示觸覺反饋，首次 tab 切換後滑動提示淡出</li>
+        <li>✅ <strong>Phase 43</strong>：landscape 面板 78vh（原 57vh）；html scroll-padding-top 避開 sticky header；info-card 0.82rem</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
