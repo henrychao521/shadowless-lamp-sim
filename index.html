@@ -16,8 +16,14 @@
     <meta name="twitter:title" content="外科手術無影燈光學模擬器">
     <meta name="twitter:description" content="互動式 3D 模擬：Ray-Tracing × PBR 渲染 × IEC 60601-2-41">
     <meta name="theme-color" content="#0b1120">
-    <!-- Inline SVG favicon — surgical lamp glow icon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='14' r='8' fill='%230ea5e9' opacity='.9'/%3E%3Ccircle cx='16' cy='14' r='5' fill='%23fff' opacity='.95'/%3E%3Crect x='14.5' y='22' width='3' height='6' rx='1.5' fill='%2314b8a6'/%3E%3Cellipse cx='16' cy='14' rx='12' ry='12' fill='none' stroke='%230ea5e9' stroke-width='1.5' opacity='.35'/%3E%3C/svg%3E">
+    <!-- Favicon + PWA manifest -->
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <link rel="manifest" href="manifest.json">
+    <!-- iOS standalone mode support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="無影燈模擬">
     <!-- Preconnect for faster font + CDN loading -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -177,7 +183,7 @@
                 <div class="view-card canvas-container 3d-container">
                     <div class="card-header">
                         <h3>三維空間無影燈物理模擬 (3D Physical Simulation)</h3>
-                        <div class="legend" style="align-items: center;">
+                        <div class="legend" style="align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                             <span class="legend-item touch-hint-desktop">🖱️ 拖曳旋轉・滾輪縮放</span>
                             <span class="legend-item touch-hint-mobile" style="display:none">👆 單指旋轉・雙指縮放</span>
                             <span class="legend-item heatmap-legend-wrapper">
@@ -186,6 +192,8 @@
                                 <div class="heatmap-bar"></div>
                                 <span class="heatmap-label">強</span>
                             </span>
+                            <!-- 3D 全螢幕切換按鈕 -->
+                            <button class="fullscreen-btn" id="fullscreen-3d-btn" title="全螢幕模式" aria-label="切換全螢幕">⛶</button>
                         </div>
                     </div>
                     <div id="canvas3d" class="canvas-3d">
@@ -328,8 +336,8 @@
             } catch(e) {}
         })();
     </script>
-    <script src="simulation.js?v=2"></script>
-    <script type="module" src="simulation3d.js?v=2"></script>
+    <script src="simulation.js?v=3"></script>
+    <script type="module" src="simulation3d.js?v=3"></script>
     <script>
     // ── 手機控制面板折疊（平滑動畫版） ──
     (function() {
@@ -449,6 +457,90 @@
         // Keyboard accessible
         header.addEventListener('keydown', function(e) {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); header.click(); }
+        });
+    })();
+    </script>
+    <script>
+    // ── 手指左右滑動切換 Tab（view-tabs 區域）──
+    (function() {
+        var area = document.querySelector('.visualization-area');
+        if (!area) return;
+        var startX = 0, startY = 0, startTime = 0;
+        var THRESHOLD = 55;   // px 最小橫向位移
+        var MAX_ANGLE = 38;   // 度數：超過此角度視為縱向滑動
+
+        area.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            startTime = Date.now();
+        }, { passive: true });
+
+        area.addEventListener('touchend', function(e) {
+            // 忽略 3D canvas 上的觸控（避免干擾 OrbitControls）
+            if (e.target.tagName === 'CANVAS') return;
+            var dt = Date.now() - startTime;
+            if (dt > 400) return; // 太慢不算手勢
+
+            var dx = e.changedTouches[0].clientX - startX;
+            var dy = e.changedTouches[0].clientY - startY;
+            if (Math.abs(dx) < THRESHOLD) return;
+            var angle = Math.abs(Math.atan2(Math.abs(dy), Math.abs(dx)) * 180 / Math.PI);
+            if (angle > MAX_ANGLE) return;
+
+            var is2D = document.getElementById('view-2d').classList.contains('active');
+            var btn3d = document.querySelector('.tab-btn:nth-child(2)');
+            var btn2d = document.querySelector('.tab-btn:nth-child(1)');
+            if (dx < 0 && is2D && btn3d) {
+                switchView('3d', btn3d);    // 左滑 → 3D
+            } else if (dx > 0 && !is2D && btn2d) {
+                switchView('2d', btn2d);    // 右滑 → 2D
+            }
+        }, { passive: true });
+    })();
+    </script>
+    <script>
+    // ── 3D 全螢幕切換 ──
+    (function() {
+        var btn    = document.getElementById('fullscreen-3d-btn');
+        var canvas = document.getElementById('canvas3d');
+        if (!btn || !canvas) return;
+
+        var fsSupported = !!(canvas.requestFullscreen || canvas.webkitRequestFullscreen
+                             || canvas.mozRequestFullScreen || canvas.msRequestFullscreen);
+        if (!fsSupported) { btn.style.display = 'none'; return; }
+
+        function isFs() {
+            return !!(document.fullscreenElement || document.webkitFullscreenElement
+                      || document.mozFullScreenElement || document.msFullscreenElement);
+        }
+        function enterFs() {
+            if      (canvas.requestFullscreen)       canvas.requestFullscreen();
+            else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
+            else if (canvas.mozRequestFullScreen)    canvas.mozRequestFullScreen();
+            else if (canvas.msRequestFullscreen)     canvas.msRequestFullscreen();
+        }
+        function exitFs() {
+            if      (document.exitFullscreen)       document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.mozCancelFullScreen)  document.mozCancelFullScreen();
+            else if (document.msExitFullscreen)     document.msExitFullscreen();
+        }
+        function syncBtn() {
+            if (isFs()) {
+                btn.textContent = '✕';
+                btn.title = '離開全螢幕 (Esc)';
+            } else {
+                btn.textContent = '⛶';
+                btn.title = '全螢幕模式';
+            }
+        }
+
+        btn.addEventListener('click', function() {
+            if (isFs()) exitFs(); else enterFs();
+        });
+        ['fullscreenchange','webkitfullscreenchange',
+         'mozfullscreenchange','MSFullscreenChange'].forEach(function(ev) {
+            document.addEventListener(ev, syncBtn);
         });
     })();
     </script>

@@ -1,0 +1,21 @@
+{
+  "name": "外科手術無影燈光學模擬器",
+  "short_name": "無影燈模擬",
+  "description": "互動式 3D 模擬器：探索多 LED 矩陣如何稀釋手術遮擋陰影，符合 IEC 60601-2-41 標準。",
+  "start_url": "/shadowless-lamp-sim/",
+  "scope": "/shadowless-lamp-sim/",
+  "display": "standalone",
+  "background_color": "#0b1120",
+  "theme_color": "#0ea5e9",
+  "orientation": "any",
+  "lang": "zh-TW",
+  "categories": ["education", "utilities"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
