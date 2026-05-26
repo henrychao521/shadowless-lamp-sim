@@ -347,7 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Update Text Display
         const centerValElem = displays.centerIlluminance;
         centerValElem.textContent = centerDilution.toFixed(1) + '%';
-        
+
         // Change color based on threshold (e.g., < 50 is bad)
         if (centerDilution < 50) {
             centerValElem.style.color = '#ef4444'; // red
@@ -355,6 +355,18 @@ document.addEventListener("DOMContentLoaded", () => {
             centerValElem.style.color = '#fbbf24'; // yellow
         } else {
             centerValElem.style.color = '#14b8a6'; // teal
+        }
+
+        // IEC 60601-2-41 Pass/Fail badge
+        const iecBadge = document.getElementById('iec-compliance-badge');
+        if (iecBadge) {
+            if (centerDilution >= 50) {
+                iecBadge.textContent = '✅ IEC PASS';
+                iecBadge.className = 'iec-badge iec-pass';
+            } else {
+                iecBadge.textContent = '❌ IEC FAIL';
+                iecBadge.className = 'iec-badge iec-fail';
+            }
         }
     }
 

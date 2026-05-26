@@ -108,6 +108,7 @@
         <tr><td>PWA 可安裝</td><td><span class="badge badge-green">✅ Phase 17</span></td><td>manifest.json + icon.svg，Android/iOS 可加入主畫面</td></tr>
         <tr><td>手勢操作</td><td><span class="badge badge-green">✅ Phase 18</span></td><td>左右 Swipe 切換 2D/3D Tab；3D 全螢幕按鈕</td></tr>
         <tr><td>教學預設場景</td><td><span class="badge badge-green">✅ Phase 19</span></td><td>4 個快速預設按鈕（IEC / 多燈 / 少燈 / 嚴苛），一鍵切換教學情境</td></tr>
+        <tr><td>IEC 合規指示</td><td><span class="badge badge-green">✅ Phase 20</span></td><td>中心照度旁即時 PASS/FAIL 徽章；@media print 列印教材樣式</td></tr>
       </tbody>
     </table>
   </section>
@@ -557,6 +558,19 @@
       </div>
 
       <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 20 IEC 徽章 + 列印樣式）</div>
+        <div class="content">
+          <strong>IEC PASS/FAIL 徽章</strong>：在 <code>.metric-highlight</code> 內的中心照度值右側加入 <code>.iec-badge</code> span。simulation.js 的 updateChart() 函式在每次計算後同步更新：≥50% 顯示 <code>✅ IEC PASS</code>（teal 邊框），&lt;50% 顯示 <code>❌ IEC FAIL</code>（red 邊框）。學生立即明白目前配置是否符合 IEC 60601-2-41 標準。<br><br>
+          <strong>列印樣式 @media print</strong>：教師可直接 Ctrl+P 列印教學講義。<br>
+          隱藏：controls-panel、view-tabs（2D/3D 切換）、share-row、preset-row、fullscreen-btn。<br>
+          強制顯示：2D 光路圖（#view-2d display:flex）、照度圖表。<br>
+          展開：paper-content.collapsed 的 max-height 強制設為 none，參考文獻全文顯示。<br>
+          顏色：背景 white，文字 #111，卡片淡灰背景。<br>
+          <code>-webkit-print-color-adjust: exact</code> 保留彩色光路與圖表色彩。
+        </div>
+      </div>
+
+      <div class="msg ai">
         <div class="role">🤖 Claude（Loop 繼續 — Phase 19 快速預設場景按鈕）</div>
         <div class="content">
           考量教學情境，教師通常需要快速切換不同的示範場景（IEC 標準配置 vs. 多燈 vs. 少燈）。為此加入 <strong>快速場景按鈕列</strong>。<br><br>
@@ -689,6 +703,19 @@
       </div>
 
     <div class="phase-card">
+      <h3>Phase 20 — IEC 合規徽章 + 列印樣式 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · simulation.js + index.html + index.css</div>
+      <ul>
+        <li><strong>IEC PASS/FAIL 徽章</strong>：中心照度右側即時顯示 ✅ IEC PASS（≥50%）或 ❌ IEC FAIL（&lt;50%）</li>
+        <li>updateChart() 每次計算後同步更新徽章樣式（.iec-pass teal / .iec-fail red）</li>
+        <li><strong>@media print 列印樣式</strong>：隱藏所有互動 UI，強制顯示 2D 光路圖和照度圖表</li>
+        <li>展開 paper-content.collapsed（max-height: none!important），列印時包含完整參考文獻</li>
+        <li>print-color-adjust: exact — 保留彩色光路、圖表色彩，教材視覺清晰</li>
+        <li>頁面分隔：paper-reference-container page-break-before: always</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 19 — 快速預設場景按鈕 <span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.html + index.css</div>
       <ul>
@@ -773,6 +800,8 @@
         <li>✅ <strong>Phase 16</strong>：Three.js CDN 從 unpkg → jsDelivr（台灣/亞洲 CDN 覆蓋更佳，載入更快）</li>
         <li>✅ <strong>Phase 17</strong>：PWA Manifest（manifest.json + icon.svg + iOS meta）— 可加入手機主畫面</li>
         <li>✅ <strong>Phase 19</strong>：快速預設場景按鈕（IEC標準 / 高效多燈 / 少燈對比 / 嚴苛遮擋，一鍵套用）</li>
+        <li>✅ <strong>Phase 20</strong>：IEC PASS/FAIL 即時徽章（中心照度旁，≥50% teal / &lt;50% red）</li>
+        <li>✅ <strong>Phase 20</strong>：@media print 列印樣式（隱藏互動 UI、展開文獻、保留彩色圖表）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
