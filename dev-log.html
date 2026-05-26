@@ -124,6 +124,7 @@
         <tr><td>面板高度限制 + 捲動</td><td><span class="badge badge-green">✅ Phase 33</span></td><td>手機版面板上限 57vh 可內部捲動，視覺化區域不再被推至螢幕外；中間標尺標籤隱藏</td></tr>
         <tr><td>rAF 防抖渲染</td><td><span class="badge badge-green">✅ Phase 34</span></td><td>slider input 事件將 Canvas + Chart.js 渲染延至 rAF，同幀內多次輸入合併為單次繪製</td></tr>
         <tr><td>ARIA Tab 模式 + 懶載入 3D</td><td><span class="badge badge-green">✅ Phase 35</span></td><td>正確 role="tablist/tab/tabpanel" + 首次點擊 3D tab 才動態 import() Three.js bundle</td></tr>
+        <tr><td>Service Worker 離線快取</td><td><span class="badge badge-green">✅ Phase 36</span></td><td>sw.js 快取本地資產（cache-first），重複訪問秒開，2D 模擬完全離線可用</td></tr>
       </tbody>
     </table>
   </section>
@@ -1026,6 +1027,24 @@
         <li><strong>全螢幕模式</strong>：<code>#canvas3d:fullscreen</code> CSS — 100vw × 100vh，無圓角，使 3D 場景填滿整個螢幕</li>
         <li><strong>圖示切換</strong>：fullscreenchange 事件將圖示在 ⛶（進入）↔ ✕（離開）之間切換</li>
         <li>不支援的舊瀏覽器自動隱藏按鈕，向後相容</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 36 — Service Worker 離線快取（PWA 完整化）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · sw.js 新增 + index.html + deploy.yml</div>
+      <ul>
+        <li><strong>sw.js</strong>：新增 Service Worker，支援 Fetch、Install、Activate 三個生命週期事件</li>
+        <li><strong>快取策略：Cache-First + 背景網路更新</strong>（stale-while-revalidate）</li>
+        <li>快取資產：index.html / index.css / simulation.js / simulation3d.js / icon.svg / manifest.json</li>
+        <li>CDN 資產（Three.js / Chart.js / Google Fonts）跳過 SW 處理，交由瀏覽器正常快取策略</li>
+        <li>Install：<code>skipWaiting()</code> 讓新版 SW 立即生效</li>
+        <li>Activate：刪除舊版快取 key，<code>clients.claim()</code> 立即接管現有頁面</li>
+        <li>Fetch：快取命中時立即回傳（秒開），背景更新資產；快取未命中時網路取得並存入快取；完全離線時回傳快取的 index.html</li>
+        <li>只攔截同源 GET 請求（非同源 CDN 資源直接放行，避免跨域快取問題）</li>
+        <li><strong>index.html 註冊</strong>：window.load 事件後 <code>navigator.serviceWorker.register('/shadowless-lamp-sim/sw.js')</code>，失敗時靜默降級</li>
+        <li><strong>deploy.yml</strong>：sw.js 加入部署清單（source cp + dest cp + git add）</li>
+        <li>效果：首次訪問後，2D 模擬器完全離線可用（包括 Canvas 光路圖和 Chart.js 照度圖）</li>
       </ul>
     </div>
 
