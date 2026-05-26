@@ -130,6 +130,7 @@
         <tr><td>Web Share API 原生分享</td><td><span class="badge badge-green">✅ Phase 39</span></td><td>手機偵測 navigator.share → 系統分享表單（LINE/訊息/AirDrop 等）；桌機仍為剪貼簿複製</td></tr>
         <tr><td>焦點管理 + 防抖 resize + 預設震動</td><td><span class="badge badge-green">✅ Phase 40</span></td><td>ESC/backdrop 關閉後焦點返回按鈕；syncHeaderHeight resize 防抖 150ms；預設場景 12ms 觸覺確認</td></tr>
         <tr><td>2D Canvas aspect-ratio 修正</td><td><span class="badge badge-green">✅ Phase 41</span></td><td>手機版 .canvas-container 改用 aspect-ratio:2/1，消除 object-fit:contain 的上下 92px 留白</td></tr>
+        <tr><td>演示體驗優化</td><td><span class="badge badge-green">✅ Phase 42</span></td><td>demo 開始自動收合面板 + 震動反饋；首次切換 tab 後淡出滑動提示</td></tr>
       </tbody>
     </table>
   </section>
@@ -575,6 +576,15 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 42 演示體驗優化）</div>
+        <div class="content">
+          <strong>Demo 面板自動收合</strong>：手機使用者開啟面板調整參數後，如果此時點擊「🎬 自動掃描演示」，面板佔 57vh 遮蓋了視覺化區域，使用者無法清楚觀看光路動態。startDemo() 最前面加入手機寬度判斷，若面板展開則觸發 click 收合，然後才開始動畫。演示結束後面板維持收合狀態（使用者可手動重新打開）。<br><br>
+          <strong>演示觸覺反饋</strong>：startDemo → vibrate([10, 40, 10])（雙點輕振，有明確"開始"感）；stopDemo → vibrate(8)（單短振）。<br><br>
+          <strong>滑動提示淡出</strong>：.mmb-hint「← 左右滑動切換視圖 →」在使用者第一次切換 tab 後就不再需要顯示（使用者已知曉手勢）。switchView() 末尾加入 opacity 0.4s fade-out + setTimeout display:none，讓 metric bar 更簡潔。後續 switchView 呼叫因為元素已 display:none，style 覆寫不會出現視覺問題。
         </div>
       </div>
 
@@ -1095,6 +1105,16 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 42 — 演示體驗優化：面板自動收合 + 滑動提示淡出 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html</div>
+      <ul>
+        <li><strong>演示開始自動收合面板</strong>：<code>startDemo()</code> 最前面判斷 <code>window.innerWidth &lt;= 768</code>，若面板展開則觸發 toggle click 收合，讓整個視覺化區域在演示期間不被遮擋</li>
+        <li><strong>演示觸覺反饋</strong>：演示開始觸發 <code>vibrate([10, 40, 10])</code>（雙點輕振，表示"開始"）；演示結束觸發 <code>vibrate(8)</code>（單短振，表示"停止"）</li>
+        <li><strong>滑動提示自動淡出</strong>：<code>switchView()</code> 在任何 tab 切換時（含 localStorage 恢復）以 0.4s opacity 淡出 <code>.mmb-hint</code>（「← 左右滑動切換視圖 →」），讓使用者首次切換後不再持續顯示已知的手勢提示，保持 metric bar 的簡潔</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 41 — 2D Canvas Aspect-Ratio 修正（消除 Letterbox 留白）<span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-27 · index.css</div>
       <ul>
@@ -1349,6 +1369,7 @@
         <li>✅ <strong>Phase 40</strong>：syncHeaderHeight resize 150ms 防抖（減少強制 reflow 次數）</li>
         <li>✅ <strong>Phase 40</strong>：預設場景套用觸覺反饋 12ms（與 IEC 閾值震動型態區分）</li>
         <li>✅ <strong>Phase 41</strong>：手機 2D canvas aspect-ratio:2/1（消除 92px letterbox 留白，節省垂直空間）</li>
+        <li>✅ <strong>Phase 42</strong>：Demo 開始自動收合手機面板（視覺化區全顯），演示觸覺反饋，首次 tab 切換後滑動提示淡出</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
