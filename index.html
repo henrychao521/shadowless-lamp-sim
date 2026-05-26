@@ -197,7 +197,7 @@
 
     <!-- 參考文獻區塊 -->
     <section class="paper-reference-container">
-        <div class="paper-header" onclick="document.getElementById('paper-content').classList.toggle('collapsed')">
+        <div class="paper-header" id="paper-toggle-btn" role="button" tabindex="0" aria-expanded="false" aria-controls="paper-content">
             <h2>📄 參考文獻與理論基礎：外科手術無影燈技術報告 <span>(點擊展開/收合閱讀完整報告)</span></h2>
         </div>
         <article id="paper-content" class="paper-content collapsed">
@@ -305,7 +305,22 @@
                     }
                 }, 80);
             }
+
+            // 記憶偏好 tab（下次造訪自動恢復）
+            try { localStorage.setItem('sls_preferredTab', viewName); } catch(e) {}
         }
+
+        // 恢復上次偏好的 tab
+        (function() {
+            try {
+                var pref = localStorage.getItem('sls_preferredTab');
+                if (pref === '3d') {
+                    // 找到 3D tab 按鈕並切換
+                    var btn3d = document.querySelector('.tab-btn:nth-child(2)');
+                    if (btn3d) switchView('3d', btn3d);
+                }
+            } catch(e) {}
+        })();
     </script>
     <script src="simulation.js?v=2"></script>
     <script type="module" src="simulation3d.js?v=2"></script>
@@ -376,6 +391,46 @@
             if (desk) desk.style.display = 'none';
             if (mob)  mob.style.display  = '';
         }
+    })();
+    </script>
+    <script>
+    // ── 參考文獻折疊（scrollHeight 精確動畫版） ──
+    (function() {
+        var header  = document.getElementById('paper-toggle-btn');
+        var content = document.getElementById('paper-content');
+        if (!header || !content) return;
+
+        function openPaper() {
+            content.classList.remove('collapsed');
+            content.style.maxHeight = content.scrollHeight + 'px';
+            content.style.opacity = '1';
+            header.setAttribute('aria-expanded', 'true');
+            content.addEventListener('transitionend', function onEnd(e) {
+                if (e.propertyName !== 'max-height') return;
+                content.removeEventListener('transitionend', onEnd);
+                if (!content.classList.contains('collapsed')) content.style.maxHeight = 'none';
+            });
+        }
+
+        function closePaper() {
+            content.style.maxHeight = content.scrollHeight + 'px';
+            content.style.opacity = '0';
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    content.style.maxHeight = '0';
+                    content.classList.add('collapsed');
+                });
+            });
+            header.setAttribute('aria-expanded', 'false');
+        }
+
+        header.addEventListener('click', function() {
+            if (content.classList.contains('collapsed')) { openPaper(); } else { closePaper(); }
+        });
+        // Keyboard accessible
+        header.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); header.click(); }
+        });
     })();
     </script>
     <script>
