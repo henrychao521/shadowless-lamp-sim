@@ -351,19 +351,19 @@
             } catch(e) {}
         })();
     </script>
-    <script src="simulation.js?v=3"></script>
-    <script type="module" src="simulation3d.js?v=3"></script>
+    <script src="simulation.js?v=4"></script>
+    <script type="module" src="simulation3d.js?v=4"></script>
     <script>
     // ── 鍵盤快捷鍵 ──
     (function() {
+        // ⌨️ header button — wire ONCE, not inside keydown handler
+        var keyBtn = document.querySelector('.key-hint-btn');
+        if (keyBtn) { keyBtn.addEventListener('click', showKeyHelp); }
+
         document.addEventListener('keydown', function(e) {
             // 忽略輸入框中的按鍵
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-            // ⌨️ button in header
-        var keyBtn = document.querySelector('.key-hint-btn');
-        if (keyBtn) { keyBtn.addEventListener('click', showKeyHelp); }
 
         switch (e.key) {
                 case '1':
