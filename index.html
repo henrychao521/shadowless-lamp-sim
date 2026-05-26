@@ -1016,14 +1016,35 @@
     })();
     </script>
     <script>
-    // ── 複製連結按鈕 ──
+    // ── 複製 / 分享連結按鈕（Web Share API 優先）──
     (function() {
         var btn      = document.getElementById('copy-url-btn');
         var feedback = document.getElementById('copy-url-feedback');
         if (!btn || !feedback) return;
+
+        // 支援 Web Share API（iOS Safari 12.1+、Chrome Android 61+）時改為原生分享
+        var canShare = !!(navigator.share);
+        if (canShare) {
+            btn.textContent = '📤 分享此設定連結';
+            btn.title = '使用系統分享功能傳送此設定';
+        }
+
         btn.addEventListener('click', function() {
             var url = window.location.href;
-            if (navigator.clipboard && navigator.clipboard.writeText) {
+            if (canShare) {
+                navigator.share({
+                    title: '外科手術無影燈光學模擬器',
+                    text: '查看這組無影燈模擬參數配置 — IEC 60601-2-41 即時模擬',
+                    url: url
+                }).then(function() {
+                    // 分享成功：短暫反饋
+                    feedback.textContent = '✅ 已分享！';
+                    showFeedback();
+                    setTimeout(function() { feedback.textContent = '✅ 已複製！'; }, 2500);
+                }).catch(function() {
+                    // 使用者取消或失敗，靜默處理
+                });
+            } else if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(url).then(function() {
                     showFeedback();
                 }).catch(function() {
@@ -1033,6 +1054,7 @@
                 fallbackCopy(url);
             }
         });
+
         function showFeedback() {
             feedback.classList.add('visible');
             setTimeout(function() { feedback.classList.remove('visible'); }, 2200);

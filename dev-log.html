@@ -127,6 +127,7 @@
         <tr><td>Service Worker 離線快取</td><td><span class="badge badge-green">✅ Phase 36</span></td><td>sw.js 快取本地資產（cache-first），重複訪問秒開，2D 模擬完全離線可用</td></tr>
         <tr><td>深色模式系統整合 + ESC + Slider Active</td><td><span class="badge badge-green">✅ Phase 37</span></td><td>color-scheme:dark + ESC 關閉面板 + 滑桿 :active 放大 + overscroll-behavior:none 兩軸</td></tr>
         <tr><td>手機面板點外關閉（Backdrop 遮罩）</td><td><span class="badge badge-green">✅ Phase 38</span></td><td>半透明遮罩 z-index 層次設計；點擊面板外側區域收合面板，符合手機 UI 慣例</td></tr>
+        <tr><td>Web Share API 原生分享</td><td><span class="badge badge-green">✅ Phase 39</span></td><td>手機偵測 navigator.share → 系統分享表單（LINE/訊息/AirDrop 等）；桌機仍為剪貼簿複製</td></tr>
       </tbody>
     </table>
   </section>
@@ -572,6 +573,14 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 39 Web Share API）</div>
+        <div class="content">
+          <strong>問題識別</strong>：「複製連結」按鈕在手機上需要使用者手動開啟 LINE/訊息 App 再貼上，增加摩擦。手機瀏覽器有 Web Share API 可直接呼叫系統分享表單。<br><br>
+          <strong>實作</strong>：初始化時檢查 <code>navigator.share</code> 支援：若支援（iOS Safari 12.1+、Chrome Android 61+），改變按鈕文字為「📤 分享此設定連結」，點擊呼叫 <code>navigator.share({ title, text, url })</code>；分享成功顯示「✅ 已分享！」反饋。若不支援（桌機），維持原有剪貼簿複製流程和「✅ 已複製！」反饋。使用者取消分享時（promise reject）靜默處理。
         </div>
       </div>
 
@@ -1066,6 +1075,19 @@
     </div>
 
     <div class="phase-card">
+      <h3>Phase 39 — Web Share API 原生分享（手機）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html</div>
+      <ul>
+        <li><strong>問題</strong>：手機使用者「分享連結」的常見行為是透過系統分享表單（LINE、訊息、AirDrop 等），而非剪貼簿複製。舊版的「📋 複製連結」UX 在手機上需要再手動開啟 LINE 貼上，多了兩步。</li>
+        <li><strong>Web Share API 偵測</strong>：初始化時檢查 <code>navigator.share</code>，iOS Safari 12.1+、Chrome Android 61+ 均支援</li>
+        <li><strong>手機模式</strong>：按鈕文字改為「📤 分享此設定連結」，<code>navigator.share({ title, text, url })</code> 呼叫系統原生分享表單。成功時顯示短暫「✅ 已分享！」回饋。</li>
+        <li><strong>桌機模式</strong>：保持原有的 Clipboard API 複製 → 舊式 execCommand 降級行為，顯示「✅ 已複製！」</li>
+        <li><code>navigator.share()</code> 失敗（使用者取消）時靜默處理，不顯示錯誤</li>
+        <li>效果：手機學生可直接以 LINE 傳送特定參數的模擬器網址，方便課堂討論與作業繳交</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
       <h3>Phase 38 — 手機面板 Backdrop 遮罩（點外關閉）<span class="badge badge-green">完成</span></h3>
       <div class="meta">2026-05-26 · index.css + index.html</div>
       <ul>
@@ -1281,6 +1303,7 @@
         <li>✅ <strong>Phase 37</strong>：滑桿 :active scale(1.4) + 光暈（觸控拖曳時視覺放大反饋）</li>
         <li>✅ <strong>Phase 37</strong>：overscroll-behavior:none 雙軸（防止 iOS 橫向 rubber-band 彈跳）</li>
         <li>✅ <strong>Phase 38</strong>：面板 Backdrop 遮罩（點外關閉，z-index 88/89/90 層次，fadeIn 動畫）</li>
+        <li>✅ <strong>Phase 39</strong>：Web Share API（手機原生分享表單，桌機降級為剪貼簿複製）</li>
         <li>✅ <strong>Phase 18</strong>：手指滑動切換 Tab（visualization-area 左右 swipe，Canvas 觸控排除）</li>
         <li>✅ <strong>Phase 18</strong>：3D 全螢幕按鈕（⛶ 按鈕，requestFullscreen 全前綴，Canvas 填滿螢幕）</li>
         <li>⬜ 體積光（raymarching volumetric spotlight）</li>
