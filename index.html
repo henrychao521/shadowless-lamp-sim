@@ -158,7 +158,13 @@
                             </span>
                         </div>
                     </div>
-                    <div id="canvas3d" class="canvas-3d"></div>
+                    <div id="canvas3d" class="canvas-3d">
+                        <!-- 3D 初始化載入提示（Three.js 就緒後自動隱藏） -->
+                        <div id="canvas3d-loading" class="canvas-loading">
+                            <div class="loading-ring"></div>
+                            <p>3D 模擬載入中…</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -257,14 +263,24 @@
         function switchView(viewName, btnElement) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.view-content').forEach(view => view.classList.remove('active'));
-            
+
             if (btnElement) {
                 btnElement.classList.add('active');
             }
             document.getElementById('view-' + viewName).classList.add('active');
-            
+
             // Trigger resize event to fix canvas rendering sizes
             window.dispatchEvent(new Event('resize'));
+
+            // 手機版：切換 tab 後自動捲動到視覺化區域頂部
+            if (window.innerWidth <= 768) {
+                setTimeout(function() {
+                    var tabs = document.querySelector('.view-tabs');
+                    if (tabs) {
+                        tabs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 80);
+            }
         }
     </script>
     <script src="simulation.js?v=2"></script>
