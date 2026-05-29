@@ -3,7 +3,9 @@ node_modules/
 package-lock.json.bak
 
 # 廠商 / 版權檔案（本機保留，不進 git）
-*.pdf
+# 注意：只排除廠商手冊，勿用 *.pdf 全域排除，否則我們自製的「操作介紹.pdf」
+# 會在 main 與 gh-pages 兩分支被 git add 靜默略過 → 線上 404（Phase 56 教訓）
+1003362-Rev.-N-MI-LINE-Manual.pdf
 *.ies
 
 # 自動測試輸出（每次跑都會重產）

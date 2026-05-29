@@ -28,6 +28,7 @@ jobs:
           mkdir -p /tmp/site
           cp index.html index.css simulation.js simulation3d.js dev-log.html /tmp/site/
           cp optics-reciprocity.html /tmp/site/
+          cp "操作介紹.pdf" /tmp/site/
           cp manifest.json icon.svg sw.js /tmp/site/
           # Copy docx if it exists (referenced by download link in index.html)
           if [ -f "手術無影燈光學設計與模擬.docx" ]; then
@@ -46,6 +47,7 @@ jobs:
           cp /tmp/site/simulation3d.js .
           cp /tmp/site/dev-log.html .
           cp /tmp/site/optics-reciprocity.html .
+          cp "/tmp/site/操作介紹.pdf" .
           cp /tmp/site/manifest.json .
           cp /tmp/site/icon.svg .
           cp /tmp/site/sw.js .
@@ -54,7 +56,7 @@ jobs:
             cp "/tmp/site/手術無影燈光學設計與模擬.docx" .
           fi
 
-          git add index.html index.css simulation.js simulation3d.js dev-log.html optics-reciprocity.html manifest.json icon.svg sw.js .nojekyll
+          git add index.html index.css simulation.js simulation3d.js dev-log.html optics-reciprocity.html "操作介紹.pdf" manifest.json icon.svg sw.js .nojekyll
           # Add docx if present (git handles binary files fine)
           git ls-files --error-unmatch "手術無影燈光學設計與模擬.docx" 2>/dev/null && \
             git add "手術無影燈光學設計與模擬.docx" || \

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>無影燈光學模擬器 — 系統操作介紹</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "STHeiti", "Heiti TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    color: #1e293b; line-height: 1.65; font-size: 10.5pt; margin: 0;
+  }
+  h1, h2, h3, h4 { color: #0f172a; line-height: 1.3; }
+  h1 { font-size: 22pt; margin: 0 0 4pt; }
+  h2 {
+    font-size: 14pt; margin: 18pt 0 6pt; padding: 5pt 10pt;
+    background: linear-gradient(135deg, #0ea5e9, #14b8a6); color: #fff;
+    border-radius: 6px;
+  }
+  h3 { font-size: 12pt; margin: 12pt 0 4pt; color: #0369a1; border-bottom: 1.5px solid #bae6fd; padding-bottom: 2pt; }
+  h4 { font-size: 10.5pt; margin: 8pt 0 3pt; color: #0f766e; }
+  p { margin: 4pt 0; }
+  ul, ol { margin: 4pt 0; padding-left: 20pt; }
+  li { margin: 2pt 0; }
+  .cover {
+    text-align: center; padding: 30pt 0 14pt; border-bottom: 3px solid #0ea5e9;
+    margin-bottom: 8pt;
+  }
+  .cover .sub { font-size: 12pt; color: #475569; margin-top: 6pt; }
+  .cover .meta { font-size: 9pt; color: #94a3b8; margin-top: 10pt; }
+  .lead {
+    background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 8pt 12pt;
+    border-radius: 0 6px 6px 0; margin: 8pt 0; font-size: 10pt;
+  }
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0; font-size: 9pt; }
+  th, td { border: 1px solid #cbd5e1; padding: 4pt 6pt; text-align: left; vertical-align: top; }
+  th { background: #e0f2fe; color: #0c4a6e; font-weight: 700; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .key { display: inline-block; min-width: 16pt; text-align: center; padding: 1pt 5pt;
+    background: #1e293b; color: #fff; border-radius: 4px; font-family: monospace; font-size: 9pt; }
+  .tag { display: inline-block; padding: 1pt 7pt; border-radius: 999px; font-size: 8pt;
+    font-weight: 700; color: #fff; }
+  .tag-2d { background: #0ea5e9; }
+  .tag-3d { background: #8b5cf6; }
+  .note { font-size: 9pt; color: #64748b; }
+  .pagebreak { page-break-before: always; }
+  .grid2 { display: flex; gap: 12pt; }
+  .grid2 > div { flex: 1; }
+  .step { counter-reset: none; }
+  .footer-note { margin-top: 14pt; padding-top: 6pt; border-top: 1px solid #e2e8f0;
+    font-size: 8.5pt; color: #94a3b8; text-align: center; }
+  .badge-iec { background:#16a34a; color:#fff; padding:1pt 6pt; border-radius:4px; font-size:8pt; font-weight:700; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>🔦 無影燈光學模擬器</h1>
+  <div class="sub">系統操作介紹手冊</div>
+  <div class="meta">Shadowless Lamp Optics Simulator · 互動式教學教具 · 繁體中文版</div>
+</div>
+
+<div class="lead">
+  本模擬器以互動方式呈現「手術無影燈」的光學原理：透過多光源／多面反射鏡的光線疊加，
+  說明陰影如何被稀釋、殘餘照度如何量化，並對照真實醫療規範（IEC 60601-2-41）。
+  本手冊說明各項操作介面與功能，協助教師與學生快速上手。
+</div>
+
+<h2>一、系統概觀</h2>
+<p>模擬器分為兩大檢視分頁，左側為共用的<strong>控制面板</strong>，右側為視覺化區域：</p>
+<ul>
+  <li><span class="tag tag-2d">2D</span> <strong>幾何剖面分析</strong>：俯視光線追跡，清楚看出每條光線如何繞過障礙物、在術野疊加，並即時計算中心殘餘照度。</li>
+  <li><span class="tag tag-3d">3D</span> <strong>空間模擬與熱圖</strong>：立體呈現燈具、障礙物與照度熱圖分佈，可自由旋轉觀察。</li>
+</ul>
+<p>另附一個獨立的延伸頁面 <strong>🔭 光路逆行互動演示</strong>（見第五節），說明光學可逆性與「障礙物擋光卻仍見全景」的孔徑遮擋原理。</p>
+
+<h2>二、控制面板</h2>
+<p class="note">手機版可按 <span class="key">P</span> 或右下角按鈕開合面板。</p>
+
+<h3>2-1 滑桿參數</h3>
+<table>
+  <tr><th>參數</th><th>範圍</th><th>預設</th><th>說明</th></tr>
+  <tr><td>燈具高度</td><td>60–150 cm</td><td>100</td><td>燈面距術野的垂直距離，影響光線張角與照度。</td></tr>
+  <tr><td>障礙物 X 位置</td><td>−30–30 cm</td><td>0</td><td>遮擋物（模擬術者頭部／手）的水平位置。</td></tr>
+  <tr><td>障礙物 Y 位置</td><td>20–90 cm</td><td>50</td><td>遮擋物的高度位置。</td></tr>
+  <tr><td>障礙物 Z 位置 <span class="tag tag-3d">3D</span></td><td>—</td><td>—</td><td>立體模式下的前後位置。</td></tr>
+  <tr><td>障礙物半徑</td><td>2–25 cm</td><td>10.5</td><td>遮擋物大小（10.5 cm 對應 IEC 標準頭部模型）。</td></tr>
+  <tr><td>光源數量</td><td>5–61 顆</td><td>25</td><td>LED 陣列／反射面數量，越多陰影稀釋越完整。</td></tr>
+  <tr><td>光束張角</td><td>1–15°</td><td>6</td><td>單一光源的發散角度。</td></tr>
+</table>
+
+<h3>2-2 模式開關</h3>
+<table>
+  <tr><th>開關</th><th>功能</th></tr>
+  <tr><td>真實感模式 (realistic)</td><td>套用真實光衰減與柔和邊緣，呈現更接近實際燈具的效果。</td></tr>
+  <tr><td>智慧補償 (smart compensation)</td><td>模擬高階燈具偵測遮擋後自動增亮鄰近光源的補光機制。</td></tr>
+  <tr><td>反射鏡模式 (reflector)</td><td>切換為「單一中央燈泡 + 同心微面反射鏡」設計（DomeLux 型），對照 LED 陣列（Trumpf iLED 型）。兩者在 2D 陰影稀釋上幾何等效。</td></tr>
+</table>
+
+<h3>2-3 快捷預設與按鈕</h3>
+<table>
+  <tr><th>按鈕</th><th>說明</th></tr>
+  <tr><td>IEC 標準</td><td>套用符合 IEC 60601-2-41 規範的標準配置。</td></tr>
+  <tr><td>高效多燈</td><td>多光源密集配置，陰影稀釋最佳。</td></tr>
+  <tr><td>少燈對比</td><td>少量光源，凸顯陰影問題。</td></tr>
+  <tr><td>嚴苛遮擋</td><td>大型障礙物情境，測試補光極限。</td></tr>
+  <tr><td>▶ 演示掃描</td><td>自動移動障礙物，動態展示陰影稀釋過程。</td></tr>
+  <tr><td>🔗 複製網址</td><td>將目前所有參數編碼進網址，方便分享指定情境。</td></tr>
+  <tr><td>📸 下載截圖</td><td>匯出目前畫面為圖片。</td></tr>
+</table>
+
+<div class="pagebreak"></div>
+
+<h2>三、視覺化區域與量測</h2>
+
+<h3>3-1 中心殘餘照度</h3>
+<p>畫面上方顯示<strong>中心殘餘照度 (%)</strong>，代表障礙物正下方術野中心相對於無遮擋時的亮度。
+數值越高代表陰影被稀釋得越好。當達標時會亮起 <span class="badge-iec">IEC 50%</span> 標記，
+表示符合 IEC 60601-2-41 對「單一遮擋物殘餘照度需 ≥ 50%」的要求。</p>
+
+<h3>3-2 照度分佈圖</h3>
+<p>下方折線圖即時繪出術野水平面的照度分佈曲線，可直觀看出遮擋造成的凹陷被多光源填補的程度。</p>
+
+<h3>3-3 設計對照表</h3>
+<p>頁面內含 LED 陣列式（Trumpf iLED）與多面反射鏡式（DomeLux）兩種無影燈設計哲學的對照表，
+說明兩者結構不同但在陰影稀釋的幾何效果上等價。</p>
+
+<h3>3-4 3D 空間模擬 <span class="tag tag-3d">3D</span></h3>
+<ul>
+  <li>滑鼠拖曳可旋轉視角，滾輪縮放。</li>
+  <li>支援<strong>自動旋轉</strong>與<strong>全螢幕 ⛶</strong>。</li>
+  <li>以熱圖呈現術野照度的空間分佈。</li>
+</ul>
+
+<h2>四、鍵盤快捷鍵</h2>
+<table>
+  <tr><th>按鍵</th><th>功能</th></tr>
+  <tr><td><span class="key">1</span></td><td>套用「IEC 標準」預設</td></tr>
+  <tr><td><span class="key">2</span></td><td>套用「高效多燈」預設</td></tr>
+  <tr><td><span class="key">3</span></td><td>套用「少燈對比」預設</td></tr>
+  <tr><td><span class="key">4</span></td><td>套用「嚴苛遮擋」預設</td></tr>
+  <tr><td><span class="key">T</span></td><td>切換 2D／3D 分頁</td></tr>
+  <tr><td><span class="key">F</span></td><td>全螢幕切換</td></tr>
+  <tr><td><span class="key">P</span></td><td>開合控制面板（手機版）</td></tr>
+  <tr><td><span class="key">Esc</span></td><td>關閉面板／離開全螢幕</td></tr>
+  <tr><td><span class="key">?</span></td><td>顯示快捷鍵說明</td></tr>
+</table>
+
+<h2>五、光路逆行互動演示頁</h2>
+<p>點擊頁首的 <strong>🔭 光路逆行演示</strong> 進入延伸頁面，內容包含：</p>
+<ul>
+  <li><strong>光學可逆性</strong>：拋物面鏡可將焦點光源轉為平行光，反向則將平行光聚焦。手術無影燈正是「反向運作的牛頓式望遠鏡反射鏡」。</li>
+  <li><strong>🚧 障礙物孔徑遮擋演示</strong>：勾選「障礙物」後可看到——即使在光路中放入遮擋物，交會處（成像點／術野）仍然全亮、不留陰影。
+    因為交會點是由<strong>整個孔徑、各方向</strong>的光線共同供光，擋住部分孔徑只會讓該點<strong>變暗</strong>，不會投下障礙物的影子。</li>
+  <li>此「免影」特性僅在<strong>會聚成像</strong>方向成立；探照燈（平行射出、無交會）則會投下真實陰影——這正是真實無影燈採用多個重疊微面光斑會聚於術野的原因。</li>
+</ul>
+
+<h2>六、分享與離線使用</h2>
+<ul>
+  <li><strong>網址分享</strong>：所有參數會編碼進網址，按「🔗 複製網址」即可分享指定教學情境。</li>
+  <li><strong>離線可用 (PWA)</strong>：首次載入後，2D 模擬已完整快取，可離線操作；亦可「加入主畫面」當作 App 使用。</li>
+  <li><strong>截圖匯出</strong>：按「📸 下載截圖」或快捷鍵保存目前畫面，方便製作講義。</li>
+</ul>
+
+<div class="footer-note">
+  無影燈光學模擬器 · 系統操作介紹手冊 · 翰林版生活科技數位教具
+</div>
+
+</body>
+</html>

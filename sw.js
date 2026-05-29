@@ -2,8 +2,8 @@
 // 緩存本地靜態資產，實現 PWA 離線功能（2D 模擬完全離線可用）
 
 // 每次更新靜態資產內容時遞增版本號，activate 會刪除舊快取、強制重新預快取，
-// 確保使用者下次造訪即取得最新版本（Phase 57：光路逆行頁新增障礙物孔徑遮擋演示）
-const CACHE_NAME = 'sls-cache-v5';
+// 確保使用者下次造訪即取得最新版本（Phase 58：新增系統操作介紹 PDF 手冊 + 頁首下載連結）
+const CACHE_NAME = 'sls-cache-v6';
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 const LOCAL_ASSETS = [
