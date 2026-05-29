@@ -144,6 +144,7 @@
         <tr><td>反射式中央光源可見性修正 + 快取破壞</td><td><span class="badge badge-green">✅ Phase 53</span></td><td>修正中央燈泡被頭部模型遮住（光源上移至 0.9×燈高、改於遮擋物之後繪製、加大光暈與「中央光源」標籤）；資產版本 ?v=4→v5、SW 快取 v1→v2 確保更新送達使用者</td></tr>
         <tr><td>光路逆行互動演示頁（牛頓式反射鏡類比）</td><td><span class="badge badge-green">✅ Phase 54</span></td><td>新增 optics-reciprocity.html：同一塊拋物面凹鏡的「收光成像（望遠鏡）↔ 出光投射（探照燈/無影燈）」可逆性互動演示（Canvas 即時流動箭頭 + 牛頓式 45° 斜鏡示意）；主頁側欄加類比小卡與連結；SW 快取 v2→v3 並預快取新頁</td></tr>
         <tr><td>逆行演示 header 直達入口</td><td><span class="badge badge-green">✅ Phase 55</span></td><td>於主模擬器頂部 header 新增永遠可見的「🔭 光路逆行演示」按鈕，獨立於手機版會隱藏的 header-badges 之外，桌機顯示全名／手機顯示精簡標籤；資產 index.css ?v=5→v6、SW 快取 v3→v4</td></tr>
+        <tr><td>修正逆行演示頁線上 404</td><td><span class="badge badge-green">✅ Phase 56</span></td><td>deploy.yml 採硬編碼檔案清單，漏掉 Phase 54 新增的 optics-reciprocity.html，導致該頁線上 404（workflow 雖綠燈卻從未複製此檔至 gh-pages）。補進 cp／git add 三處清單，重新部署後線上回 200</td></tr>
       </tbody>
     </table>
   </section>
@@ -151,6 +152,18 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 56 — 修正光路逆行演示頁線上 404 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 自動 Loop · 使用者回報截圖（optics-reciprocity.html 顯示 GitHub Pages 404）</div>
+      <p>使用者實際開啟 header 新入口時發現演示頁線上 404。追查發現並非頁面本身問題，而是部署腳本漏檔。</p>
+      <ul>
+        <li><strong>根因</strong>：<code>.github/workflows/deploy.yml</code> 以<strong>硬編碼檔案清單</strong>逐一 <code>cp</code> 至 gh-pages 分支，Phase 54 新增 <code>optics-reciprocity.html</code> 時未加入清單。Workflow 每次皆綠燈「成功」，卻從未把此檔複製到 gh-pages——故 main 有檔、gh-pages 無檔，線上 404。</li>
+        <li><strong>修正</strong>：將 <code>optics-reciprocity.html</code> 補進 deploy.yml 三處（暫存 <code>cp</code>、gh-pages <code>cp</code>、<code>git add</code>）。</li>
+        <li><strong>驗證</strong>：重新部署後 <code>curl</code> 確認 <code>optics-reciprocity.html</code> 回 <strong>HTTP 200</strong>（原為 404）。</li>
+        <li><strong>教訓</strong>：硬編碼清單易漏；未來新增頁面須同步更新 deploy.yml，或改為萬用比對（待評估）。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 55 — 逆行演示 header 直達入口 <span class="badge badge-green">完成</span></h3>
@@ -744,6 +757,19 @@
           建立獨立互動頁 <code>optics-reciprocity.html</code>：用同一塊拋物面凹鏡演示「收光成像（牛頓式望遠鏡）↔ 出光投射（探照燈／無影燈）」的可逆性。Canvas 即時繪製行進中的箭頭（天藍＝平行光側、琥珀＝焦點側），「⇄ 光路逆行」鈕一鍵交換光源與接收器、流向隨之反轉；可調焦距/碗深與光線數量，拋物面以微鏡格刻痕呼應實際反射碗。<br><br>
           收光模式可開啟<strong>牛頓式 45° 斜鏡 + 目鏡</strong>示意疊加層；因本演示為快焦比深碗，逐線 45° 折射在邊緣光線會出現幾何退化（光線與鏡面平行），故改採近焦點窄束的示意折射，安全且清楚。<br><br>
           主頁側欄另加「光學原理類比」小卡與連結；<code>sw.js</code> 預快取新頁、<code>CACHE_NAME</code> v2→v3。驗證：node --check 語法通過、Preview getImageData 掃描確認場景繪製（~12k 亮點）、切換模式/斜鏡/滑桿皆無 console error。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">（附截圖）optics-reciprocity.html 顯示 GitHub Pages 404 — File not found。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 56 修正逆行演示頁線上 404）</div>
+        <div class="content">
+          追查 404：頁面本身沒問題（main 有檔、語法正確），問題在<strong>部署腳本漏檔</strong>。<code>deploy.yml</code> 以硬編碼檔案清單逐一 <code>cp</code> 至 gh-pages，Phase 54 新增 <code>optics-reciprocity.html</code> 時未加入清單——workflow 每次綠燈卻從未複製此檔，故 gh-pages 無檔、線上 404。<br><br>
+          將該檔補進 deploy.yml 三處（暫存 cp、gh-pages cp、git add），重新部署後 <code>curl</code> 確認回 <strong>HTTP 200</strong>。先前 Phase 54/55 回報的「部署成功」即被此盲點誤導。
         </div>
       </div>
 
