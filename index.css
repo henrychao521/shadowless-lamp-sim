@@ -154,6 +154,32 @@ body {
     to   { opacity: 1; transform: scale(1); }
 }
 
+/* 永遠可見的 header 入口：直接連進光路逆行互動演示頁 */
+.header-demo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-left: 0.75rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    color: #e0f2fe;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.85), rgba(20, 184, 166, 0.85));
+    border: 1px solid rgba(56, 189, 248, 0.6);
+    box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+    white-space: nowrap;
+    transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+}
+.header-demo-link:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 16px rgba(14, 165, 233, 0.5);
+    transform: translateY(-1px);
+}
+.header-demo-link .demo-link-short { display: none; }
+.header-demo-link .demo-link-full { display: inline; }
+
 /* Main Layout */
 .app-container {
     display: grid;
@@ -1499,6 +1525,10 @@ input[type="range"]:focus-visible {
 @media (max-width: 390px) {
     .app-header h1 { font-size: 0.9rem; }
     .header-badges { display: none; }
+    /* header-badges 隱藏後，逆行演示連結獨立保留並改用精簡標籤 */
+    .header-demo-link { margin-left: 0.4rem; padding: 0.3rem 0.6rem; font-size: 0.72rem; }
+    .header-demo-link .demo-link-full { display: none; }
+    .header-demo-link .demo-link-short { display: inline; }
     .logo-icon { display: none; } /* 節省橫向空間 */
     .tab-btn { font-size: 0.75rem; padding: 0.75rem 0.25rem; }
     .canvas-3d { height: 60vw; min-height: 240px; }
@@ -1539,6 +1569,7 @@ input[type="range"]:focus-visible {
     .app-header h1 { color: #111 !important; font-size: 14pt; }
     .app-header h1 span { display: inline !important; color: #555 !important; }
     .header-badges { display: none !important; }
+    .header-demo-link { display: none !important; }
 
     /* 隱藏互動 UI */
     .panel-toggle      { display: none !important; }

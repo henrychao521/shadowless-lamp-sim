@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=5">
+    <link rel="stylesheet" href="index.css?v=6">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
     <link rel="preload" as="script" href="simulation.js?v=5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -59,6 +59,10 @@
             <span class="badge realistic-badge" id="realistic-mode-badge" style="display:none">✨ 真實模式</span>
             <button class="badge key-hint-btn" title="顯示鍵盤快捷鍵 (?)">⌨️</button>
         </div>
+        <!-- 永遠可見的入口：直接連進光路逆行互動演示（手機版 header-badges 隱藏，此連結獨立保留）-->
+        <a href="optics-reciprocity.html" class="header-demo-link" title="開啟光路逆行互動演示頁">
+            🔭 <span class="demo-link-full">光路逆行演示</span><span class="demo-link-short">逆行演示</span>
+        </a>
     </header>
 
     <main class="app-container">

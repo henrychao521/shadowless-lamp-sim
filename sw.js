@@ -3,7 +3,7 @@
 
 // 每次更新靜態資產內容時遞增版本號，activate 會刪除舊快取、強制重新預快取，
 // 確保使用者下次造訪即取得最新版本（Phase 54：新增光路逆行互動演示頁）
-const CACHE_NAME = 'sls-cache-v3';
+const CACHE_NAME = 'sls-cache-v4';
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 const LOCAL_ASSETS = [
