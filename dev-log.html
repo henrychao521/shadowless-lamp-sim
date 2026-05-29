@@ -150,6 +150,7 @@
         <tr><td>專案搬遷至 128G</td><td><span class="badge badge-green">✅ 維運</span></td><td>整個專案由 /Users/henry/ailocal 移至 /Volumes/128G/shadowless-lamp-sim；修復 exFAT 副作用（清除 3568 個 macOS ._ 伴隨檔以解決 git non-monotonic index、設 core.fileMode=false 避免全檔誤判修改）；git 完整性、遠端、HEAD 皆驗證無誤</td></tr>
         <tr><td>滑桿 ± 微調按鈕</td><td><span class="badge badge-green">✅ Phase 59</span></td><td>每個參數滑桿兩側新增 −／＋ 按鈕：單擊跳一個 step、長按 380ms 後每 60ms 連續調整並於上下限自動停；觸控目標手機版 44px（WCAG 2.5.5），解決手指拖曳難對準精確值（如 0cm／100cm）的痛點。以 JS 通用注入（不改 7 段 HTML），dispatch input 事件沿用既有數值/渲染/觸覺流程；index.css ?v=7→v8、SW 快取 v6→v7</td></tr>
         <tr><td>對話紀錄與發展歷程備份</td><td><span class="badge badge-green">✅ 維運</span></td><td>依使用者要求開始備份「所有對話紀錄與實作發展歷程」到 GitHub：解析本機工作階段 transcript（JSONL），產生 <code>對話完整紀錄.md</code>（使用者訊息每句原文逐字保留、AI 回應全文、工具操作摘要 + 60 階段實作歷程表 + 工程教訓）。存於 repo 同層、push 至 main 作為備份（不併入 gh-pages 線上資產）；往後每階段增補</td></tr>
+        <tr><td>數值徽章直接輸入</td><td><span class="badge badge-green">✅ Phase 60</span></td><td>點擊參數標籤中的數值徽章即就地展開 number 輸入框，可一次跳到特定值（如燈高 137cm、LED 41 顆），補足 ± 按鈕只能逐格微調的不足。輸入後自動對齊 step 網格、夾在上下限內、Enter 套用／Esc 取消／失焦套用；沿用既有 input 事件流程（數值更新/URL hash/渲染），與拖曳一致。手機加大觸控目標。通用 JS 注入（badge id=val_&lt;sliderid&gt;），不改 7 段 HTML；index.css ?v=8→v9、SW 快取 v7→v8</td></tr>
       </tbody>
     </table>
   </section>
@@ -157,6 +158,19 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 60 — 點擊數值徽章直接輸入精確數值 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 自動 Loop · 手機優化（接續 Phase 59 ± 微調按鈕）</div>
+      <p>Phase 59 的 ± 按鈕適合微調，但要一次跳到特定值（例如把無影燈高設成 137cm、LED 設成 41 顆）仍須連點多次。本階段讓每個參數標籤裡的數值徽章可點擊，就地展開數字輸入框直接鍵入。</p>
+      <ul>
+        <li><strong>互動</strong>：點擊數值（如「100」）→ 原地以 <code>&lt;input type=number&gt;</code> 取代，自動聚焦並全選；Enter 或失焦即套用、Esc 取消還原。</li>
+        <li><strong>輸入正規化</strong>：套用前夾在滑桿 min／max 之間，並對齊 step 網格（<code>min + round((v−min)/step)·step</code>），再以 <code>toFixed</code> 修正浮點誤差（beam_spread／obstacle_rad 的 0.5 step）。</li>
+        <li><strong>零回歸</strong>：僅 <code>dispatchEvent(new Event('input'))</code>，沿用既有監聽（數值 span、URL hash、觸覺、rAF 渲染）；徽章點擊 <code>preventDefault</code> 阻止 label 把點擊轉發給滑桿。</li>
+        <li><strong>實作方式</strong>：通用 JS IIFE，依 <code>val_&lt;sliderid&gt;</code> 對應徽章與滑桿，不改 7 段 HTML；徽章加虛線底線提示可編輯，手機版加大內距與輸入框觸控目標。</li>
+        <li><strong>驗證</strong>：未啟動本機預覽（依使用者指示），以 <code>node --check</code> + 自製 DOM shim 實跑注入邏輯，15 項斷言全過（開框/種值/提交/上限夾制/step 對齊/Esc 取消）。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>維運 — 對話紀錄與實作發展歷程備份至 GitHub <span class="badge badge-green">完成</span></h3>
@@ -839,6 +853,20 @@
           先把整個專案由 <code>/Users/henry/ailocal</code> 安全移到 <code>/Volumes/128G/shadowless-lamp-sim</code>。128G 是 exFAT，搬遷觸發兩個 git 問題並修復：清掉 3568 個 macOS <code>._</code> 伴隨檔（解 <em>non-monotonic index</em>）、設 <code>core.fileMode=false</code>（exFAT 不保留執行位元，否則全檔誤判修改）。<code>git fsck</code> 無錯、遠端與 HEAD 不變。後續驗證改以 <code>curl</code> 對 GitHub Pages 線上版進行，不再起本機預覽。<br><br>
           接著做 Phase 59 手機優化：每個參數滑桿兩側加 <strong>−／＋ 微調按鈕</strong>，解決手指拖曳難對準精確值的痛點。單擊跳一格、長按 380ms 後每 60ms 連續調整、抵達上下限自動停；手機觸控目標 44px。以單一 JS 通用注入（包一層 flex 容器、不改 7 段 HTML），按鈕僅派發 <code>input</code> 事件，完全沿用既有數值更新 / 閃光 / URL hash / 觸覺 / rAF 渲染流程，與手動拖曳零差異。<br><br>
           <code>node --check</code> 語法通過；index.css ?v=7→v8、SW v6→v7。部署後對線上版驗證資產更新與按鈕注入。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">一個段落後請開始記錄所有對話紀錄以及實作發展歷程，並將資料開始備份到 GitHub。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（維運備份 + Loop 繼續 — Phase 60 數值徽章直接輸入）</div>
+        <div class="content">
+          先處理備份：依你選定的「同一個 repo 新增檔案 + 完整逐字稿（每句原文）」，解析本機工作階段 transcript（JSONL），產生 <code>對話完整紀錄.md</code>（約 245 KB）——含專案概觀、Phase 0～60 實作發展歷程表 + 工程教訓、對話完整逐字稿（29 則使用者訊息每句原文、AI 回應全文、工具操作摘要）。過濾系統注入訊息、修正匯入相黏、去重後 push 至 main 作為備份（此檔不併入 gh-pages 線上資產）。<br><br>
+          接著 Phase 60 手機優化：Phase 59 的 ± 鈕適合微調，但要一次跳到特定值（如燈高 137cm、LED 41 顆）仍須連點。讓參數標籤裡的<strong>數值徽章可點擊 → 就地展開 number 輸入框</strong>直接鍵入；輸入後夾在上下限、對齊 step 網格（含浮點修正），Enter 套用／Esc 取消／失焦套用，僅派發 <code>input</code> 事件沿用既有流程，與拖曳一致。徽章加虛線底線提示、手機加大觸控目標。<br><br>
+          通用 JS 注入（依 <code>val_&lt;sliderid&gt;</code> 對應），不改 7 段 HTML；index.css ?v=8→v9、SW v7→v8。依你指示不起本機預覽，改以 <code>node --check</code> + 自製 DOM shim 實跑邏輯，15 項斷言全過（開框/種值/提交/上限夾制/step 對齊/Esc 取消）。
         </div>
       </div>
 

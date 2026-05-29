@@ -416,6 +416,32 @@ input[type="range"]::-moz-range-thumb:active {
 .slider-step-btn:hover  { background: rgba(14, 165, 233, 0.2); }
 .slider-step-btn:active { transform: scale(0.9); background: rgba(14, 165, 233, 0.32); }
 
+/* Phase 60：可點擊的數值徽章 → 直接輸入精確數值 */
+.val-editable {
+    cursor: pointer;
+    text-decoration: underline dotted rgba(14, 165, 233, 0.6);
+    text-underline-offset: 3px;
+    border-radius: 4px;
+    padding: 0 2px;
+    transition: background 0.15s;
+}
+.val-editable:hover  { background: rgba(14, 165, 233, 0.14); }
+.val-editable:active { background: rgba(14, 165, 233, 0.26); }
+.val-edit-input {
+    width: 5em;
+    font: inherit;
+    font-weight: 700;
+    color: var(--accent-blue);
+    background: rgba(14, 165, 233, 0.08);
+    border: 1px solid var(--accent-blue);
+    border-radius: 6px;
+    padding: 0 4px;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.val-edit-input::-webkit-outer-spin-button,
+.val-edit-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
 .divider {
     border: none;
     height: 1px;
@@ -1463,6 +1489,9 @@ input[type="range"]:focus-visible {
         font-size: 1.5rem;
     }
     .slider-row { gap: 0.6rem; }
+    /* Phase 60：手機版加大數值徽章與輸入框觸控目標 */
+    .val-editable { padding: 2px 6px; }
+    .val-edit-input { width: 4em; padding: 4px 6px; font-size: 1.05em; }
 
     /* Tab 按鈕：全寬、更高觸控目標 */
     .view-tabs {
