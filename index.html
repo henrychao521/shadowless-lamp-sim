@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=8">
+    <link rel="stylesheet" href="index.css?v=9">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
     <link rel="preload" as="script" href="simulation.js?v=5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1333,6 +1333,87 @@
 
             bindHold(minus, function() { return stepBy(-1); });
             bindHold(plus,  function() { return stepBy(1); });
+        });
+    })();
+    </script>
+
+    <script>
+    // ── Phase 60：點擊數值徽章直接輸入精確數值 ──
+    // ± 按鈕適合微調，但要一次跳到特定值（如燈高 137cm、LED 41 顆）仍須多次點按。
+    // 點擊標籤中的數值徽章 → 就地展開 number 輸入框，輸入後對齊 step 網格、夾在上下限內，
+    // 沿用既有 input 事件流程（數值更新 / URL hash / 渲染），與拖曳完全一致。
+    (function() {
+        var panel = document.getElementById('controls-panel-body');
+        if (!panel) return;
+
+        function decimals(stepStr) {
+            var i = String(stepStr).indexOf('.');
+            return i < 0 ? 0 : String(stepStr).length - i - 1;
+        }
+
+        panel.querySelectorAll('input[type="range"]').forEach(function(input) {
+            var badge = document.getElementById('val_' + input.id);
+            if (!badge) return;
+
+            var step = parseFloat(input.step) || 1;
+            var min  = parseFloat(input.min);
+            var max  = parseFloat(input.max);
+            var dec  = decimals(input.step || '1');
+
+            badge.classList.add('val-editable');
+            badge.setAttribute('role', 'button');
+            badge.setAttribute('tabindex', '-1'); // 鍵盤族可直接用方向鍵調滑桿，不增加多餘 tab 停留
+            badge.title = '點擊輸入精確數值（' + min + '–' + max + '）';
+
+            var editing = false;
+
+            function openEditor() {
+                if (editing) return;
+                editing = true;
+
+                var box = document.createElement('input');
+                box.type = 'number';
+                box.className = 'val-edit-input';
+                box.min = min; box.max = max; box.step = input.step || 1;
+                box.value = input.value;
+                box.setAttribute('aria-label', '輸入精確數值（' + min + ' 至 ' + max + '）');
+                badge.style.display = 'none';
+                badge.parentNode.insertBefore(box, badge.nextSibling);
+                box.focus();
+                box.select();
+
+                function commit(apply) {
+                    if (!editing) return;
+                    editing = false;
+                    if (apply) {
+                        var v = parseFloat(box.value);
+                        if (!isNaN(v)) {
+                            v = Math.min(max, Math.max(min, v));
+                            v = min + Math.round((v - min) / step) * step;  // 對齊 step 網格
+                            v = parseFloat(v.toFixed(dec));
+                            if (v !== parseFloat(input.value)) {
+                                input.value = v;
+                                input.dispatchEvent(new Event('input',  { bubbles: true }));
+                                input.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        }
+                    }
+                    if (box.parentNode) box.parentNode.removeChild(box);
+                    badge.style.display = '';
+                }
+
+                box.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter')      { e.preventDefault(); commit(true); }
+                    else if (e.key === 'Escape'){ e.preventDefault(); commit(false); }
+                });
+                box.addEventListener('blur', function() { commit(true); });
+            }
+
+            badge.addEventListener('click', function(e) {
+                e.preventDefault();   // 阻止 label 將點擊轉發給滑桿
+                e.stopPropagation();
+                openEditor();
+            });
         });
     })();
     </script>
