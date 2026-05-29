@@ -31,9 +31,9 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index.css?v=5">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
-    <link rel="preload" as="script" href="simulation.js?v=4">
+    <link rel="preload" as="script" href="simulation.js?v=5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Three.js ESM Import Map — jsDelivr has better CDN coverage in Asia/Taiwan -->
     <script type="importmap">
@@ -406,7 +406,7 @@
             // ── 懶載入 3D 模組（首次切換至 3D tab 才下載 Three.js bundle）──
             if (viewName === '3d' && !window._sls3dLoading) {
                 window._sls3dLoading = true;
-                import('./simulation3d.js?v=4').catch(function(e) {
+                import('./simulation3d.js?v=5').catch(function(e) {
                     console.warn('[sls] 3D module load failed:', e);
                     window._sls3dLoading = false; // 允許重試
                 });
@@ -494,7 +494,7 @@
         }
     })();
     </script>
-    <script src="simulation.js?v=4"></script>
+    <script src="simulation.js?v=5"></script>
     <!-- simulation3d.js は 3D tab 首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
     <script>
     // ── ARIA Tablist 鍵盤導航（WAI-ARIA tablist pattern）──

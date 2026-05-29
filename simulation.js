@@ -149,8 +149,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 多面反射式：中央光源位於反射碗開口內（燈體高度的 0.55 倍處）
-    const REFLECTOR_SOURCE_FACTOR = 0.55;
+    // 多面反射式：中央燈泡位於反射碗內、靠近反射面弧線下方（燈體高度的 0.9 倍處）。
+    // 物理上燈泡在燈頭高處的碗內，光線向下打到術野；不可設太低（會與病人頭部模型重疊）。
+    const REFLECTOR_SOURCE_FACTOR = 0.9;
 
     function runSimulation() {
         // Read parameters
@@ -335,23 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ctx.lineTo(fx + tanx * half, fy + tany * half);
                 ctx.stroke();
             });
-
-            // 中央光源：徑向漸層光暈 + 亮核
-            const cx = mapX(source.x), cy = mapY(source.y);
-            const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 34);
-            grad.addColorStop(0, 'rgba(253, 230, 138, 0.95)');
-            grad.addColorStop(1, 'rgba(253, 230, 138, 0)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(cx, cy, 34, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = '#fde68a';
-            ctx.strokeStyle = '#f59e0b';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(cx, cy, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
+            // 注意：中央光源（燈泡）改在繪製遮擋物之後才畫，確保燈具永遠在前景可見
         } else {
             // ── LED 陣列式：每個發光單元畫成獨立 LED ──
             ctx.fillStyle = '#fbbf24';
@@ -380,6 +365,43 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText("模擬頭部", mapX(obsX), mapY(obsY));
+
+        // ── 多面反射式：中央光源（燈泡）畫在最上層，確保燈具永遠可見 ──
+        if (reflectorMode && source) {
+            const cx = mapX(source.x), cy = mapY(source.y);
+            const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 52);
+            grad.addColorStop(0, 'rgba(253, 230, 138, 1)');
+            grad.addColorStop(0.5, 'rgba(251, 191, 36, 0.55)');
+            grad.addColorStop(1, 'rgba(253, 230, 138, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 52, 0, Math.PI * 2);
+            ctx.fill();
+            // 亮核
+            ctx.fillStyle = '#fffbeb';
+            ctx.strokeStyle = '#f59e0b';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            // 標籤「中央光源」：右側引線 + 文字
+            const labelX = cx + 70, labelY = cy - 6;
+            ctx.strokeStyle = 'rgba(253, 230, 138, 0.85)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(cx + 14, cy);
+            ctx.lineTo(labelX - 6, labelY);
+            ctx.stroke();
+            ctx.fillStyle = '#fde68a';
+            ctx.font = 'bold 22px "Inter"';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('中央光源', labelX, labelY);
+            ctx.font = '16px "Inter"';
+            ctx.fillStyle = 'rgba(253, 230, 138, 0.7)';
+            ctx.fillText('（單一燈泡）', labelX, labelY + 20);
+        }
     }
 
     // ── 依模式切換 UI 文字（圖例、標籤、模式分析卡片）──

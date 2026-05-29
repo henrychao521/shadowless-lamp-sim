@@ -141,6 +141,7 @@
         <tr><td>CSS 包含 + overscroll 防鏈結 + PWA 安全區域</td><td><span class="badge badge-green">✅ Phase 50</span></td><td>visualization-area contain:layout style；controls-panel overscroll-behavior:contain；PWA bar safe-area-inset-bottom</td></tr>
         <tr><td>雙光源設計模式（LED 陣列 ↔ 多面反射）</td><td><span class="badge badge-green">✅ Phase 51</span></td><td>新增「多面反射式（DomeLux 型）」切換：中央光源 + 環形反射面（依反射定律繪製鏡片）；即時模式分析卡片 + 設計哲學對照表；rf= hash 參數</td></tr>
         <tr><td>對照表手機優化（sticky 首欄）</td><td><span class="badge badge-green">✅ Phase 52</span></td><td>設計對照表首欄 position:sticky 不透明底色，水平捲動時行標籤恆可見；手機顯示捲動提示 + 縮小字型/間距</td></tr>
+        <tr><td>反射式中央光源可見性修正 + 快取破壞</td><td><span class="badge badge-green">✅ Phase 53</span></td><td>修正中央燈泡被頭部模型遮住（光源上移至 0.9×燈高、改於遮擋物之後繪製、加大光暈與「中央光源」標籤）；資產版本 ?v=4→v5、SW 快取 v1→v2 確保更新送達使用者</td></tr>
       </tbody>
     </table>
   </section>
@@ -148,6 +149,20 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 53 — 反射式中央光源可見性修正 + 資產快取破壞 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-29 · 自動 Loop · 強化 Phase 51 反射式教學辨識度</div>
+      <p>強化多面反射式的中央光源呈現時，發現並修正一個實際 bug：原本中央光源設在 <code>0.55×燈高</code>（世界座標 y=55），與預設病人頭部模型（y=50、半徑 10.5）幾乎重疊，且光源在遮擋物之前繪製，導致燈泡完全被頭部蓋住、看不見。</p>
+      <ul>
+        <li><strong>光源位置修正</strong>：<code>REFLECTOR_SOURCE_FACTOR</code> 0.55 → 0.9（世界 y=90），符合物理——燈泡位於燈頭高處的反射碗內，而非貼近病人。</li>
+        <li><strong>繪製順序</strong>：中央光源（燈泡）改於遮擋物之後繪製，確保燈具永遠在前景可見。</li>
+        <li><strong>視覺強化</strong>：光暈半徑 34→52px、三段漸層更亮；亮核加大；新增「中央光源（單一燈泡）」引線標籤，教學辨識度大增。</li>
+        <li><strong>🔑 資產快取破壞（關鍵）</strong>：發現 <code>simulation.js?v=4</code> 是手動快取版本碼，未隨檔案更新遞增，導致瀏覽器與 Service Worker（依 URL 快取）持續供應舊內容——Phase 53 的 JS 改動在驗證時始終無法載入。將 <code>?v=4 → ?v=5</code>（含 preload / import / script），並為 <code>index.css</code> 補上 <code>?v=5</code>。</li>
+        <li><strong>SW 快取版本</strong>：<code>CACHE_NAME</code> v1 → v2，activate 時刪除舊快取並重新預快取，確保已安裝 PWA 的使用者下次造訪即取得最新版。</li>
+        <li><strong>Preview 驗證</strong>：以 getImageData 取樣，修正後中央光源亮核（亮度 741）出現在 canvas (798,328)、標籤（亮度 621）於 (880,322)，皆位於遮擋物上方，確認可見。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 52 — Phase 51 對照表手機優化：sticky 首欄 + 捲動提示 <span class="badge badge-green">完成</span></h3>
@@ -659,7 +674,16 @@
 
       <div class="msg user">
         <div class="role">👨‍🏫 Henry</div>
-        <div class="content">請繼續執行。</div>
+        <div class="content">各項內容請繼續執行修正，完成後提供我檢視的網址。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 53 反射式光源可見性 + 快取修正）</div>
+        <div class="content">
+          強化反射式中央光源呈現時，從 Preview 的 canvas 像素取樣發現燈泡不見了——原因是光源設在 0.55×燈高（y=55）與預設頭部模型（y=50）重疊且畫在其下。修正：光源上移至 0.9×燈高、改於遮擋物後繪製、加大光暈 + 加「中央光源（單一燈泡）」標籤。<br><br>
+          除錯過程又發現更關鍵的問題：<strong>瀏覽器始終載入舊版 JS</strong>。逐一排除 Service Worker（localhost 未註冊）、HTTP 強制重抓後，定位到 <code>simulation.js?v=4</code> 是手動快取版本碼，未隨改動遞增——瀏覽器/SW 依 URL 快取，持續供應舊 <code>?v=4</code>。將 <code>?v=4→v5</code>（preload/import/script）+ <code>index.css?v=5</code> + SW <code>CACHE_NAME v1→v2</code> 後，重新取樣確認光源亮核（亮度 741）已出現在遮擋物上方，修正生效。<br><br>
+          這也代表 Phase 51/53 對 simulation.js 的更新，先前因版本碼未變動而未送達已造訪過的瀏覽器；本次 bump 一併解決。
+        </div>
       </div>
 
       <div class="msg ai">
