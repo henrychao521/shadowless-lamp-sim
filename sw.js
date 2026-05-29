@@ -2,8 +2,8 @@
 // 緩存本地靜態資產，實現 PWA 離線功能（2D 模擬完全離線可用）
 
 // 每次更新靜態資產內容時遞增版本號，activate 會刪除舊快取、強制重新預快取，
-// 確保使用者下次造訪即取得最新版本（Phase 53：雙光源設計模式相關更新）
-const CACHE_NAME = 'sls-cache-v2';
+// 確保使用者下次造訪即取得最新版本（Phase 54：新增光路逆行互動演示頁）
+const CACHE_NAME = 'sls-cache-v3';
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 const LOCAL_ASSETS = [
@@ -12,6 +12,7 @@ const LOCAL_ASSETS = [
     '/shadowless-lamp-sim/index.css',
     '/shadowless-lamp-sim/simulation.js',
     '/shadowless-lamp-sim/simulation3d.js',
+    '/shadowless-lamp-sim/optics-reciprocity.html',
     '/shadowless-lamp-sim/icon.svg',
     '/shadowless-lamp-sim/manifest.json',
 ];
