@@ -147,6 +147,8 @@
         <tr><td>修正逆行演示頁線上 404</td><td><span class="badge badge-green">✅ Phase 56</span></td><td>deploy.yml 採硬編碼檔案清單，漏掉 Phase 54 新增的 optics-reciprocity.html，導致該頁線上 404（workflow 雖綠燈卻從未複製此檔至 gh-pages）。補進 cp／git add 三處清單，重新部署後線上回 200</td></tr>
         <tr><td>障礙物孔徑遮擋演示</td><td><span class="badge badge-green">✅ Phase 57</span></td><td>逆行演示頁新增「🚧 障礙物演示」：在會聚光路中放入不透明障礙物，擋掉中央光線後交會處（成像點／術野）仍完整受光、只變暗不留影子；含寬度滑桿與亮度讀數，回應「光路中加障礙物卻仍見全景」之提問；SW 快取 v4→v5</td></tr>
         <tr><td>系統操作介紹 PDF 手冊</td><td><span class="badge badge-green">✅ Phase 58</span></td><td>依使用者要求生成《系統操作介紹》PDF（A4／繁中／4 頁）：系統概觀、控制面板全參數表、量測指標、3D 操作、鍵盤快捷鍵、光路逆行頁、分享與離線。以 Chrome headless --print-to-pdf 產生（CJK 正常）；頁首新增琥珀色「📄 操作手冊」下載連結；deploy.yml 三處清單加入 PDF；index.css ?v=6→v7、SW 快取 v5→v6</td></tr>
+        <tr><td>專案搬遷至 128G</td><td><span class="badge badge-green">✅ 維運</span></td><td>整個專案由 /Users/henry/ailocal 移至 /Volumes/128G/shadowless-lamp-sim；修復 exFAT 副作用（清除 3568 個 macOS ._ 伴隨檔以解決 git non-monotonic index、設 core.fileMode=false 避免全檔誤判修改）；git 完整性、遠端、HEAD 皆驗證無誤</td></tr>
+        <tr><td>滑桿 ± 微調按鈕</td><td><span class="badge badge-green">✅ Phase 59</span></td><td>每個參數滑桿兩側新增 −／＋ 按鈕：單擊跳一個 step、長按 380ms 後每 60ms 連續調整並於上下限自動停；觸控目標手機版 44px（WCAG 2.5.5），解決手指拖曳難對準精確值（如 0cm／100cm）的痛點。以 JS 通用注入（不改 7 段 HTML），dispatch input 事件沿用既有數值/渲染/觸覺流程；index.css ?v=7→v8、SW 快取 v6→v7</td></tr>
       </tbody>
     </table>
   </section>
@@ -154,6 +156,30 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 59 — 滑桿 ±微調按鈕（手機精準調整、長按連續調整） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 自動 Loop · 手機優化（專案已搬至 /Volumes/128G/shadowless-lamp-sim）</div>
+      <p>觸控裝置上拖曳滑桿難以對準精確值（例如把遮擋物 X 歸零、燈高設成整數 100cm）。本階段為每個參數滑桿兩側加上 −／＋ 微調按鈕，提供確定性的逐格調整。</p>
+      <ul>
+        <li><strong>互動</strong>：單擊跳一個 step（lamp_height 1、num_leds 2、obstacle_rad/beam_spread 0.5…各自依滑桿原生 step）；按住 380ms 後進入每 60ms 連續調整、抵達上下限自動停止；每次有效調整觸發 8ms 觸覺。</li>
+        <li><strong>觸控目標</strong>：按鈕桌機 34px、手機版放大至 44px（WCAG 2.5.5），<code>touch-action:manipulation</code> 消除 300ms 延遲、<code>-webkit-tap-highlight-color:transparent</code> 去除點擊灰底。</li>
+        <li><strong>實作方式</strong>：以單一 JS IIFE 通用注入——掃描 <code>#controls-panel-body</code> 內所有 <code>input[type=range]</code>，包一層 <code>.slider-row</code> flex 容器（−／slider／＋），不必改動 7 段 HTML；按鈕 <code>tabindex=-1</code>（鍵盤族以方向鍵調滑桿即可，不增加多餘 tab 停留）。</li>
+        <li><strong>零回歸</strong>：按鈕僅 <code>dispatchEvent(new Event('input'))</code>，完全沿用既有監聽器（數值 span 更新、val-pulse 閃光、URL hash 編碼、邊界觸覺、rAF 防抖渲染），與手動拖曳行為一致；浮點 step 以 <code>toFixed</code> 修正避免誤差累積。</li>
+        <li><strong>驗證</strong>：JS 以 <code>node --check</code> 通過語法檢查；部署後對 GitHub Pages 線上版 <code>curl</code> 確認資產更新、DOM 注入 14 顆按鈕（7 滑桿 ×2）且點擊可改變滑桿值。</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>維運 — 專案搬遷至 128G 外接卷（exFAT 副作用修復） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 使用者要求「把整個專案移到 128G 存放」</div>
+      <p>將整個專案由 <code>/Users/henry/ailocal/shadowless-lamp-sim</code> 移至 <code>/Volumes/128G/shadowless-lamp-sim</code>（與 hydro-monitor 等專案同卷）。128G 為 exFAT 格式，搬遷後出現兩個 git 問題，已一併修復。</p>
+      <ul>
+        <li><strong>non-monotonic index 錯誤</strong>：macOS 跨卷複製時於 exFAT 產生大量 AppleDouble <code>._</code> 伴隨檔，git 誤把 <code>._pack-*.idx</code> 當成 pack 索引讀取 → <code>find . -name '._*' -delete</code> 清除 3568 個後解除。</li>
+        <li><strong>全檔誤判為已修改</strong>：exFAT 不保留 Unix 執行位元，git 看到每個檔案 mode 由 644 變 700 → 設 <code>core.fileMode=false</code>（與同卷 hydro-monitor 一致）後恢復。</li>
+        <li><strong>驗證</strong>：<code>git fsck</code> 無錯、HEAD 仍為 aa16061、遠端 origin 不變、工作樹乾淨；關鍵檔案（操作介紹.pdf、deploy.yml 等）皆就位。優化迴圈路徑同步更新為新位置。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 58 — 系統操作介紹 PDF 手冊（A4 繁中 4 頁）+ 頁首下載入口 <span class="badge badge-green">完成</span></h3>
@@ -785,6 +811,20 @@
           建立獨立互動頁 <code>optics-reciprocity.html</code>：用同一塊拋物面凹鏡演示「收光成像（牛頓式望遠鏡）↔ 出光投射（探照燈／無影燈）」的可逆性。Canvas 即時繪製行進中的箭頭（天藍＝平行光側、琥珀＝焦點側），「⇄ 光路逆行」鈕一鍵交換光源與接收器、流向隨之反轉；可調焦距/碗深與光線數量，拋物面以微鏡格刻痕呼應實際反射碗。<br><br>
           收光模式可開啟<strong>牛頓式 45° 斜鏡 + 目鏡</strong>示意疊加層；因本演示為快焦比深碗，逐線 45° 折射在邊緣光線會出現幾何退化（光線與鏡面平行），故改採近焦點窄束的示意折射，安全且清楚。<br><br>
           主頁側欄另加「光學原理類比」小卡與連結；<code>sw.js</code> 預快取新頁、<code>CACHE_NAME</code> v2→v3。驗證：node --check 語法通過、Preview getImageData 掃描確認場景繪製（~12k 亮點）、切換模式/斜鏡/滑桿皆無 console error。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">本機部分，把整個專案移到 128G 存放。不用啟動本機預覽，直接讓他在 GitHub Pages 運作即可。然後開始優化。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（維運搬遷 + Loop 繼續 — Phase 59 滑桿 ±微調按鈕）</div>
+        <div class="content">
+          先把整個專案由 <code>/Users/henry/ailocal</code> 安全移到 <code>/Volumes/128G/shadowless-lamp-sim</code>。128G 是 exFAT，搬遷觸發兩個 git 問題並修復：清掉 3568 個 macOS <code>._</code> 伴隨檔（解 <em>non-monotonic index</em>）、設 <code>core.fileMode=false</code>（exFAT 不保留執行位元，否則全檔誤判修改）。<code>git fsck</code> 無錯、遠端與 HEAD 不變。後續驗證改以 <code>curl</code> 對 GitHub Pages 線上版進行，不再起本機預覽。<br><br>
+          接著做 Phase 59 手機優化：每個參數滑桿兩側加 <strong>−／＋ 微調按鈕</strong>，解決手指拖曳難對準精確值的痛點。單擊跳一格、長按 380ms 後每 60ms 連續調整、抵達上下限自動停；手機觸控目標 44px。以單一 JS 通用注入（包一層 flex 容器、不改 7 段 HTML），按鈕僅派發 <code>input</code> 事件，完全沿用既有數值更新 / 閃光 / URL hash / 觸覺 / rAF 渲染流程，與手動拖曳零差異。<br><br>
+          <code>node --check</code> 語法通過；index.css ?v=7→v8、SW v6→v7。部署後對線上版驗證資產更新與按鈕注入。
         </div>
       </div>
 

@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=7">
+    <link rel="stylesheet" href="index.css?v=8">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
     <link rel="preload" as="script" href="simulation.js?v=5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1255,6 +1255,84 @@
         window.addEventListener('appinstalled', function() {
             if (bar) { bar.classList.remove('visible'); }
             deferredPrompt = null;
+        });
+    })();
+    </script>
+
+    <script>
+    // ── Phase 59：滑桿 ± 微調按鈕（手機精準調整、長按連續調整）──
+    // 觸控拖曳滑桿難以對準精確值（如 0cm／100cm）。為每個滑桿兩側加上 −／＋ 按鈕，
+    // 單擊跳一個 step，長按延遲後連續調整並在抵達上下限時自動停止。
+    (function() {
+        var panel = document.getElementById('controls-panel-body');
+        if (!panel) return;
+
+        function decimals(stepStr) {
+            var i = String(stepStr).indexOf('.');
+            return i < 0 ? 0 : String(stepStr).length - i - 1;
+        }
+
+        function makeBtn(glyph, label) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'slider-step-btn';
+            b.textContent = glyph;
+            b.setAttribute('aria-label', label);
+            b.tabIndex = -1; // 鍵盤使用者可直接用方向鍵調整滑桿，避免增加多餘 tab 焦點
+            return b;
+        }
+
+        // 按住連續調整：立即跳一步 → 延遲 380ms → 每 60ms 連續，抵達邊界自動停
+        function bindHold(btn, action) {
+            var holdTimer = null, repeatTimer = null;
+            function stop() {
+                if (holdTimer)   { clearTimeout(holdTimer);  holdTimer = null; }
+                if (repeatTimer) { clearInterval(repeatTimer); repeatTimer = null; }
+            }
+            btn.addEventListener('pointerdown', function(e) {
+                e.preventDefault();
+                if (!action()) return;
+                if (navigator.vibrate) { try { navigator.vibrate(8); } catch (_) {} }
+                holdTimer = setTimeout(function() {
+                    repeatTimer = setInterval(function() {
+                        if (!action()) stop();
+                    }, 60);
+                }, 380);
+            });
+            btn.addEventListener('pointerup', stop);
+            btn.addEventListener('pointerleave', stop);
+            btn.addEventListener('pointercancel', stop);
+            window.addEventListener('blur', stop);
+        }
+
+        panel.querySelectorAll('input[type="range"]').forEach(function(input) {
+            var step = parseFloat(input.step) || 1;
+            var min  = parseFloat(input.min);
+            var max  = parseFloat(input.max);
+            var dec  = decimals(input.step || '1');
+
+            var row = document.createElement('div');
+            row.className = 'slider-row';
+            input.parentNode.insertBefore(row, input);   // row 取代 input 原位置
+            var minus = makeBtn('−', '減少');
+            var plus  = makeBtn('+', '增加');
+            row.appendChild(minus);
+            row.appendChild(input);                       // 將 input 移入 row
+            row.appendChild(plus);
+
+            function stepBy(dir) {
+                var cur = parseFloat(input.value);
+                var v = Math.min(max, Math.max(min, cur + dir * step));
+                v = parseFloat(v.toFixed(dec));           // 修正浮點誤差（step 0.5 等）
+                if (v === cur) return false;              // 已達邊界
+                input.value = v;
+                input.dispatchEvent(new Event('input',  { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                return true;
+            }
+
+            bindHold(minus, function() { return stepBy(-1); });
+            bindHold(plus,  function() { return stepBy(1); });
         });
     })();
     </script>
