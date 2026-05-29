@@ -145,6 +145,7 @@
         <tr><td>光路逆行互動演示頁（牛頓式反射鏡類比）</td><td><span class="badge badge-green">✅ Phase 54</span></td><td>新增 optics-reciprocity.html：同一塊拋物面凹鏡的「收光成像（望遠鏡）↔ 出光投射（探照燈/無影燈）」可逆性互動演示（Canvas 即時流動箭頭 + 牛頓式 45° 斜鏡示意）；主頁側欄加類比小卡與連結；SW 快取 v2→v3 並預快取新頁</td></tr>
         <tr><td>逆行演示 header 直達入口</td><td><span class="badge badge-green">✅ Phase 55</span></td><td>於主模擬器頂部 header 新增永遠可見的「🔭 光路逆行演示」按鈕，獨立於手機版會隱藏的 header-badges 之外，桌機顯示全名／手機顯示精簡標籤；資產 index.css ?v=5→v6、SW 快取 v3→v4</td></tr>
         <tr><td>修正逆行演示頁線上 404</td><td><span class="badge badge-green">✅ Phase 56</span></td><td>deploy.yml 採硬編碼檔案清單，漏掉 Phase 54 新增的 optics-reciprocity.html，導致該頁線上 404（workflow 雖綠燈卻從未複製此檔至 gh-pages）。補進 cp／git add 三處清單，重新部署後線上回 200</td></tr>
+        <tr><td>障礙物孔徑遮擋演示</td><td><span class="badge badge-green">✅ Phase 57</span></td><td>逆行演示頁新增「🚧 障礙物演示」：在會聚光路中放入不透明障礙物，擋掉中央光線後交會處（成像點／術野）仍完整受光、只變暗不留影子；含寬度滑桿與亮度讀數，回應「光路中加障礙物卻仍見全景」之提問；SW 快取 v4→v5</td></tr>
       </tbody>
     </table>
   </section>
@@ -152,6 +153,19 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 57 — 障礙物孔徑遮擋演示（光路中放障礙物，交會處仍不成影） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 自動 Loop · 回應使用者「能否演示在光路前加障礙物、卻仍能在投影面／觀看位置看到全景」</div>
+      <p>使用者問：能否在光路逆行頁演示「障礙物擋在光路上、但交會處仍見全景」的現象？這正是<strong>孔徑遮擋（aperture obstruction）</strong>原理，也是無影燈之所以無影的核心。為此在頁面加入互動演示。</p>
+      <ul>
+        <li><strong>核心物理</strong>：交會處（焦點＝成像點＝術野）的每一點，都由整片鏡面各方向的光共同供應；擋掉一部分孔徑，只是讓每點都<strong>變暗</strong>，而非缺一塊 → 不會留下障礙物的影子。</li>
+        <li><strong>互動</strong>：「🚧 障礙物演示」核取方塊 + 障礙物寬度滑桿。開啟時於平行光段放入不透明橫桿（斜紋），被擋光線以灰虛線止於障礙物、不再有會聚段與流動；未被擋的光線照常會聚到交會處，交會點仍標示「成像點／術野（仍全亮）」。即時亮度讀數「通過光線 N/總數 · 交會處亮度約 NN%」。</li>
+        <li><strong>物理誠實性</strong>：此免疫力只在「會聚到交會處」方向成立 → 開啟障礙物演示會自動切到「收光」方向並停用牛頓斜鏡（切到「出光」或逆行會自動關閉演示）。並於說明區點出：把光平行射出當探照燈（不交會）就<strong>沒有</strong>此免疫力、會投下實影——這正是無影燈刻意讓眾多鏡面光斑重疊匯聚於術野的原因，呼應主模擬器的陰影稀釋。</li>
+        <li><strong>連結兩個系統</strong>：牛頓式斜鏡／支架本身就擋在主鏡前的光路上、卻仍見完整星空；醫師的手擋進光束、術野仍全亮——兩者同一原理。</li>
+        <li><strong>驗證</strong>：Preview 桌機 + 375px 手機實測——障礙物切換強制 collect、停用牛頓、亮度讀數隨寬度/光線數更新（如 6/9→67%）、切到出光自動關閉演示；截圖確認障礙物橫桿、被擋光線灰虛線、外側光線仍會聚至交會點皆正確繪製，無 console error。SW 快取 v4→v5。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 56 — 修正光路逆行演示頁線上 404 <span class="badge badge-green">完成</span></h3>
@@ -757,6 +771,20 @@
           建立獨立互動頁 <code>optics-reciprocity.html</code>：用同一塊拋物面凹鏡演示「收光成像（牛頓式望遠鏡）↔ 出光投射（探照燈／無影燈）」的可逆性。Canvas 即時繪製行進中的箭頭（天藍＝平行光側、琥珀＝焦點側），「⇄ 光路逆行」鈕一鍵交換光源與接收器、流向隨之反轉；可調焦距/碗深與光線數量，拋物面以微鏡格刻痕呼應實際反射碗。<br><br>
           收光模式可開啟<strong>牛頓式 45° 斜鏡 + 目鏡</strong>示意疊加層；因本演示為快焦比深碗，逐線 45° 折射在邊緣光線會出現幾何退化（光線與鏡面平行），故改採近焦點窄束的示意折射，安全且清楚。<br><br>
           主頁側欄另加「光學原理類比」小卡與連結；<code>sw.js</code> 預快取新頁、<code>CACHE_NAME</code> v2→v3。驗證：node --check 語法通過、Preview getImageData 掃描確認場景繪製（~12k 亮點）、切換模式/斜鏡/滑桿皆無 console error。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">光路逆行互動演示，有辦法說明演示在光路前加障礙物，但卻又能在投影面或是觀看位置看到全景的現象嗎？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 57 障礙物孔徑遮擋演示）</div>
+        <div class="content">
+          可以——這正是<strong>孔徑遮擋</strong>原理，也是無影燈無影的核心。在頁面加了「🚧 障礙物演示」：於會聚光路放入不透明橫桿，擋掉中央光線後，<strong>所有光線交會的「成像點／術野」仍完整受光、只是變暗，不留影子</strong>；附寬度滑桿與「通過光線 N/總數 · 亮度約 NN%」讀數。<br><br>
+          關鍵在於交會處每一點都由整片鏡面各方向供光，遮住一部分等於每點都少收一些 → 變暗而非缺塊。並誠實點出：把光平行射出當探照燈（不交會）就<strong>沒有</strong>此免疫力、會投下實影，這正是無影燈刻意讓眾多鏡面光斑重疊匯聚於術野的原因（呼應主模擬器的陰影稀釋）。故演示限定在「收光・會聚」方向（開啟時自動切換並停用牛頓斜鏡）。<br><br>
+          牛頓式斜鏡／支架本身就擋在主鏡前、卻仍見完整星空；醫師的手擋進光束、術野仍全亮——同一原理。Preview 桌機＋手機實測通過，SW 快取 v4→v5。
         </div>
       </div>
 

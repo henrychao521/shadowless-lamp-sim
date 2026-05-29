@@ -191,6 +191,19 @@
                     <span>顯示<b>牛頓式 45° 斜鏡 + 目鏡</b>（僅「收光」模式）：把會聚光束折向側邊成像</span>
                 </label>
             </div>
+
+            <div class="ctl-card">
+                <h3>🚧 障礙物演示（孔徑遮擋 → 不成影）</h3>
+                <label class="check-row" for="obstacle">
+                    <input type="checkbox" id="obstacle">
+                    <span>在光路中放入<b>障礙物</b>：擋住部分光線，觀察<b>光線交會處（成像點／術野）仍完整、不留影子</b>，只是變暗（會自動切到「收光」方向）</span>
+                </label>
+                <div class="slider-group" id="obsSizeGroup" style="margin-top:0.75rem; opacity:0.45;">
+                    <label for="obsSize">障礙物寬度：<b><span id="obsSizeVal">60</span></b></label>
+                    <input type="range" id="obsSize" min="20" max="120" step="4" value="60" disabled>
+                </div>
+                <div id="obsReadout" style="font-size:0.82rem; color:var(--accent-teal); font-weight:600; margin-top:0.5rem; min-height:1.2em;"></div>
+            </div>
         </div>
 
         <div class="explain">
@@ -202,6 +215,15 @@
                 <li>同一塊鏡面，因<strong>設計目的相反</strong>而長相迥異，但幾何原理相同。</li>
             </ul>
             <p><strong>但要注意三個差異：</strong>① 望遠鏡<strong>收光成像</strong>、無影燈<strong>出光投射</strong>（方向相反）；② 牛頓式的招牌是那片 <span class="hl-sky">45° 斜鏡</span>，無影燈沒有對應元件；③ 望遠鏡要<strong>單一銳焦</strong>（光滑鏡面），無影燈反而把鏡面切成<strong>數千片微鏡格刻意散焦</strong>，投出許多重疊光斑來消除陰影。</p>
+
+            <h3 style="margin-top:1.1rem;">🚧 障礙物擋在光路上，為什麼交會處還是看得到全景？</h3>
+            <p>打開上方<strong>「障礙物演示」</strong>，把一塊不透明障礙物放進光路：它擋掉中央一部分光線，但<strong>所有光線交會的那個點（望遠鏡的成像點／無影燈的術野）仍然完整受光</strong>——畫面只是整體變暗，<strong>不會出現障礙物的影子或缺口</strong>。</p>
+            <p>關鍵在於：<strong>交會處（焦點／重疊區）的每一點，都同時由整片鏡面上各個方向的光供應</strong>。擋住其中一部分，等於每個點都少收了一些光 → 只是變暗，而不是某塊不見。這正是：</p>
+            <ul class="key-points">
+                <li><span class="hl-sky">望遠鏡</span>：牛頓式的<strong>斜鏡與支架就實實在在擋在主鏡前方</strong>的光路上，但你仍看到完整星空（只是對比略降）——勾選上面的「45° 斜鏡」即可看到這塊在路徑中的障礙物。</li>
+                <li><span class="hl-amber">手術無影燈</span>：醫師的手或器械擋進光束，<strong>術野仍然全亮、不被遮黑</strong>——因為術野是「許多反射鏡面光斑的重疊區」，被擋掉的方向，由其他方向補上（這就是主模擬器在演示的<strong>陰影稀釋</strong>）。</li>
+            </ul>
+            <p class="footnote">※ 反過來說，把光「平行射出去當探照燈」（不重疊、不交會）就<strong>沒有</strong>這種免疫力——障礙物會在遠處屏幕投下實影。所以無影燈刻意讓眾多鏡面光斑<strong>重疊匯聚在術野</strong>，把術野做成像「成像面／重疊區」一樣的交會處，才得以無影。本演示的障礙物示範採「收光・會聚到交會處」方向呈現此原理。</p>
             <p class="footnote">※ 為呈現「方向相反、路徑相同」，本頁把碗口朝上。真實手術無影燈的反射碗碗口朝下、燈泡在焦點，原理完全相同——把這裡的「出光・投射」模式上下翻轉即是。最相近的日常裝置是探照燈／車頭燈反射鏡（光源在焦點、光向外射）。</p>
         </div>
     </div>
@@ -218,8 +240,13 @@
             mode: 'collect',   // 'collect'（收光） | 'project'（出光）
             focal: 120,
             rays: 9,
-            newton: false
+            newton: false,
+            obstacle: false,   // 障礙物演示（孔徑遮擋）
+            obsW: 60           // 障礙物半寬（世界座標）
         };
+
+        // 障礙物所在高度（平行光分離段，介於鏡緣與平行光端之間，對所有焦距都成立）
+        const OBS_Y = 200;
 
         // ── 世界座標（拋物面碗口朝上，頂點在下）──
         const A = 200;             // 開口半寬
@@ -318,9 +345,25 @@
             ctx.stroke();
             ctx.setLineDash([]);
 
+            const obsOn = state.obstacle;   // 障礙物演示僅在收光模式（setObstacle 會強制 collect）
+            const isBlocked = P => obsOn && Math.abs(P.x) <= state.obsW;
+
             // ── 光線（先畫淡底線，再灑流動箭頭）──
             g.pts.forEach(P => {
                 const topPt = { x: P.x, y: TOP_Y };
+                if (isBlocked(P)) {
+                    // 被障礙物擋住：只畫到障礙物高度，虛線、灰暗，無內段
+                    ctx.save();
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeStyle = 'rgba(100,116,139,0.5)';
+                    ctx.lineWidth = 1.4;
+                    ctx.beginPath();
+                    ctx.moveTo(mx(P.x), my(TOP_Y));
+                    ctx.lineTo(mx(P.x), my(OBS_Y));
+                    ctx.stroke();
+                    ctx.restore();
+                    return;
+                }
                 // 外段（平行光那一側）── 永遠是天藍
                 ctx.strokeStyle = SKY_FAINT;
                 ctx.lineWidth = 1.4;
@@ -340,6 +383,7 @@
 
             // 流動箭頭：collect → 外段向下(入)、內段往焦點；project → 外段向上(出)、內段離焦點
             g.pts.forEach(P => {
+                if (isBlocked(P)) return;   // 被擋住的光線無流動
                 const topPt = { x: P.x, y: TOP_Y };
                 const tx = mx(topPt.x), ty = my(topPt.y);
                 const pxv = mx(P.x), pyv = my(P.y);
@@ -418,6 +462,30 @@
                 ctx.fillText('45° 斜鏡', sx - mw - 4, sy - mw);
             }
 
+            // ── 障礙物（孔擋）：不透明橫桿 + 斜紋 ──
+            if (obsOn) {
+                const oy = my(OBS_Y);
+                const x0 = mx(-state.obsW), x1 = mx(state.obsW);
+                const hh = 8;
+                ctx.fillStyle = 'rgba(2,6,16,0.96)';
+                ctx.strokeStyle = '#64748b';
+                ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.rect(x0, oy - hh, x1 - x0, hh * 2); ctx.fill(); ctx.stroke();
+                // 斜紋
+                ctx.save();
+                ctx.beginPath(); ctx.rect(x0, oy - hh, x1 - x0, hh * 2); ctx.clip();
+                ctx.strokeStyle = 'rgba(148,163,184,0.5)'; ctx.lineWidth = 1;
+                for (let hx = x0 - hh * 2; hx < x1 + hh * 2; hx += 6) {
+                    ctx.beginPath(); ctx.moveTo(hx, oy - hh); ctx.lineTo(hx + hh * 2, oy + hh); ctx.stroke();
+                }
+                ctx.restore();
+                // 標籤
+                ctx.fillStyle = '#cbd5e1';
+                ctx.font = '600 12px Inter, "Noto Sans TC", sans-serif';
+                ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+                ctx.fillText('障礙物（擋在光路上）', (x0 + x1) / 2, oy - hh - 4);
+            }
+
             // ── 焦點 / 光源標記 ──
             const fx = mx(g.focus.x), fy = my(g.focus.y);
             if (collect) {
@@ -428,7 +496,7 @@
                     ctx.beginPath(); ctx.arc(fx, fy, 8, 0, Math.PI * 2); ctx.stroke();
                     ctx.fillStyle = '#e0f2fe';
                     ctx.beginPath(); ctx.arc(fx, fy, 3.5, 0, Math.PI * 2); ctx.fill();
-                    label(fx + 14, fy, '焦點（感光元件／成像）', '#7dd3fc');
+                    label(fx + 14, fy, obsOn ? '成像點／術野（仍全亮）' : '焦點（感光元件／成像）', '#7dd3fc');
                 }
             } else {
                 // 出光模式：焦點放燈泡（發光）
@@ -461,9 +529,26 @@
 
         function updateCaption() {
             const cap = document.getElementById('flowCaption');
+            if (state.obstacle) {
+                cap.textContent = '孔徑遮擋演示：障礙物擋掉中央光線，但所有光線交會的「成像點／術野」仍完整受光 — 只是變暗，不留影子';
+                return;
+            }
             cap.textContent = state.mode === 'collect'
                 ? '收光・成像：平行星光 → 凹鏡 → 會聚於焦點（牛頓式反射望遠鏡）'
                 : '出光・投射：燈泡在焦點 → 凹鏡 → 射出平行光束（探照燈／手術無影燈）';
+        }
+
+        function updateObsReadout() {
+            const el = document.getElementById('obsReadout');
+            if (!state.obstacle) { el.textContent = ''; return; }
+            const N = state.rays;
+            let pass = 0;
+            for (let i = 0; i < N; i++) {
+                const x = -A + (2 * A * i) / (N - 1);
+                if (Math.abs(x) > state.obsW) pass++;
+            }
+            const pct = Math.round((pass / N) * 100);
+            el.textContent = `通過光線 ${pass}/${N} 條 · 交會處亮度約 ${pct}%（仍完整成像，無影）`;
         }
 
         // ── 控制項 ──
@@ -473,20 +558,47 @@
         const focal = document.getElementById('focal');
         const rays = document.getElementById('rays');
         const newton = document.getElementById('newton');
+        const obstacle = document.getElementById('obstacle');
+        const obsSize = document.getElementById('obsSize');
+        const obsSizeGroup = document.getElementById('obsSizeGroup');
 
         function setMode(m) {
             state.mode = m;
             btnCollect.classList.toggle('active', m === 'collect');
             btnProject.classList.toggle('active', m === 'project');
-            // 出光模式停用牛頓斜鏡選項
-            newton.disabled = (m === 'project');
-            newton.closest('.check-row').style.opacity = (m === 'project') ? 0.45 : 1;
+            // 出光模式 / 障礙物演示時停用牛頓斜鏡選項
+            newton.disabled = (m === 'project') || state.obstacle;
+            newton.closest('.check-row').style.opacity = newton.disabled ? 0.45 : 1;
             updateCaption();
             if (!animating) draw(0.0);
         }
+
+        // 障礙物演示僅在「收光・會聚到交會處」方向成立 → 開啟時強制 collect 並關閉牛頓斜鏡
+        function setObstacle(on) {
+            state.obstacle = on;
+            obstacle.checked = on;
+            obsSize.disabled = !on;
+            obsSizeGroup.style.opacity = on ? 1 : 0.45;
+            if (on) {
+                newton.checked = false; state.newton = false;
+                setMode('collect');
+            } else {
+                setMode(state.mode);
+            }
+            updateObsReadout();
+            if (!animating) draw(0.0);
+        }
+
         btnCollect.addEventListener('click', () => setMode('collect'));
-        btnProject.addEventListener('click', () => setMode('project'));
-        btnSwap.addEventListener('click', () => setMode(state.mode === 'collect' ? 'project' : 'collect'));
+        btnProject.addEventListener('click', () => {
+            if (state.obstacle) setObstacle(false);   // 出光方向不適用障礙物演示
+            setMode('project');
+        });
+        btnSwap.addEventListener('click', () => {
+            const next = state.mode === 'collect' ? 'project' : 'collect';
+            if (next === 'project' && state.obstacle) setObstacle(false);
+            setMode(next);
+        });
         focal.addEventListener('input', () => {
             state.focal = parseInt(focal.value, 10);
             document.getElementById('focalVal').textContent = state.focal;
@@ -495,10 +607,18 @@
         rays.addEventListener('input', () => {
             state.rays = parseInt(rays.value, 10);
             document.getElementById('raysVal').textContent = state.rays;
+            updateObsReadout();
             if (!animating) draw(0.0);
         });
         newton.addEventListener('change', () => {
             state.newton = newton.checked;
+            if (!animating) draw(0.0);
+        });
+        obstacle.addEventListener('change', () => setObstacle(obstacle.checked));
+        obsSize.addEventListener('input', () => {
+            state.obsW = parseInt(obsSize.value, 10);
+            document.getElementById('obsSizeVal').textContent = state.obsW;
+            updateObsReadout();
             if (!animating) draw(0.0);
         });
 
