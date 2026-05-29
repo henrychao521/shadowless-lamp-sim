@@ -381,6 +381,41 @@ input[type="range"]::-moz-range-thumb:active {
     color: var(--text-muted);
 }
 
+/* Phase 59：滑桿 ± 微調按鈕（手機精準調整） */
+.slider-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.slider-row input[type="range"] {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+}
+.slider-step-btn {
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    line-height: 1;
+    font-weight: 700;
+    color: var(--accent-blue);
+    background: rgba(14, 165, 233, 0.1);
+    border: 1px solid rgba(14, 165, 233, 0.35);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: background 0.15s, transform 0.08s;
+}
+.slider-step-btn:hover  { background: rgba(14, 165, 233, 0.2); }
+.slider-step-btn:active { transform: scale(0.9); background: rgba(14, 165, 233, 0.32); }
+
 .divider {
     border: none;
     height: 1px;
@@ -1421,6 +1456,13 @@ input[type="range"]:focus-visible {
         background: var(--accent-blue);
         cursor: pointer;
     }
+    /* Phase 59：手機版放大 ± 微調按鈕觸控目標（WCAG 2.5.5 ≥44px） */
+    .slider-step-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.5rem;
+    }
+    .slider-row { gap: 0.6rem; }
 
     /* Tab 按鈕：全寬、更高觸控目標 */
     .view-tabs {
