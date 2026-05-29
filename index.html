@@ -150,14 +150,23 @@
 
             <hr class="divider">
 
+            <!-- 光源設計模式切換：LED 陣列式 ↔ 多面反射式（DomeLux 型）-->
             <div class="control-group">
-                <label for="num_leds">LED 發光單元數量 (<span id="val_num_leds">25</span>)</label>
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--accent-amber); font-weight: 600;">
+                    <input type="checkbox" id="reflector_mode" style="width: 18px; height: 18px; cursor: pointer;">
+                    切換多面反射式光源（DomeLux 型）🪞
+                </label>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">未勾選＝LED 陣列式（多顆獨立 LED，如 Trumpf iLED）；勾選＝單一中央光源透過環形多面反射鏡聚焦（傳統鹵素/DomeLux）。僅影響 2D 幾何剖面的呈現與分析。</p>
+            </div>
+
+            <div class="control-group">
+                <label for="num_leds"><span id="num_leds_label_text">LED 發光單元數量</span> (<span id="val_num_leds">25</span>)</label>
                 <input type="range" id="num_leds" min="5" max="61" step="2" value="25">
                 <div class="range-labels"><span>5 顆</span><span>稀疏 ↔ 密集</span><span>61 顆</span></div>
             </div>
 
             <div class="control-group">
-                <label for="beam_spread">透鏡準直發散角 (<span id="val_beam_spread">6.0</span>°)</label>
+                <label for="beam_spread"><span id="beam_spread_label_text">透鏡準直發散角</span> (<span id="val_beam_spread">6.0</span>°)</label>
                 <input type="range" id="beam_spread" min="1" max="15" step="0.5" value="6.0">
                 <div class="range-labels"><span>1° (極窄)</span><span>6°</span><span>15° (泛光)</span></div>
             </div>
@@ -165,6 +174,14 @@
             <div class="info-card">
                 <h3>臨床物理意義</h3>
                 <p>當遮擋物（醫生頭部）介入光路時，邊緣以大張角投射的光束能繞過障礙物，將焦點處的本影稀釋。中心照度若能維持在 <strong>50%</strong> 以上，即具備良好的無影效能。</p>
+            </div>
+
+            <!-- 光源設計模式分析卡片：依模式即時更新優劣比較 -->
+            <div class="info-card mode-analysis-card" id="mode-analysis-card">
+                <h3 id="mode-analysis-title">💡 LED 陣列式（Trumpf iLED 型）</h3>
+                <p id="mode-analysis-pros"></p>
+                <p id="mode-analysis-desc"></p>
+                <p id="mode-analysis-note" class="mode-analysis-note"></p>
             </div>
         </aside>
 
@@ -190,7 +207,7 @@
                     <div class="card-header">
                         <h3>二維幾何光路追跡空間 (Ray-Tracing Space)</h3>
                         <div class="legend">
-                            <span class="legend-item"><span class="dot led"></span>LED 光源</span>
+                            <span class="legend-item"><span class="dot led"></span><span id="legend-source-label">LED 光源</span></span>
                             <span class="legend-item"><span class="dot ray-valid"></span>有效光線</span>
                             <span class="legend-item"><span class="dot ray-blocked"></span>被攔截光線</span>
                         </div>
@@ -216,6 +233,37 @@
                         <!-- 手機版：點擊放大圖表 -->
                         <button class="chart-expand-btn" id="chart-expand-btn" aria-label="切換圖表大小" title="點擊切換圖表大小">⤢</button>
                     </div>
+                </div>
+
+                <!-- 兩種無影燈設計哲學對照表 -->
+                <div class="view-card design-compare-card">
+                    <div class="card-header">
+                        <h3>兩種無影燈設計哲學對照 (LED 陣列式 vs. 多面反射式)</h3>
+                    </div>
+                    <div class="design-compare-scroll">
+                        <table class="design-compare-table">
+                            <thead>
+                                <tr>
+                                    <th>比較項目</th>
+                                    <th>💡 LED 陣列式<br><small>Trumpf iLED 型</small></th>
+                                    <th>🪞 多面反射式<br><small>DomeLux 型</small></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>光源結構</td><td>環形排列的多顆獨立 LED</td><td>單一中央光源 + 環形多面反射鏡</td></tr>
+                                <tr><td>陰影稀釋原理</td><td>多顆 LED 從不同角度補光</td><td>各反射面把單一光源導向不同角度</td></tr>
+                                <tr><td>2D 幾何陰影曲線</td><td colspan="2" class="cmp-same">相同——只取決於抵達術野的光角度分布</td></tr>
+                                <tr><td>故障模式</td><td class="cmp-good">單顆失效僅損失局部光通量</td><td class="cmp-bad">單點故障，需 Bulb Failure I/II 雙燈備援</td></tr>
+                                <tr><td>色溫一致性</td><td class="cmp-warn">多顆需校準以免色差</td><td class="cmp-good">單一光源天生色溫一致</td></tr>
+                                <tr><td>光學效率</td><td class="cmp-good">直接出光，無反射損耗</td><td class="cmp-warn">反射面損耗約 10%</td></tr>
+                                <tr><td>壽命</td><td class="cmp-good">LED 約 5 萬小時</td><td class="cmp-warn">燈泡壽命較短、需定期更換</td></tr>
+                                <tr><td>耗電與發熱</td><td class="cmp-good">省電、低熱、可分區調光</td><td class="cmp-warn">發熱集中於單一光源</td></tr>
+                                <tr><td>燈體</td><td class="cmp-good">薄型輕量</td><td class="cmp-warn">較深重（需容納反射碗）</td></tr>
+                                <tr><td>成本</td><td class="cmp-warn">驅動電路較複雜</td><td class="cmp-good">結構單純、成本較低</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="design-compare-foot">⚖️ 結論：兩者皆為合規的無影燈設計，<strong>2D 幾何陰影稀釋效果相同</strong>；真正差異在於可靠度、色彩、效率、體積等工程取捨。勾選左側「多面反射式」可即時切換 2D 剖面對照。</p>
                 </div>
             </div>
 
