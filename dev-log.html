@@ -139,6 +139,7 @@
         <tr><td>Sticky 論文標題列 + manifest id 欄位</td><td><span class="badge badge-green">✅ Phase 48</span></td><td>.paper-header sticky top：捲動時始終可折疊論文區塊；manifest id 欄位確保 Chrome/Edge PWA 安裝識別</td></tr>
         <tr><td>PWA 安裝提示條 + accent-color + smooth scroll</td><td><span class="badge badge-green">✅ Phase 49</span></td><td>beforeinstallprompt 捕捉顯示安裝條；accent-color 品牌藍；scroll-behavior smooth + prefers-reduced-motion 降級</td></tr>
         <tr><td>CSS 包含 + overscroll 防鏈結 + PWA 安全區域</td><td><span class="badge badge-green">✅ Phase 50</span></td><td>visualization-area contain:layout style；controls-panel overscroll-behavior:contain；PWA bar safe-area-inset-bottom</td></tr>
+        <tr><td>雙光源設計模式（LED 陣列 ↔ 多面反射）</td><td><span class="badge badge-green">✅ Phase 51</span></td><td>新增「多面反射式（DomeLux 型）」切換：中央光源 + 環形反射面（依反射定律繪製鏡片）；即時模式分析卡片 + 設計哲學對照表；rf= hash 參數</td></tr>
       </tbody>
     </table>
   </section>
@@ -146,6 +147,20 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 51 — 雙光源設計模式：LED 陣列 ↔ 多面反射（DomeLux 型） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-29 · 自動 Loop · 使用者實地拍攝外科無影燈後的光學再檢視</div>
+      <p>使用者提供實際手術室無影燈（多面反射式 DomeLux）照片，質疑原模型（LED 陣列式）是否正確。經分析：兩者皆為合規的無影燈設計哲學，<strong>2D 幾何陰影稀釋效果完全相同</strong>——因為陰影稀釋只取決於「光線抵達術野的角度分布」，與光源是 LED 還是反射面無關。差異在於工程取捨。本階段在 2D 剖面新增可切換的多面反射模式，並以模擬分析說明優劣。</p>
+      <ul>
+        <li><strong>統一發光單元模型</strong>（simulation.js）：兩模式共用相同弧線位置與瞄準角度，確保陰影曲線一致，凸顯「幾何等價」教學重點。</li>
+        <li><strong>多面反射式繪製</strong>：中央光源置於反射碗開口內（燈高 ×0.55），畫出反射碗弧線、依<strong>反射定律</strong>（法線 n ∝ d_out − d_in）繪製各反射面小鏡片切線、光源→反射面內部光路（淡琥珀）、徑向漸層光暈 + 亮核。</li>
+        <li><strong>即時模式分析卡片</strong>：依模式更新標題/優點/缺點（LED：單顆故障僅損局部、5 萬小時壽命、省電低熱可分區調光 ↔ 反射：色溫一致、單光源易維護、但單點故障故設 Bulb Failure I/II 備援、反射損耗約 10%、燈體深重）。</li>
+        <li><strong>設計哲學對照表</strong>：9 列比較（結構、原理、故障模式、色溫、效率、壽命、耗電、燈體、成本），含可橫向捲動 + 色彩標記（綠=優、琥珀=取捨、紅=風險）。</li>
+        <li><strong>圖例/標籤同步</strong>：legend 與滑桿標籤依模式改字（「LED 光源/發光單元數量」↔「中央光源+反射面/反射面數量」）。</li>
+        <li><strong>狀態可分享</strong>：新增 <code>rf=</code> URL hash 參數，切換時更新 hash + 觸覺反饋 + rAF 防抖重繪。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 0 — 初始研究與分析 <span class="badge badge-green">完成</span></h3>
@@ -457,7 +472,7 @@
 
   <!-- ── 對話逐字稿 ── -->
   <section>
-    <h2>💬 對話逐字稿（2026-05-26）</h2>
+    <h2>💬 對話逐字稿（2026-05-26 ～ 05-29）</h2>
     <div class="transcript">
 
       <div class="msg user">
@@ -584,6 +599,47 @@
           由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
           修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
           simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">有個問題，這個外科手術的操作介面，下方會有一些位置的光線照度百分比低於 50%，雖然小範圍，但也會影響醫師判斷吧？我們目前的模型真的正確嗎？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          誠實點出模型的簡化：目前 IEC 判定<strong>只檢查中心 bin（x=0）</strong>，並未逐點檢查整個術野是否都 ≥ 50% E_center。真實 IEC 60601-2-41 要求中心照度 ≥ 40,000 lux <em>且</em>術野內所有點 ≥ 50%。曲線兩側偶有低於 50% 的點，確實會影響判斷，這正是無影燈要靠多角度補光稀釋本影的原因。模型在幾何示意上正確，但合規判定是簡化版。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">（附 5 張實地照片）這是我實際拍攝外科手術間的無影燈，但覺得設計上跟目前的設計看起來不太一樣，可以重新檢視他的光學設計模擬與解說嗎？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          照片中的是<strong>多面反射式無影燈（DomeLux 型）</strong>：單一中央光源 + 環形排列的拋物面反射鏡片，每片把光導向術野不同角度——與目前模型的「LED 陣列式」（多顆獨立 LED，如 Trumpf iLED）是兩種不同設計哲學。照片中的「Bulb Failure I / II」面板正印證了單一光源的雙燈泡備援設計。<br><br>
+          關鍵洞察：<strong>兩者的 2D 幾何陰影稀釋效果相同</strong>——陰影稀釋只取決於光線抵達術野的角度分布，與光源是 LED 還是反射面無關。真正差異在工程取捨（故障模式、色溫、效率、體積、成本）。提出 A（純文字解說）/ B（在模擬中新增可切換的反射式模式 + 分析）兩方案。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">B 選項，並模擬分析說明其中的差異與優劣。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 51 雙光源設計模式）</div>
+        <div class="content">
+          <strong>simulation.js</strong>：將 LED 產生邏輯重構為統一「發光單元」模型，兩模式共用相同弧線位置與瞄準角度（確保陰影曲線一致，凸顯幾何等價）。多面反射模式下另建中央光源（燈高 ×0.55，位於反射碗開口內）與內部光路。<code>drawCanvas()</code> 依模式繪製：反射碗弧線、依<strong>反射定律</strong>（鏡面法線 n ∝ d_out − d_in，切線垂直於 n）畫出各反射面小鏡片、光源→反射面淡琥珀內部光路、中央光源徑向漸層光暈 + 亮核。<br><br>
+          新增 <code>updateModeUI()</code>：依模式即時更新圖例文字、滑桿標籤、模式分析卡片（標題 + 優點 + 缺點 + 教學註記）。<br><br>
+          <strong>index.html</strong>：新增「切換多面反射式光源（DomeLux 型）🪞」勾選框；模式分析卡片；9 列「設計哲學對照表」（結構/原理/故障模式/色溫/效率/壽命/耗電/燈體/成本，色彩標記優劣，可橫向捲動）。<br>
+          <strong>index.css</strong>：<code>.mode-analysis-card</code> 與 <code>.design-compare-table</code> 樣式（cmp-good 綠 / cmp-warn 琥珀 / cmp-bad 紅 / cmp-same 置中藍）。<br>
+          <strong>狀態分享</strong>：新增 <code>rf=</code> URL hash 參數。Preview 實測：兩模式切換、UI 文字同步、hash 編碼、表格樣式皆正常。
         </div>
       </div>
 
