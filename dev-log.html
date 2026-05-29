@@ -146,6 +146,7 @@
         <tr><td>逆行演示 header 直達入口</td><td><span class="badge badge-green">✅ Phase 55</span></td><td>於主模擬器頂部 header 新增永遠可見的「🔭 光路逆行演示」按鈕，獨立於手機版會隱藏的 header-badges 之外，桌機顯示全名／手機顯示精簡標籤；資產 index.css ?v=5→v6、SW 快取 v3→v4</td></tr>
         <tr><td>修正逆行演示頁線上 404</td><td><span class="badge badge-green">✅ Phase 56</span></td><td>deploy.yml 採硬編碼檔案清單，漏掉 Phase 54 新增的 optics-reciprocity.html，導致該頁線上 404（workflow 雖綠燈卻從未複製此檔至 gh-pages）。補進 cp／git add 三處清單，重新部署後線上回 200</td></tr>
         <tr><td>障礙物孔徑遮擋演示</td><td><span class="badge badge-green">✅ Phase 57</span></td><td>逆行演示頁新增「🚧 障礙物演示」：在會聚光路中放入不透明障礙物，擋掉中央光線後交會處（成像點／術野）仍完整受光、只變暗不留影子；含寬度滑桿與亮度讀數，回應「光路中加障礙物卻仍見全景」之提問；SW 快取 v4→v5</td></tr>
+        <tr><td>系統操作介紹 PDF 手冊</td><td><span class="badge badge-green">✅ Phase 58</span></td><td>依使用者要求生成《系統操作介紹》PDF（A4／繁中／4 頁）：系統概觀、控制面板全參數表、量測指標、3D 操作、鍵盤快捷鍵、光路逆行頁、分享與離線。以 Chrome headless --print-to-pdf 產生（CJK 正常）；頁首新增琥珀色「📄 操作手冊」下載連結；deploy.yml 三處清單加入 PDF；index.css ?v=6→v7、SW 快取 v5→v6</td></tr>
       </tbody>
     </table>
   </section>
@@ -153,6 +154,19 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 58 — 系統操作介紹 PDF 手冊（A4 繁中 4 頁）+ 頁首下載入口 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 自動 Loop · 回應使用者「幫我生成一份系統操作介紹的 PDF」</div>
+      <p>使用者要求一份介紹系統操作的 PDF。為此撰寫一份列印優化的操作手冊（A4、繁體中文），完整對照實際 UI，並以 Chrome headless 轉為 PDF；同時在主模擬器頁首加入下載入口、納入部署流程。</p>
+      <ul>
+        <li><strong>內容（4 頁）</strong>：① 系統概觀（2D 幾何剖面 / 3D 空間熱圖兩分頁 + 光路逆行延伸頁）；② 控制面板——7 條滑桿（燈具高度、障礙物 X/Y/Z、半徑、光源數、光束張角）含範圍/預設、三個模式開關（真實感 / 智慧補償 / 反射鏡）、預設場景與按鈕；③ 量測（中心殘餘照度 % + IEC 50% 徽章、照度分佈圖、設計對照表、3D 操作）；④ 鍵盤快捷鍵表、光路逆行頁與障礙物演示、URL 分享 / 截圖 / PWA 離線。</li>
+        <li><strong>產生方式</strong>：以 <code>Google Chrome --headless --print-to-pdf --no-pdf-header-footer</code> 由 <code>操作介紹.html</code> 產生 <code>操作介紹.pdf</code>（CJK 字型正常、含彩色標題與表格）。保留來源 HTML 以便日後維護重生。</li>
+        <li><strong>網站整合</strong>：主模擬器頁首新增琥珀色「📄 操作手冊」連結（與青藍色「🔭 逆行演示」區隔），桌機顯示全名／手機顯示精簡標籤，列印時隱藏；deploy.yml 的 cp→/tmp、cp→gh-pages、git add 三處硬編碼清單均加入 PDF（避免 Phase 56 的線上 404 重演）。</li>
+        <li><strong>快取破壞</strong>：index.css ?v=6→v7、SW 快取 v5→v6，確保使用者取得新頁首與樣式。</li>
+        <li><strong>驗證</strong>：PDF 首頁轉 PNG 檢視——標題、表格、徽章、CJK 皆正確，共 4 頁；Preview 375px 手機實測頁首三元素（標題＋逆行演示＋手冊）並排不溢出、琥珀色手冊鍵清楚可辨。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 57 — 障礙物孔徑遮擋演示（光路中放障礙物，交會處仍不成影） <span class="badge badge-green">完成</span></h3>
@@ -771,6 +785,20 @@
           建立獨立互動頁 <code>optics-reciprocity.html</code>：用同一塊拋物面凹鏡演示「收光成像（牛頓式望遠鏡）↔ 出光投射（探照燈／無影燈）」的可逆性。Canvas 即時繪製行進中的箭頭（天藍＝平行光側、琥珀＝焦點側），「⇄ 光路逆行」鈕一鍵交換光源與接收器、流向隨之反轉；可調焦距/碗深與光線數量，拋物面以微鏡格刻痕呼應實際反射碗。<br><br>
           收光模式可開啟<strong>牛頓式 45° 斜鏡 + 目鏡</strong>示意疊加層；因本演示為快焦比深碗，逐線 45° 折射在邊緣光線會出現幾何退化（光線與鏡面平行），故改採近焦點窄束的示意折射，安全且清楚。<br><br>
           主頁側欄另加「光學原理類比」小卡與連結；<code>sw.js</code> 預快取新頁、<code>CACHE_NAME</code> v2→v3。驗證：node --check 語法通過、Preview getImageData 掃描確認場景繪製（~12k 亮點）、切換模式/斜鏡/滑桿皆無 console error。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">可以繼續執行。另外幫我生成一份系統操作介紹的 PDF。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 58 系統操作介紹 PDF 手冊）</div>
+        <div class="content">
+          產出《系統操作介紹》PDF（A4／繁體中文／4 頁），完整對照實際 UI：① 系統概觀（2D 幾何剖面、3D 空間熱圖兩分頁 + 光路逆行延伸頁）；② 控制面板全參數——7 條滑桿（燈具高度、障礙物 X/Y/Z、半徑、光源數、光束張角）含範圍/預設值、三個模式開關（真實感/智慧補償/反射鏡）、預設場景與按鈕；③ 量測（中心殘餘照度 % + IEC 50% 徽章、照度分佈圖、設計對照表、3D 操作）；④ 鍵盤快捷鍵表、光路逆行頁與障礙物演示、URL 分享/截圖/PWA 離線。<br><br>
+          以 <code>Chrome --headless --print-to-pdf</code> 由來源 HTML 產生（CJK 字型、彩色標題與表格皆正常），來源 HTML 一併保留以利日後維護重生。並在主模擬器頁首加上琥珀色「📄 操作手冊」下載連結（與青藍「🔭 逆行演示」區隔，桌機全名／手機精簡、列印隱藏），同時把 PDF 加進 deploy.yml 三處清單（避免 Phase 56 線上 404 重演）。<br><br>
+          快取破壞 index.css ?v=6→v7、SW v5→v6。PDF 轉 PNG 檢視首頁正確、共 4 頁；Preview 375px 手機實測頁首三元素並排不溢出。
         </div>
       </div>
 
