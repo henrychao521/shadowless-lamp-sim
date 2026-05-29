@@ -149,6 +149,7 @@
         <tr><td>系統操作介紹 PDF 手冊</td><td><span class="badge badge-green">✅ Phase 58</span></td><td>依使用者要求生成《系統操作介紹》PDF（A4／繁中／4 頁）：系統概觀、控制面板全參數表、量測指標、3D 操作、鍵盤快捷鍵、光路逆行頁、分享與離線。以 Chrome headless --print-to-pdf 產生（CJK 正常）；頁首新增琥珀色「📄 操作手冊」下載連結；deploy.yml 三處清單加入 PDF；index.css ?v=6→v7、SW 快取 v5→v6</td></tr>
         <tr><td>專案搬遷至 128G</td><td><span class="badge badge-green">✅ 維運</span></td><td>整個專案由 /Users/henry/ailocal 移至 /Volumes/128G/shadowless-lamp-sim；修復 exFAT 副作用（清除 3568 個 macOS ._ 伴隨檔以解決 git non-monotonic index、設 core.fileMode=false 避免全檔誤判修改）；git 完整性、遠端、HEAD 皆驗證無誤</td></tr>
         <tr><td>滑桿 ± 微調按鈕</td><td><span class="badge badge-green">✅ Phase 59</span></td><td>每個參數滑桿兩側新增 −／＋ 按鈕：單擊跳一個 step、長按 380ms 後每 60ms 連續調整並於上下限自動停；觸控目標手機版 44px（WCAG 2.5.5），解決手指拖曳難對準精確值（如 0cm／100cm）的痛點。以 JS 通用注入（不改 7 段 HTML），dispatch input 事件沿用既有數值/渲染/觸覺流程；index.css ?v=7→v8、SW 快取 v6→v7</td></tr>
+        <tr><td>對話紀錄與發展歷程備份</td><td><span class="badge badge-green">✅ 維運</span></td><td>依使用者要求開始備份「所有對話紀錄與實作發展歷程」到 GitHub：解析本機工作階段 transcript（JSONL），產生 <code>對話完整紀錄.md</code>（使用者訊息每句原文逐字保留、AI 回應全文、工具操作摘要 + 60 階段實作歷程表 + 工程教訓）。存於 repo 同層、push 至 main 作為備份（不併入 gh-pages 線上資產）；往後每階段增補</td></tr>
       </tbody>
     </table>
   </section>
@@ -156,6 +157,19 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>維運 — 對話紀錄與實作發展歷程備份至 GitHub <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 自動 Loop · 依使用者指示「開始記錄所有對話紀錄以及實作發展歷程，並將資料備份到 GitHub」</div>
+      <p>使用者選定：<strong>同一個 repo 新增檔案</strong> + <strong>完整逐字稿（每句原文）</strong>。將本機 Claude Code 工作階段的對話原文與開發過程整理成單一 Markdown，存入 repo 並推上 GitHub 作為備份。</p>
+      <ul>
+        <li><strong>來源</strong>：解析本機工作階段 transcript JSONL（<code>~/.claude/projects/-Volumes-128G/*.jsonl</code>），自 2082 次提及 shadowless-lamp-sim 的紀錄中鎖定主開發工作階段。</li>
+        <li><strong>產物</strong>：<code>對話完整紀錄.md</code>（約 245 KB）含三部分——專案概觀、60 階段實作發展歷程表＋關鍵工程教訓、對話完整逐字稿。</li>
+        <li><strong>逐字保留</strong>：29 則使用者訊息每句原文完整收錄；AI 回應全文保留；工具操作（Bash／Edit／Write…）以摘要呈現（保留指令與檔案路徑）以維持可讀性。</li>
+        <li><strong>清理</strong>：過濾系統注入訊息（壓縮摘要、slash 指令後設、loop 技能展開、速率限制提示），修正匯入造成的相黏訊息，去除 queue 重送的重複。</li>
+        <li><strong>備份策略</strong>：push 至 <code>main</code> 即完成 GitHub 備份；此檔為開發紀錄，<strong>不</strong>加入 deploy.yml／gh-pages 線上資產清單。往後每完成一階段即增補。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 59 — 滑桿 ±微調按鈕（手機精準調整、長按連續調整） <span class="badge badge-green">完成</span></h3>
