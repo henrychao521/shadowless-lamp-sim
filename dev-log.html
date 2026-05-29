@@ -140,6 +140,7 @@
         <tr><td>PWA 安裝提示條 + accent-color + smooth scroll</td><td><span class="badge badge-green">✅ Phase 49</span></td><td>beforeinstallprompt 捕捉顯示安裝條；accent-color 品牌藍；scroll-behavior smooth + prefers-reduced-motion 降級</td></tr>
         <tr><td>CSS 包含 + overscroll 防鏈結 + PWA 安全區域</td><td><span class="badge badge-green">✅ Phase 50</span></td><td>visualization-area contain:layout style；controls-panel overscroll-behavior:contain；PWA bar safe-area-inset-bottom</td></tr>
         <tr><td>雙光源設計模式（LED 陣列 ↔ 多面反射）</td><td><span class="badge badge-green">✅ Phase 51</span></td><td>新增「多面反射式（DomeLux 型）」切換：中央光源 + 環形反射面（依反射定律繪製鏡片）；即時模式分析卡片 + 設計哲學對照表；rf= hash 參數</td></tr>
+        <tr><td>對照表手機優化（sticky 首欄）</td><td><span class="badge badge-green">✅ Phase 52</span></td><td>設計對照表首欄 position:sticky 不透明底色，水平捲動時行標籤恆可見；手機顯示捲動提示 + 縮小字型/間距</td></tr>
       </tbody>
     </table>
   </section>
@@ -147,6 +148,19 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 52 — Phase 51 對照表手機優化：sticky 首欄 + 捲動提示 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-29 · 自動 Loop · 延續手機優化重點</div>
+      <p>Phase 51 新增的「設計哲學對照表」在窄螢幕（&lt;480px）需水平捲動。實測手機 375px 下，表格 scrollWidth 480px &gt; 容器 320px，捲動後「比較項目」欄會跟著滑出視窗，使用者讀不到右側欄位對應的列名。本階段針對手機檢視做優化。</p>
+      <ul>
+        <li><strong>sticky 首欄</strong>：<code>.design-compare-table</code> 首欄 <code>th/td:first-child</code> 設 <code>position:sticky; left:0</code>，水平捲動時「比較項目」欄恆固定在左側，右側數值欄滑動時行標籤始終可見。</li>
+        <li><strong>不透明底色</strong>：sticky 欄需不透明背景避免被捲動的儲存格透出。卡片底色 <code>rgba(30,41,59,.6)</code> 疊在頁面 <code>#0b1120</code> 上的等效色約 <code>#16202f</code>（內文欄）/ <code>#202a3b</code>（表頭左上角格）。表頭角格 z-index:2 蓋在內文 sticky 格（z-index:1）之上。</li>
+        <li><strong>首欄分隔線</strong>：sticky 定位會蓋住原 border，改用 <code>box-shadow: 1px 0 0 var(--border-color)</code> 補回右側分隔線。</li>
+        <li><strong>手機捲動提示</strong>：表格上方加入「← 左右滑動檢視完整對照（首欄項目固定）→」提示（<code>aria-hidden</code>，僅 ≤768px 顯示）。</li>
+        <li><strong>手機字型/間距</strong>：≤768px 時表格字型 0.78rem、儲存格 padding 縮為 0.45/0.55rem，容納更多內容。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 51 — 雙光源設計模式：LED 陣列 ↔ 多面反射（DomeLux 型） <span class="badge badge-green">完成</span></h3>
@@ -640,6 +654,21 @@
           <strong>index.html</strong>：新增「切換多面反射式光源（DomeLux 型）🪞」勾選框；模式分析卡片；9 列「設計哲學對照表」（結構/原理/故障模式/色溫/效率/壽命/耗電/燈體/成本，色彩標記優劣，可橫向捲動）。<br>
           <strong>index.css</strong>：<code>.mode-analysis-card</code> 與 <code>.design-compare-table</code> 樣式（cmp-good 綠 / cmp-warn 琥珀 / cmp-bad 紅 / cmp-same 置中藍）。<br>
           <strong>狀態分享</strong>：新增 <code>rf=</code> URL hash 參數。Preview 實測：兩模式切換、UI 文字同步、hash 編碼、表格樣式皆正常。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">請繼續執行。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 52 對照表手機優化）</div>
+        <div class="content">
+          先確認 Phase 51 的 GitHub Actions 部署成功（Deploy + pages-build 皆 success，已上線）。接著回到手機優化重點：Phase 51 的設計對照表在 375px 手機下 scrollWidth 480 &gt; 容器 320，水平捲動時「比較項目」欄會滑出視窗。<br><br>
+          <strong>index.css</strong>：對照表首欄改 <code>position:sticky; left:0</code> + 不透明底色（<code>#16202f</code> 內文 / <code>#202a3b</code> 表頭角格，為卡片半透明色疊在頁底的等效色）+ <code>box-shadow</code> 補回首欄分隔線；新增手機捲動提示樣式 + ≤768px 縮小字型/間距。<br>
+          <strong>index.html</strong>：表格上方加入「← 左右滑動檢視完整對照（首欄項目固定）→」提示（僅手機顯示）。<br><br>
+          Preview 以 375px mobile preset 實測：首欄 sticky、left:0、不透明底色、z-index 堆疊、box-shadow 分隔線、提示 display:block、表格確實 overflow（480&gt;320）皆正確，無 console 錯誤。
         </div>
       </div>
 

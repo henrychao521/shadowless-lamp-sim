@@ -385,10 +385,23 @@ input[type="range"]::-moz-range-thumb:active {
 }
 
 /* 兩種設計哲學對照表 */
-.design-compare-card { margin-top: 1rem; }
+/* sticky 首欄用不透明底色（卡片 rgba(30,41,59,.6) 疊在 #0b1120 上的等效色），
+   避免水平捲動時被捲動的儲存格從首欄底下透出 */
+.design-compare-card {
+    margin-top: 1rem;
+    --cmp-sticky-bg: #16202f;        /* 內文首欄 */
+    --cmp-sticky-head-bg: #202a3b;   /* 表頭左上角格 */
+}
 .design-compare-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+}
+/* 手機版捲動提示：表格在窄螢幕需水平捲動，提示使用者左右滑動 */
+.design-compare-hint {
+    display: none;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
 }
 .design-compare-table {
     width: 100%;
@@ -413,10 +426,24 @@ input[type="range"]::-moz-range-thumb:active {
     color: var(--text-muted);
     font-weight: 400;
 }
+/* sticky 首欄：捲動時行標籤恆可見 */
+.design-compare-table th:first-child,
+.design-compare-table td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
 .design-compare-table tbody td:first-child {
     color: var(--text-secondary);
     font-weight: 600;
     white-space: nowrap;
+    background: var(--cmp-sticky-bg);
+    box-shadow: 1px 0 0 var(--border-color); /* 首欄右側分隔線（取代被 sticky 遮住的 border）*/
+}
+.design-compare-table thead th:first-child {
+    z-index: 2; /* 左上角格需蓋在內文 sticky 格之上 */
+    background: var(--cmp-sticky-head-bg);
+    box-shadow: 1px 0 0 var(--border-color);
 }
 .design-compare-table tbody td { color: var(--text-secondary); }
 .design-compare-table .cmp-good { color: var(--accent-teal); }
@@ -1257,6 +1284,12 @@ input[type="range"]:focus-visible {
 
 /* ── 手機（768px 以下）全面優化 ── */
 @media (max-width: 768px) {
+
+    /* 設計對照表：窄螢幕需水平捲動，顯示提示 + 縮小字型 */
+    .design-compare-hint { display: block; }
+    .design-compare-table { font-size: 0.78rem; }
+    .design-compare-table th,
+    .design-compare-table td { padding: 0.45rem 0.55rem; }
 
     /* Header：隱藏英文副標題，縮短標題 */
     .app-header {
