@@ -364,11 +364,15 @@ coneGeo.rotateX(Math.PI / 2);
 // Load IES Profile
 const iesLoader = new IESLoader();
 let iesTexture = null;
+// IES 為廠商版權檔，未隨線上版部署（.gitignore 排除）。載入失敗時靜默降級：
+// 聚光燈改用 Three.js 內建光錐（下方 if (iesTexture) 已做保護），不影響教學模擬，僅少了精確光域分佈。
 iesLoader.load('LDP0109501.ies', (texture) => {
     iesTexture = texture;
     spotLights.forEach(light => {
         light.iesMap = iesTexture;
     });
+}, undefined, () => {
+    console.info('[sls] IES 光域檔未提供，聚光燈改用內建光錐（不影響模擬結果）');
 });
 
 for(let i=0; i<numSpotLights; i++) {

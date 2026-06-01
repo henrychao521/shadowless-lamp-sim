@@ -151,6 +151,8 @@
         <tr><td>滑桿 ± 微調按鈕</td><td><span class="badge badge-green">✅ Phase 59</span></td><td>每個參數滑桿兩側新增 −／＋ 按鈕：單擊跳一個 step、長按 380ms 後每 60ms 連續調整並於上下限自動停；觸控目標手機版 44px（WCAG 2.5.5），解決手指拖曳難對準精確值（如 0cm／100cm）的痛點。以 JS 通用注入（不改 7 段 HTML），dispatch input 事件沿用既有數值/渲染/觸覺流程；index.css ?v=7→v8、SW 快取 v6→v7</td></tr>
         <tr><td>對話紀錄與發展歷程備份</td><td><span class="badge badge-green">✅ 維運</span></td><td>依使用者要求開始備份「所有對話紀錄與實作發展歷程」到 GitHub：解析本機工作階段 transcript（JSONL），產生 <code>對話完整紀錄.md</code>（使用者訊息每句原文逐字保留、AI 回應全文、工具操作摘要 + 60 階段實作歷程表 + 工程教訓）。存於 repo 同層、push 至 main 作為備份（不併入 gh-pages 線上資產）；往後每階段增補</td></tr>
         <tr><td>數值徽章直接輸入</td><td><span class="badge badge-green">✅ Phase 60</span></td><td>點擊參數標籤中的數值徽章即就地展開 number 輸入框，可一次跳到特定值（如燈高 137cm、LED 41 顆），補足 ± 按鈕只能逐格微調的不足。輸入後自動對齊 step 網格、夾在上下限內、Enter 套用／Esc 取消／失焦套用；沿用既有 input 事件流程（數值更新/URL hash/渲染），與拖曳一致。手機加大觸控目標。通用 JS 注入（badge id=val_&lt;sliderid&gt;），不改 7 段 HTML；index.css ?v=8→v9、SW 快取 v7→v8</td></tr>
+        <tr><td>教學鷹架（學習目標／探究／自我檢核）</td><td><span class="badge badge-green">✅ Phase 61</span></td><td>把模擬器從「工程師儀表板」升級為「一堂課」：頁首下新增教學指引區——一句話原理（稀釋 vs 消滅陰影）、學習目標、🔬試試看（5 個先猜再看的引導探究任務，藍鈕直接套用對應預設場景並捲回模擬區）、✅自我檢核（4 題點開看解答）、108 課綱對應。純 &lt;details&gt; 原生無障礙、手機單欄堆疊、列印隱藏。另修 IES 廠商檔線上 404：加 onError 靜默降級（既有 if(iesTexture) 已保護，不影響模擬）。index.css ?v=9→v10、simulation3d.js ?v=5→v6、SW 快取 v8→v9</td></tr>
+        <tr><td>個人站首頁卡文案更新</td><td><span class="badge badge-green">✅ 維運</span></td><td>henrychao521.github.io 首頁精選卡改為教學導向文案（拖曳即見陰影稀釋、2D/3D 雙視圖、IEC 對照、光路逆行與孔徑遮擋、課堂預設、手機可離線），修正原「智慧 PWM 補光演算法」不精確描述</td></tr>
       </tbody>
     </table>
   </section>
@@ -158,6 +160,21 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 61 — 教學鷹架：把模擬器包成一堂課（學習目標／探究／自我檢核） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 使用者指示「讓他符合優質的教學模擬平台需求」· 先以子代理做教學設計＋技術雙審查</div>
+      <p>啟用兩個審查子代理（教學設計面 + 技術/無障礙/正確性面）盤點落差。核心結論：互動引擎已很強，但缺「學習鷹架」——學生只能拖滑桿看數字變化，卻沒被告知<strong>要學什麼、該試什麼、怎麼檢核</strong>。本階段補上這層。</p>
+      <ul>
+        <li><strong>一句話原理</strong>（永遠可見）：用國中生能懂的話講「稀釋而非消滅陰影、半影/本影、≥50% 仍夠亮」。</li>
+        <li><strong>📚 學習目標</strong>：3 條可被評量的目標（解釋稀釋、判讀影響因素、連結工程取捨）。</li>
+        <li><strong>🔬 試試看</strong>：5 個「先預測再驗證」的引導探究任務；藍色按鈕直接套用對應預設場景（少燈對比／高效多燈／嚴苛遮擋）並平滑捲回模擬區，重用既有 preset 按鈕邏輯。</li>
+        <li><strong>✅ 自我檢核</strong>：4 題點開看解答（原生 &lt;details&gt;，無障礙、免 JS）。</li>
+        <li><strong>108 課綱對應</strong>：點出「科技的本質／工程設計與問題解決」與 trade-off 主軸，給教師使用正當性。</li>
+        <li><strong>技術修正</strong>：IES 為廠商版權檔（.gitignore 排除、未上線）→ 線上 404；加 onError 靜默降級（既有 <code>if(iesTexture)</code> 保護，聚光燈改用內建光錐，不影響模擬與教學）。另核實「Chart 重複初始化洩漏」為誤報（initChart 僅載入時呼叫一次）。</li>
+        <li><strong>驗證</strong>（不起本機預覽）：<code>node --check</code> + 標籤平衡檢查（section/details/summary 各 7/7 配對）+ DOM shim 實跑「試試看」按鈕導向正確 preset。index.css ?v=9→v10、simulation3d.js ?v=5→v6、SW v8→v9。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 60 — 點擊數值徽章直接輸入精確數值 <span class="badge badge-green">完成</span></h3>
@@ -858,7 +875,16 @@
 
       <div class="msg user">
         <div class="role">👨‍🏫 Henry</div>
-        <div class="content">一個段落後請開始記錄所有對話紀錄以及實作發展歷程，並將資料開始備份到 GitHub。</div>
+        <div class="content">幫我把無影燈加入 GitHub Page henrychao521.github.io 首頁，讓其他人可以快速找到。 → 可以，請幫我完整且詳細的更新，接下來 30 分鐘請你反覆檢查這個系統，並讓他符合優質的教學模擬平台需求。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（個人站首頁卡更新 + Phase 61 教學鷹架）</div>
+        <div class="content">
+          先查證：無影燈模擬器其實<strong>早已在個人站首頁</strong>（漸層藍大卡 + NEW 標籤）且在 projects.html 教育類分類，重複新增反而會變兩張卡。故改為<strong>更新文案</strong>：把堆術語的描述改為學生視角的教學價值，並修正原「智慧 PWM 補光演算法」不精確說法。<br><br>
+          接著針對「優質教學模擬平台」做品質迭代：先派兩個子代理（教學設計審查 + 技術/無障礙/正確性審查）盤點。最大落差是缺<strong>學習鷹架</strong>。Phase 61 於頁首下新增教學指引區——一句話原理、學習目標、🔬 試試看（5 個先猜再看的探究任務，按鈕直接套場景）、✅ 自我檢核（4 題點開看解答）、108 課綱對應；全用原生 &lt;details&gt; 確保無障礙、手機單欄、列印隱藏。<br><br>
+          技術面修掉真實 bug：IES 廠商版權檔未隨線上部署 → 加 onError 靜默降級（不影響模擬）；並核實「Chart 洩漏」為誤報。驗證以 node --check + 標籤平衡 + DOM shim（不起本機預覽）。index.css ?v=10、simulation3d.js ?v=6、SW v9。
+        </div>
       </div>
 
       <div class="msg ai">

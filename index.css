@@ -442,6 +442,56 @@ input[type="range"]::-moz-range-thumb:active {
 .val-edit-input::-webkit-outer-spin-button,
 .val-edit-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
+/* ── Phase 61：教學鷹架（學習目標 / 試試看 / 自我檢核 / 課綱）── */
+.learning-guide { padding: 0 1.5rem; margin-top: 1.25rem; }
+.lg-hook {
+    display: flex; gap: 0.75rem; align-items: flex-start;
+    background: linear-gradient(135deg, rgba(20,184,166,0.12), rgba(14,165,233,0.12));
+    border: 1px solid var(--border-highlight); border-left: 4px solid var(--accent-teal);
+    border-radius: 12px; padding: 0.9rem 1.1rem;
+}
+.lg-hook-icon { font-size: 1.6rem; line-height: 1.5; flex: 0 0 auto; }
+.lg-hook p { color: var(--text-primary); font-size: 0.95rem; line-height: 1.7; }
+.lg-hook strong { color: var(--accent-teal); }
+.lg-hook em { color: var(--accent-amber); font-style: normal; font-weight: 700; }
+.lg-panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 0.75rem; align-items: start; }
+.lg-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+.lg-card > summary {
+    cursor: pointer; list-style: none; padding: 0.7rem 1rem; font-weight: 700;
+    color: var(--text-primary); background: rgba(14,165,233,0.08); user-select: none;
+}
+.lg-card > summary::-webkit-details-marker { display: none; }
+.lg-card > summary::after { content: '▾'; float: right; color: var(--accent-blue); transition: transform 0.2s; }
+.lg-card[open] > summary::after { transform: rotate(180deg); }
+.lg-body { padding: 0.8rem 1rem 1rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; }
+.lg-body ol { padding-left: 1.2rem; }
+.lg-body li { margin: 0.45rem 0; }
+.lg-body strong { color: var(--text-primary); }
+.lg-body em { color: var(--accent-amber); font-style: normal; }
+.lg-tip { background: rgba(245,158,11,0.1); border-radius: 8px; padding: 0.5rem 0.7rem; margin-bottom: 0.6rem; }
+.lg-preset {
+    display: inline-flex; align-items: center; gap: 0.2rem; margin: 0 0.15rem;
+    padding: 0.12rem 0.55rem; font-size: 0.82rem; font-weight: 700; color: var(--accent-blue);
+    background: rgba(14,165,233,0.12); border: 1px solid var(--border-highlight);
+    border-radius: 999px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.lg-preset:hover  { background: rgba(14,165,233,0.24); }
+.lg-preset:active { transform: scale(0.95); }
+.lg-qa { border-bottom: 1px dashed var(--border-color); padding: 0.4rem 0; }
+.lg-qa:last-child { border-bottom: none; }
+.lg-qa > summary { cursor: pointer; color: var(--text-primary); font-weight: 600; }
+.lg-qa > p { margin-top: 0.4rem; color: var(--accent-teal); }
+.lg-curriculum {
+    margin-top: 0.75rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;
+    border-top: 1px dashed var(--border-color); padding-top: 0.6rem;
+}
+.lg-curriculum strong { color: var(--text-secondary); }
+@media (max-width: 768px) {
+    .learning-guide { padding: 0 1rem; margin-top: 1rem; }
+    .lg-panels { grid-template-columns: 1fr; }
+}
+@media print { .learning-guide { display: none !important; } }
+
 .divider {
     border: none;
     height: 1px;
