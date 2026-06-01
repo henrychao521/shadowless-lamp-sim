@@ -154,6 +154,7 @@
         <tr><td>教學鷹架（學習目標／探究／自我檢核）</td><td><span class="badge badge-green">✅ Phase 61</span></td><td>把模擬器從「工程師儀表板」升級為「一堂課」：頁首下新增教學指引區——一句話原理（稀釋 vs 消滅陰影）、學習目標、🔬試試看（5 個先猜再看的引導探究任務，藍鈕直接套用對應預設場景並捲回模擬區）、✅自我檢核（4 題點開看解答）、108 課綱對應。純 &lt;details&gt; 原生無障礙、手機單欄堆疊、列印隱藏。另修 IES 廠商檔線上 404：加 onError 靜默降級（既有 if(iesTexture) 已保護，不影響模擬）。index.css ?v=9→v10、simulation3d.js ?v=5→v6、SW 快取 v8→v9</td></tr>
         <tr><td>個人站首頁卡文案更新</td><td><span class="badge badge-green">✅ 維運</span></td><td>henrychao521.github.io 首頁精選卡改為教學導向文案（拖曳即見陰影稀釋、2D/3D 雙視圖、IEC 對照、光路逆行與孔徑遮擋、課堂預設、手機可離線），修正原「智慧 PWM 補光演算法」不精確描述</td></tr>
         <tr><td>名詞小幫手 + 設計取捨導讀</td><td><span class="badge badge-green">✅ Phase 62</span></td><td>降低專有名詞門檻：控制面板加「📖 名詞小幫手」詞彙卡（本影/半影/相對照度/發散角/遮擋物/IEC，國中語言、原生 &lt;details&gt; 無障礙、手機可點）；設計對照表上方加「這張表就是工程設計（取捨）」導讀，把參考表轉為學習時刻；optics-reciprocity.html 障礙物演示加「先猜再看」提示。另核實技術審查的 2D 分箱越界、IEC 顏色不一致皆為誤報，simulation.js 不動。index.css ?v=10→v11、SW v9→v10</td></tr>
+        <tr><td>白話即時解讀</td><td><span class="badge badge-green">✅ Phase 63</span></td><td>把「中心殘餘照度」數字即時翻成白話意義：≥80% 很亮、≥50% 仍合格、&lt;50% 不合格會留影、&lt;20% 嚴重不足、≈100% 尚無有效遮擋；依 IEC 50% 門檻三色（青/琥珀/紅）對應。以 MutationObserver 監看既有 #center-illuminance-val（完全不改 simulation.js），數值一變即更新並用 aria-live 播報。DOM shim 7 級門檻測試全過、50% 邊界與 PASS 徽章一致。index.css ?v=11→v12、SW v10→v11</td></tr>
       </tbody>
     </table>
   </section>
@@ -161,6 +162,17 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 63 — 白話即時解讀：把照度數字翻成「這代表什麼」 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 續教學品質迭代 · 把即時量測連結到意義（formative feedback）</div>
+      <p>數字會變，但學生不一定知道「87%」「42%」分別代表好還是壞。本階段在中心殘餘照度下方加一行<strong>白話即時解讀</strong>，隨數值變化更新，幫學生把量測連回學習目標。</p>
+      <ul>
+        <li><strong>分級解讀</strong>：≈100%（尚無有效遮擋）／≥80%（很亮，補光成功）／≥50%（仍合格，符合 IEC）／&lt;50%（不合格、會留影，建議加燈或加大發散角）／&lt;20%（嚴重不足）。三色（青/琥珀/紅）對應 IEC 50% 門檻。</li>
+        <li><strong>非侵入式</strong>：用 MutationObserver 監看既有 <code>#center-illuminance-val</code> 文字變化，完全不動 simulation.js 計算邏輯；<code>aria-live</code> 讓螢幕報讀器也能聽到解讀。</li>
+        <li><strong>驗證</strong>：node --check + DOM shim 跑 7 級門檻（含 50% 邊界與 PASS 徽章一致、--% 清空）全過；HTML 標籤平衡通過。index.css ?v=11→v12、SW v10→v11。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 62 — 名詞小幫手 + 設計取捨導讀（降低門檻、強化探究） <span class="badge badge-green">完成</span></h3>

@@ -514,6 +514,18 @@ input[type="range"]::-moz-range-thumb:active {
 }
 .design-compare-lead strong { color: var(--accent-amber); }
 
+/* ── Phase 63：白話即時解讀 ── */
+.metric-interpret {
+    width: 100%; margin-top: 0.5rem; padding: 0.5rem 0.7rem;
+    font-size: 0.86rem; line-height: 1.6; border-radius: 8px;
+    border-left: 3px solid var(--text-muted); background: rgba(148,163,184,0.08);
+    color: var(--text-secondary); transition: background 0.2s, border-color 0.2s;
+}
+.metric-interpret:empty { display: none; }
+.metric-interpret.mi-ok   { border-left-color: var(--accent-teal);  background: rgba(20,184,166,0.1); }
+.metric-interpret.mi-warn { border-left-color: var(--accent-amber); background: rgba(245,158,11,0.1); }
+.metric-interpret.mi-bad  { border-left-color: var(--accent-red);   background: rgba(239,68,68,0.1); }
+
 .divider {
     border: none;
     height: 1px;
