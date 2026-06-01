@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=11">
+    <link rel="stylesheet" href="index.css?v=12">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
     <link rel="preload" as="script" href="simulation.js?v=5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -298,6 +298,8 @@
                         </div>
                         <button class="screenshot-btn" id="download-screenshot-btn" title="下載模擬截圖 (PNG)">📸</button>
                         </div>
+                        <!-- Phase 63：白話即時解讀 — 把中心照度數字翻成「這代表什麼」 -->
+                        <p class="metric-interpret" id="metric-interpret" aria-live="polite"></p>
                     </div>
                     <div class="chart-wrapper" id="chart-wrapper">
                         <canvas id="illuminanceChart" role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），三條折線分別顯示遮擋場景照度、無遮擋基準，以及 IEC 60601 50% 標準線"></canvas>
@@ -1487,6 +1489,39 @@
                 if (sim && sim.scrollIntoView) sim.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
+    })();
+    </script>
+
+    <script>
+    // ── Phase 63：白話即時解讀 — 觀察中心照度數值，翻譯成「這代表什麼」 ──
+    // 以 MutationObserver 監看既有的 #center-illuminance-val（不改 simulation.js），
+    // 解讀文字依 IEC 50% 門檻分級，幫學生把數字連結到意義。
+    (function() {
+        var valEl = document.getElementById('center-illuminance-val');
+        var outEl = document.getElementById('metric-interpret');
+        if (!valEl || !outEl) return;
+
+        function interpret() {
+            var n = parseFloat((valEl.textContent || '').replace('%', ''));
+            if (isNaN(n)) { outEl.textContent = ''; outEl.className = 'metric-interpret'; return; }
+            var msg, level;
+            if (n >= 99.5) {
+                level = 'ok';   msg = '目前沒有有效遮擋，術野照度幾乎滿值——還沒形成需要稀釋的陰影。試著移動遮擋物或加大半徑。';
+            } else if (n >= 80) {
+                level = 'ok';   msg = '很亮（≥80%）：遮擋幾乎沒影響，多角度補光成功把本影稀釋掉了，術野依然明亮。';
+            } else if (n >= 50) {
+                level = 'warn'; msg = '仍合格（≥50%）：照度有下降但仍符合 IEC 60601 標準，醫師的眼睛還不會覺得暗。';
+            } else if (n >= 20) {
+                level = 'bad';  msg = '不合格（<50%）：低於 IEC 50% 下限，術野中心會出現明顯陰影、影響判斷。試試增加燈數或加大發散角來補光。';
+            } else {
+                level = 'bad';  msg = '嚴重不足（<20%）：本影幾乎沒被稀釋，接近「單一光源被擋住」的情況。';
+            }
+            outEl.textContent = '💬 ' + msg;
+            outEl.className = 'metric-interpret mi-' + level;
+        }
+
+        new MutationObserver(interpret).observe(valEl, { childList: true, characterData: true, subtree: true });
+        interpret();
     })();
     </script>
 </body>
