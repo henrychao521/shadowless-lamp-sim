@@ -153,6 +153,7 @@
         <tr><td>數值徽章直接輸入</td><td><span class="badge badge-green">✅ Phase 60</span></td><td>點擊參數標籤中的數值徽章即就地展開 number 輸入框，可一次跳到特定值（如燈高 137cm、LED 41 顆），補足 ± 按鈕只能逐格微調的不足。輸入後自動對齊 step 網格、夾在上下限內、Enter 套用／Esc 取消／失焦套用；沿用既有 input 事件流程（數值更新/URL hash/渲染），與拖曳一致。手機加大觸控目標。通用 JS 注入（badge id=val_&lt;sliderid&gt;），不改 7 段 HTML；index.css ?v=8→v9、SW 快取 v7→v8</td></tr>
         <tr><td>教學鷹架（學習目標／探究／自我檢核）</td><td><span class="badge badge-green">✅ Phase 61</span></td><td>把模擬器從「工程師儀表板」升級為「一堂課」：頁首下新增教學指引區——一句話原理（稀釋 vs 消滅陰影）、學習目標、🔬試試看（5 個先猜再看的引導探究任務，藍鈕直接套用對應預設場景並捲回模擬區）、✅自我檢核（4 題點開看解答）、108 課綱對應。純 &lt;details&gt; 原生無障礙、手機單欄堆疊、列印隱藏。另修 IES 廠商檔線上 404：加 onError 靜默降級（既有 if(iesTexture) 已保護，不影響模擬）。index.css ?v=9→v10、simulation3d.js ?v=5→v6、SW 快取 v8→v9</td></tr>
         <tr><td>個人站首頁卡文案更新</td><td><span class="badge badge-green">✅ 維運</span></td><td>henrychao521.github.io 首頁精選卡改為教學導向文案（拖曳即見陰影稀釋、2D/3D 雙視圖、IEC 對照、光路逆行與孔徑遮擋、課堂預設、手機可離線），修正原「智慧 PWM 補光演算法」不精確描述</td></tr>
+        <tr><td>名詞小幫手 + 設計取捨導讀</td><td><span class="badge badge-green">✅ Phase 62</span></td><td>降低專有名詞門檻：控制面板加「📖 名詞小幫手」詞彙卡（本影/半影/相對照度/發散角/遮擋物/IEC，國中語言、原生 &lt;details&gt; 無障礙、手機可點）；設計對照表上方加「這張表就是工程設計（取捨）」導讀，把參考表轉為學習時刻；optics-reciprocity.html 障礙物演示加「先猜再看」提示。另核實技術審查的 2D 分箱越界、IEC 顏色不一致皆為誤報，simulation.js 不動。index.css ?v=10→v11、SW v9→v10</td></tr>
       </tbody>
     </table>
   </section>
@@ -160,6 +161,18 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 62 — 名詞小幫手 + 設計取捨導讀（降低門檻、強化探究） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-30 · 續 30 分鐘教學品質迭代 · 詞彙無障礙 + 把參考表轉為學習時刻</div>
+      <ul>
+        <li><strong>📖 名詞小幫手</strong>：控制面板頂端加 &lt;details&gt; 詞彙卡，以國中語言解釋 本影／半影／相對照度／發散角・準直／遮擋物／IEC 60601-2-41，手機可點、原生無障礙。</li>
+        <li><strong>設計取捨導讀</strong>：在「兩種設計哲學對照表」上方加導讀句——「這張表就是工程設計本身，沒有誰絕對好、各有取捨」，引導學生以設計師視角思考。</li>
+        <li><strong>逆行頁試試看</strong>：optics-reciprocity.html 障礙物演示下加「先猜再看（缺口還是整體變暗？）」。</li>
+        <li><strong>核實誤報</strong>：技術審查指出的 2D 分箱越界（其實已有邊界保護）、IEC 數字顏色與徽章不一致（其實邏輯一致）皆為靜態分析誤報，simulation.js 不動，避免無謂改動。</li>
+        <li>index.css ?v=10→v11、SW v9→v10；index.html 與 optics-reciprocity.html 標籤平衡檢查通過。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 61 — 教學鷹架：把模擬器包成一堂課（學習目標／探究／自我檢核） <span class="badge badge-green">完成</span></h3>
