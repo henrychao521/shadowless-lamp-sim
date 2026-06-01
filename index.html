@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=9">
+    <link rel="stylesheet" href="index.css?v=10">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
     <link rel="preload" as="script" href="simulation.js?v=5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -67,6 +67,50 @@
             📄 <span class="demo-link-full">操作手冊</span><span class="demo-link-short">手冊</span>
         </a>
     </header>
+
+    <!-- Phase 61：教學鷹架 — 學習目標 / 引導探究 / 自我檢核 / 課綱對應，把模擬器包成一堂課 -->
+    <section class="learning-guide" aria-label="學習指引">
+        <div class="lg-hook">
+            <span class="lg-hook-icon" aria-hidden="true">💡</span>
+            <p><strong>一句話原理：</strong>只要有東西擋光，就一定有影子。無影燈靠「<strong>很多顆燈從不同角度同時補光</strong>」，把醫生頭、手造成的深暗<strong>本影</strong>打散成幾乎看不見的淡<strong>半影</strong>——只要術野中心還保有一半以上的亮度，眼睛就不覺得暗。它<em>稀釋</em>陰影，而不是<em>消滅</em>陰影。</p>
+        </div>
+        <div class="lg-panels">
+            <details class="lg-card" open>
+                <summary>📚 學習目標</summary>
+                <div class="lg-body">
+                    <p>完成本單元的操作後，你應該能夠：</p>
+                    <ol>
+                        <li>用自己的話解釋「無影燈不是<em>消滅</em>陰影，而是<em>稀釋</em>陰影」。</li>
+                        <li>說出哪些因素（燈的數量、發散角、遮擋物大小與位置、燈的高度）會讓陰影變淡或變深，並能從照度分佈圖判讀。</li>
+                        <li>連結到工程設計的<strong>取捨（trade-off）</strong>概念：理解為什麼沒有一種設計樣樣完美。</li>
+                    </ol>
+                </div>
+            </details>
+            <details class="lg-card">
+                <summary>🔬 試試看（先猜再看）</summary>
+                <div class="lg-body">
+                    <p class="lg-tip">每個任務都<strong>先預測、再操作驗證</strong>——這才是科學探究。下方藍色按鈕會直接幫你套用對應場景。</p>
+                    <ol class="lg-tasks">
+                        <li><strong>燈愈多就愈無影嗎？</strong>先套用 <button type="button" class="lg-preset" data-preset="preset-sparse">🔦 少燈對比</button>，記下中心照度 ____%；再套用 <button type="button" class="lg-preset" data-preset="preset-dense">💡 高效多燈</button>。<em>先猜</em>照度會升還是降，再看圖驗證。</li>
+                        <li><strong>遮擋物移到正中央最暗嗎？</strong>把「遮擋物水平位置」從 0 慢慢拖到 +30cm，觀察陰影曲線的最低點怎麼移動，想想為什麼偏移時某一側反而更暗。</li>
+                        <li><strong>發散角的兩難。</strong>把「發散角」從 1° 調到 15°：光斑變大還是變小？中心照度呢？討論看看，泛光（大角度）補影較強，<em>代價</em>是什麼。</li>
+                        <li><strong>把燈拉低。</strong>燈高從 100 降到 60cm，再套用 <button type="button" class="lg-preset" data-preset="preset-hard">⚠️ 嚴苛遮擋</button>，看中心照度會不會跌破 50% 的紅色基準線。</li>
+                        <li><strong>延伸任務（光路逆行）。</strong>開啟 <a href="optics-reciprocity.html">🔭 光路逆行演示</a>：先猜障礙物變寬時，交會處會出現「缺口」還是只是「整體變暗」？再拖動寬度滑桿驗證。</li>
+                    </ol>
+                </div>
+            </details>
+            <details class="lg-card">
+                <summary>✅ 自我檢核（點開看解答）</summary>
+                <div class="lg-body">
+                    <details class="lg-qa"><summary>Q1　無影燈能完全消除陰影嗎？</summary><p>不能。只要有遮擋就有影子；它是把最暗的本影「稀釋」成很淡的半影，不是消滅陰影。</p></details>
+                    <details class="lg-qa"><summary>Q2　為什麼 LED 要排在半球形的凹弧上，而不是排成平面？</summary><p>讓所有光束都指向同一個術野焦點，從四面八方交會；當某個方向被擋住，其他方向的光仍能補進來。</p></details>
+                    <details class="lg-qa"><summary>Q3　IEC 標準裡「殘餘照度需 ≥ 50%」是什麼意思？</summary><p>被頭部之類的物體遮擋後，術野中心仍要保有「沒有遮擋時」一半以上的亮度，醫師的眼睛才不會覺得變暗、影響判斷。</p></details>
+                    <details class="lg-qa"><summary>Q4　增大發散角能加強補影，缺點是什麼？</summary><p>光斑變大、能量被分散，中心照度與聚焦深度會下降——這正是工程設計裡的「取捨」。</p></details>
+                </div>
+            </details>
+        </div>
+        <p class="lg-curriculum"><strong>對應 108 課綱（生活科技）：</strong>本工具扣合「科技的本質」與「工程設計與問題解決」——以無影燈為例，體驗光學原理如何轉化為產品；並透過 <strong>LED 陣列式 vs. 多面反射式</strong>的設計對照，理解工程設計中<strong>沒有完美解、只有取捨</strong>的核心概念。適合作為「光與照明」或「設計與製作」單元的探究素材。</p>
+    </section>
 
     <main class="app-container">
         <!-- 手機版折疊按鈕（桌機隱藏） -->
@@ -420,7 +464,7 @@
             // ── 懶載入 3D 模組（首次切換至 3D tab 才下載 Three.js bundle）──
             if (viewName === '3d' && !window._sls3dLoading) {
                 window._sls3dLoading = true;
-                import('./simulation3d.js?v=5').catch(function(e) {
+                import('./simulation3d.js?v=6').catch(function(e) {
                     console.warn('[sls] 3D module load failed:', e);
                     window._sls3dLoading = false; // 允許重試
                 });
@@ -1413,6 +1457,20 @@
                 e.preventDefault();   // 阻止 label 將點擊轉發給滑桿
                 e.stopPropagation();
                 openEditor();
+            });
+        });
+    })();
+    </script>
+
+    <script>
+    // ── Phase 61：學習指引「試試看」按鈕 → 套用對應預設場景並捲動回模擬區 ──
+    (function() {
+        document.querySelectorAll('.lg-preset[data-preset]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var target = document.getElementById(btn.getAttribute('data-preset'));
+                if (target) target.click();   // 重用既有預設場景按鈕邏輯
+                var sim = document.querySelector('.visualization-area');
+                if (sim && sim.scrollIntoView) sim.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
     })();
