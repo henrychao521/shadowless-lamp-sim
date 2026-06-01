@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=10">
+    <link rel="stylesheet" href="index.css?v=11">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
     <link rel="preload" as="script" href="simulation.js?v=5">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -126,6 +126,19 @@
         <aside class="controls-panel" id="controls-panel-body" role="region" aria-label="模擬參數控制面板">
             <h2>模擬參數控制面板</h2>
             <p class="panel-desc">即時調整無影燈陣列與遮擋物參數，觀察本影與半影的光子分佈變化。</p>
+
+            <!-- Phase 62：名詞小幫手 — 降低專有名詞門檻（手機可點、原生無障礙）-->
+            <details class="glossary-card">
+                <summary>📖 名詞小幫手（看不懂時點我）</summary>
+                <dl class="glossary-list">
+                    <dt>本影（Umbra）</dt><dd>完全被擋住、最暗的核心陰影。</dd>
+                    <dt>半影（Penumbra）</dt><dd>只被擋掉一部分光、比較淡的陰影。無影燈就是把本影變成淡半影。</dd>
+                    <dt>相對照度（%）</dt><dd>跟「完全沒有遮擋」時相比，現在這個位置還剩多少亮度。100% = 跟沒擋一樣亮。</dd>
+                    <dt>發散角 / 準直</dt><dd>光束張開的角度。角度小＝細而集中的光柱（準直）；角度大＝散開的泛光。</dd>
+                    <dt>遮擋物</dt><dd>代表擋在燈與術野之間的東西，例如醫師的頭或手。</dd>
+                    <dt>IEC 60601-2-41</dt><dd>醫療電氣設備的國際安全標準，規定無影燈被遮擋後中心照度仍需 ≥ 50%。</dd>
+                </dl>
+            </details>
 
             <div class="control-group">
                 <label for="lamp_height">無影燈高度 (Y: <span id="val_lamp_height">100</span> cm)</label>
@@ -298,6 +311,7 @@
                     <div class="card-header">
                         <h3>兩種無影燈設計哲學對照 (LED 陣列式 vs. 多面反射式)</h3>
                     </div>
+                    <p class="design-compare-lead">💭 <strong>這張表就是「工程設計」本身</strong>：兩種設計沒有誰絕對比較好，各有取捨（trade-off）。閱讀時請想——如果你是設計師，會為了哪個目標（成本、亮度、無影效果、散熱、維修）犧牲哪個？</p>
                     <p class="design-compare-hint" aria-hidden="true">← 左右滑動檢視完整對照（首欄項目固定）→</p>
                     <div class="design-compare-scroll">
                         <table class="design-compare-table">
