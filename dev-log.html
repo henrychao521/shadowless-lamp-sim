@@ -155,6 +155,7 @@
         <tr><td>個人站首頁卡文案更新</td><td><span class="badge badge-green">✅ 維運</span></td><td>henrychao521.github.io 首頁精選卡改為教學導向文案（拖曳即見陰影稀釋、2D/3D 雙視圖、IEC 對照、光路逆行與孔徑遮擋、課堂預設、手機可離線），修正原「智慧 PWM 補光演算法」不精確描述</td></tr>
         <tr><td>名詞小幫手 + 設計取捨導讀</td><td><span class="badge badge-green">✅ Phase 62</span></td><td>降低專有名詞門檻：控制面板加「📖 名詞小幫手」詞彙卡（本影/半影/相對照度/發散角/遮擋物/IEC，國中語言、原生 &lt;details&gt; 無障礙、手機可點）；設計對照表上方加「這張表就是工程設計（取捨）」導讀，把參考表轉為學習時刻；optics-reciprocity.html 障礙物演示加「先猜再看」提示。另核實技術審查的 2D 分箱越界、IEC 顏色不一致皆為誤報，simulation.js 不動。index.css ?v=10→v11、SW v9→v10</td></tr>
         <tr><td>白話即時解讀</td><td><span class="badge badge-green">✅ Phase 63</span></td><td>把「中心殘餘照度」數字即時翻成白話意義：≥80% 很亮、≥50% 仍合格、&lt;50% 不合格會留影、&lt;20% 嚴重不足、≈100% 尚無有效遮擋；依 IEC 50% 門檻三色（青/琥珀/紅）對應。以 MutationObserver 監看既有 #center-illuminance-val（完全不改 simulation.js），數值一變即更新並用 aria-live 播報。DOM shim 7 級門檻測試全過、50% 邊界與 PASS 徽章一致。index.css ?v=11→v12、SW v10→v11</td></tr>
+        <tr><td>探究學習單 PDF</td><td><span class="badge badge-green">✅ Phase 67</span></td><td>新增可列印探究學習單（A4 三頁，Chrome headless 產 PDF，黑白印表機友善）：第 1–2 頁為學生任務——對應站上「🔬 試試看」五任務的「先猜→操作→記錄」書寫欄（含勾選預測、照度記錄格、開放問答線）+ 自我檢核 3 題；第 3 頁教師指引（108 課綱對應、各任務參考答案要點、常見迷思澄清、評量建議、課堂操作技巧），發放前可抽除。試試看卡尾新增「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔（Phase 56 教訓）；pdftoppm 三頁逐頁目視驗證。index.css ?v=13→v14、SW v15→v16</td></tr>
         <tr><td>2D 剖面說明 + 更新提示條</td><td><span class="badge badge-green">✅ Phase 66</span></td><td>① 預設場景一開即「IEC FAIL 37.5%」屬 2D 剖面幾何特性（所有 LED 壓同一切面、高估遮擋），於白話解讀下方加常駐說明，指引切到 3D 分頁看真實環形陣列效果，避免教學第一印象誤導；② SW 更新提示條：HTML 快取優先導致回訪者本次可能看到上一版，新 SW 接管（controllerchange）時彈出「✨ 已更新到新版本｜立即重新整理」吐司（首次安裝不提示、僅提示一次、safe-area 定位、列印隱藏）。toast 邏輯 shim 3/3（修正 Node 24 唯讀 navigator 的測試假象後重測）；index.css ?v=12→v13、SW v14→v15</td></tr>
         <tr><td>線上全面實測 + 檔名版本化（含診斷自我修正）</td><td><span class="badge badge-green">✅ Phase 65</span></td><td>首次以真實 Chrome 對線上版全功能實測：教學鷹架/名詞小幫手/白話解讀/±按鈕/就地輸入/一鍵套場景全部通過、無 console 錯誤、無重複 ID。期間誤判「CDN 供應陳舊 JS」（量測假象：fetch text().length 回傳 UTF-16 字元數 25611，實為正確檔案的字元數；位元組級 diff 證明線上=本機 27571B 完全一致），「徽章凍結」實為隱藏分頁的標準 rAF 節流（vis=hidden 時 Chrome 暫停 rAF，回前景即自動補算，無資料遺失）。改名 simulation.js→simulation-v6.js 與預快取 cache:'no-cache' 保留作為快取體質強化（版本以檔名承載，杜絕任何快取鍵歧義）；SW v14 安裝與預快取於線上驗證成功。教訓：fetch text().length≠位元組數；隱藏分頁 rAF 不跑——量測工具本身要先驗證</td></tr>
         <tr><td>PWA 離線修正 + 倉庫健檢</td><td><span class="badge badge-green">✅ Phase 64</span></td><td>換模型全新視角健檢，修三個真問題：① SW 預快取存「無版本碼 URL」但頁面請求帶 ?v=N → cache key 不同、預快取永遠不命中，改為預快取帶版本碼資產並加交叉檢查；② SW 原本跳過所有非同源請求 → 真離線時 Chart.js/Three.js 載不到，加入 jsdelivr runtime 快取（含 opaque 回應），「2D 離線可用」自此名副其實；③ 離線 fallback 原對任何請求回 index.html（腳本會收到 HTML），改僅限頁面導航。另清除 11 個過時 puppeteer 殘留檔（operate/test_*.js、step*.png、package*），重寫過時 README（移除 lux 誤述、補教學鷹架/逆行頁/PDF/PWA）。SW v11→v12</td></tr>
@@ -165,6 +166,17 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 67 — 探究學習單 PDF（教師教學包） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-06-12 · 自動 Loop · 教學品質佇列：把線上探究任務轉成可列印的課堂工具</div>
+      <p>線上的「🔬 試試看」適合自由探索，但課堂需要可繳交、可評量的紙本載體。新增 <code>學習單.pdf</code>（A4 三頁，黑白印表機友善）：</p>
+      <ul>
+        <li><strong>學生頁（1–2 頁）</strong>：五個任務完整對應站上試試看——每題「<strong>先猜</strong>（勾選預測）→ 操作 → <strong>記錄</strong>（照度 % 填空、觀察結果）→ 想一想（開放問答線）」；強調「預測錯了正是探究最有價值的時刻」；尾附自我檢核 3 題（含後設反思「哪個結果跟預測最不一樣」）。</li>
+        <li><strong>教師指引（第 3 頁，發放前可抽除）</strong>：108 課綱對應、各任務參考答案要點、常見迷思澄清（消滅 vs 稀釋、2D 高估遮擋非故障、多燈非必然好）、評量建議（重說理不重猜對）、課堂操作技巧（投影用自動掃描、手機用 ±鈕）。</li>
+        <li><strong>工程</strong>：來源 <code>學習單.html</code>（@page A4、STHeiti）保留供日後維護；Chrome headless 產 PDF（354KB）；<code>pdftoppm</code> 三頁逐頁轉 PNG 目視驗證（版面、CJK、書寫線皆正確）；試試看卡尾加「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔；確認不被 .gitignore 排除。index.css ?v=13→v14、SW v15→v16。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 66 — 2D 剖面限制說明 + SW 更新提示條 <span class="badge badge-green">完成</span></h3>
