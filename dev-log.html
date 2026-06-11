@@ -155,7 +155,7 @@
         <tr><td>個人站首頁卡文案更新</td><td><span class="badge badge-green">✅ 維運</span></td><td>henrychao521.github.io 首頁精選卡改為教學導向文案（拖曳即見陰影稀釋、2D/3D 雙視圖、IEC 對照、光路逆行與孔徑遮擋、課堂預設、手機可離線），修正原「智慧 PWM 補光演算法」不精確描述</td></tr>
         <tr><td>名詞小幫手 + 設計取捨導讀</td><td><span class="badge badge-green">✅ Phase 62</span></td><td>降低專有名詞門檻：控制面板加「📖 名詞小幫手」詞彙卡（本影/半影/相對照度/發散角/遮擋物/IEC，國中語言、原生 &lt;details&gt; 無障礙、手機可點）；設計對照表上方加「這張表就是工程設計（取捨）」導讀，把參考表轉為學習時刻；optics-reciprocity.html 障礙物演示加「先猜再看」提示。另核實技術審查的 2D 分箱越界、IEC 顏色不一致皆為誤報，simulation.js 不動。index.css ?v=10→v11、SW v9→v10</td></tr>
         <tr><td>白話即時解讀</td><td><span class="badge badge-green">✅ Phase 63</span></td><td>把「中心殘餘照度」數字即時翻成白話意義：≥80% 很亮、≥50% 仍合格、&lt;50% 不合格會留影、&lt;20% 嚴重不足、≈100% 尚無有效遮擋；依 IEC 50% 門檻三色（青/琥珀/紅）對應。以 MutationObserver 監看既有 #center-illuminance-val（完全不改 simulation.js），數值一變即更新並用 aria-live 播報。DOM shim 7 級門檻測試全過、50% 邊界與 PASS 徽章一致。index.css ?v=11→v12、SW v10→v11</td></tr>
-        <tr><td>線上陳舊 JS 根治（檔名版本化）</td><td><span class="badge badge-green">✅ Phase 65</span></td><td>線上 Chrome 實測抓到重大快取事故：使用者頁面執行的是 Phase 53 前的舊版 simulation.js（25611B），而 gh-pages/curl 取得的是正確新版（27571B）。回應標頭實證：SIN 邊緣節點回「新標頭（etag 對應 27571）＋舊內文」，且任意 query 一律 x-cache HIT——此 CDN 對該資產不把 query 納入快取鍵，?v=N 破壞快取在邊緣層從來無效。症狀：滑桿拖曳 hash 會動但數值徽章與模擬凍結。根治：版本改以檔名承載（git mv simulation.js simulation-v6.js），index.html/sw.js/deploy.yml 三處同步；SW 預快取一律 cache:'no-cache'；CACHE_NAME v12→v14</td></tr>
+        <tr><td>線上全面實測 + 檔名版本化（含診斷自我修正）</td><td><span class="badge badge-green">✅ Phase 65</span></td><td>首次以真實 Chrome 對線上版全功能實測：教學鷹架/名詞小幫手/白話解讀/±按鈕/就地輸入/一鍵套場景全部通過、無 console 錯誤、無重複 ID。期間誤判「CDN 供應陳舊 JS」（量測假象：fetch text().length 回傳 UTF-16 字元數 25611，實為正確檔案的字元數；位元組級 diff 證明線上=本機 27571B 完全一致），「徽章凍結」實為隱藏分頁的標準 rAF 節流（vis=hidden 時 Chrome 暫停 rAF，回前景即自動補算，無資料遺失）。改名 simulation.js→simulation-v6.js 與預快取 cache:'no-cache' 保留作為快取體質強化（版本以檔名承載，杜絕任何快取鍵歧義）；SW v14 安裝與預快取於線上驗證成功。教訓：fetch text().length≠位元組數；隱藏分頁 rAF 不跑——量測工具本身要先驗證</td></tr>
         <tr><td>PWA 離線修正 + 倉庫健檢</td><td><span class="badge badge-green">✅ Phase 64</span></td><td>換模型全新視角健檢，修三個真問題：① SW 預快取存「無版本碼 URL」但頁面請求帶 ?v=N → cache key 不同、預快取永遠不命中，改為預快取帶版本碼資產並加交叉檢查；② SW 原本跳過所有非同源請求 → 真離線時 Chart.js/Three.js 載不到，加入 jsdelivr runtime 快取（含 opaque 回應），「2D 離線可用」自此名副其實；③ 離線 fallback 原對任何請求回 index.html（腳本會收到 HTML），改僅限頁面導航。另清除 11 個過時 puppeteer 殘留檔（operate/test_*.js、step*.png、package*），重寫過時 README（移除 lux 誤述、補教學鷹架/逆行頁/PDF/PWA）。SW v11→v12</td></tr>
       </tbody>
     </table>
@@ -166,14 +166,14 @@
     <h2>🛠️ 開發階段紀錄</h2>
 
     <div class="phase-card">
-      <h3>Phase 65 — 線上陳舊 JS 根治：版本改以檔名承載 <span class="badge badge-green">完成</span></h3>
-      <div class="meta">2026-06-12 · 使用者問「頁面或模擬動畫都正確嗎？」· 線上 Chrome 實測揪出潛伏快取事故</div>
-      <p>首次以真實瀏覽器對線上版做完整功能實測（先前依約定僅 curl + DOM shim），發現<strong>使用者實際執行的 simulation.js 是 Phase 53 之前的舊版</strong>——滑桿拖曳時 URL hash 會更新，但數值徽章與模擬重算凍結。</p>
+      <h3>Phase 65 — 線上全面實測 + 檔名版本化（含一次誠實的診斷自我修正） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-06-12 · 使用者問「頁面或模擬動畫都正確嗎？」· 首次以真實 Chrome 對線上版全功能實測</div>
+      <p><strong>最終結論：頁面與模擬動畫完全正確</strong>——線上 JS 與 repo 位元組級一致（27571B）、渲染正常、所有互動（教學鷹架、名詞小幫手、白話解讀、± 微調、就地輸入、一鍵套場景）實測通過、無 console 錯誤。但過程中我先後做出兩個錯誤診斷，特此完整記錄：</p>
       <ul>
-        <li><strong>追查過程</strong>：徽章不更新 → 排除監聽器（hash 有動）→ 排除 rAF／JS 錯誤（探針攔截皆正常）→ 頁內 fetch 發現 JS 大小 25611B vs 本機 27571B → curl 與 gh-pages 皆為新版 → 鎖定瀏覽器所走的邊緣節點。</li>
-        <li><strong>實證</strong>：回應標頭 <code>etag W/"…-6bb3"</code>（0x6bb3=27571，新版）配 25611B 舊內文；隨機 query 也回 <code>x-cache: HIT</code>（cache-sin-wsat…-SIN）——<strong>query 不在此 CDN 的快取鍵內，?v=N 從來打不掉邊緣陳舊副本</strong>。</li>
-        <li><strong>根治</strong>：版本改以檔名承載——<code>git mv simulation.js simulation-v6.js</code>（路徑必在快取鍵內），index.html preload/script、sw.js 預快取、deploy.yml 硬編碼清單三處同步更名；SW 預快取一律 <code>cache:'no-cache'</code>；CACHE_NAME v12→v14。日後 simulation 內容變更時改檔名後綴，不再依賴 query。</li>
-        <li><strong>驗證</strong>：gh-pages 上 simulation-v6.js=27571B、HTML 引用 ×3、SW v14 皆確認；瀏覽器端待邊緣傳播後重測（拖曳 → 徽章/中心值/圖表即時更新）。</li>
+        <li><strong>誤判一「CDN 供應陳舊 JS」</strong>：頁內 <code>fetch().text().length</code> 回傳 25611、本機檔案 27571B，看似版本不符。實情：<code>text().length</code> 是 <strong>UTF-16 字元數</strong>而非位元組數，此檔含大量中文註解——25611 正是正確檔案的字元數（python 驗證吻合）；事後以 <code>diff</code> 做位元組級比對，線上＝本機完全一致。etag <code>…-6bb3</code>（0x6bb3=27571）從頭到尾都是對的。</li>
+        <li><strong>誤判二「徽章/模擬凍結」</strong>：派發 input 後 hash 會動但徽章與中心值不更新。實情：測試分頁在背景（<code>document.visibilityState === 'hidden'</code>），<strong>Chrome 對隱藏分頁暫停 requestAnimationFrame</strong>，而模擬重算正是 rAF 防抖驅動——回到前景時 rAF 以「當下滑桿值」補算，無資料遺失、自我修復。真實使用者（分頁可見）從未受影響；可見期間也實測到中心值即時更新（37.5%→66.7%）。</li>
+        <li><strong>保留的強化</strong>：改名 <code>simulation.js→simulation-v6.js</code>（版本以檔名承載，徹底消除任何快取鍵歧義）與 SW 預快取 <code>cache:'no-cache'</code> 雖起因於誤判，但屬正向的快取體質強化，予以保留；deploy.yml 三處清單同步更名，SW v14 於線上安裝與預快取驗證成功（caches=[sls-cache-v14]）。</li>
+        <li><strong>沉澱的教訓</strong>：① <code>text().length</code> ≠ 位元組數，含 CJK 的檔案必須用位元組級工具比對；② 隱藏分頁 rAF 不跑，自動化測試先檢查 <code>visibilityState</code>；③ 下診斷前先驗證量測工具本身。</li>
       </ul>
     </div>
 
