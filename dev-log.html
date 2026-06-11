@@ -155,6 +155,7 @@
         <tr><td>個人站首頁卡文案更新</td><td><span class="badge badge-green">✅ 維運</span></td><td>henrychao521.github.io 首頁精選卡改為教學導向文案（拖曳即見陰影稀釋、2D/3D 雙視圖、IEC 對照、光路逆行與孔徑遮擋、課堂預設、手機可離線），修正原「智慧 PWM 補光演算法」不精確描述</td></tr>
         <tr><td>名詞小幫手 + 設計取捨導讀</td><td><span class="badge badge-green">✅ Phase 62</span></td><td>降低專有名詞門檻：控制面板加「📖 名詞小幫手」詞彙卡（本影/半影/相對照度/發散角/遮擋物/IEC，國中語言、原生 &lt;details&gt; 無障礙、手機可點）；設計對照表上方加「這張表就是工程設計（取捨）」導讀，把參考表轉為學習時刻；optics-reciprocity.html 障礙物演示加「先猜再看」提示。另核實技術審查的 2D 分箱越界、IEC 顏色不一致皆為誤報，simulation.js 不動。index.css ?v=10→v11、SW v9→v10</td></tr>
         <tr><td>白話即時解讀</td><td><span class="badge badge-green">✅ Phase 63</span></td><td>把「中心殘餘照度」數字即時翻成白話意義：≥80% 很亮、≥50% 仍合格、&lt;50% 不合格會留影、&lt;20% 嚴重不足、≈100% 尚無有效遮擋；依 IEC 50% 門檻三色（青/琥珀/紅）對應。以 MutationObserver 監看既有 #center-illuminance-val（完全不改 simulation.js），數值一變即更新並用 aria-live 播報。DOM shim 7 級門檻測試全過、50% 邊界與 PASS 徽章一致。index.css ?v=11→v12、SW v10→v11</td></tr>
+        <tr><td>PWA 離線修正 + 倉庫健檢</td><td><span class="badge badge-green">✅ Phase 64</span></td><td>換模型全新視角健檢，修三個真問題：① SW 預快取存「無版本碼 URL」但頁面請求帶 ?v=N → cache key 不同、預快取永遠不命中，改為預快取帶版本碼資產並加交叉檢查；② SW 原本跳過所有非同源請求 → 真離線時 Chart.js/Three.js 載不到，加入 jsdelivr runtime 快取（含 opaque 回應），「2D 離線可用」自此名副其實；③ 離線 fallback 原對任何請求回 index.html（腳本會收到 HTML），改僅限頁面導航。另清除 11 個過時 puppeteer 殘留檔（operate/test_*.js、step*.png、package*），重寫過時 README（移除 lux 誤述、補教學鷹架/逆行頁/PDF/PWA）。SW v11→v12</td></tr>
       </tbody>
     </table>
   </section>
@@ -162,6 +163,20 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 64 — PWA 離線修正 + 倉庫健檢（換模型全新視角分析） <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-06-12 · 使用者切換模型後要求「分析專案並看看是否可優化」· 以數據盤點後修真問題</div>
+      <p>全新視角健檢（檔案大小、CDN 依賴、SW 快取鍵、殘留檔、README 正確性），發現並修正三個<strong>真問題</strong>：</p>
+      <ul>
+        <li><strong>SW 預快取永遠不命中</strong>：預快取存無版本碼的 <code>index.css</code>，但頁面實際請求 <code>index.css?v=12</code>——SW 快取以完整 URL（含 query）為 key，兩者不同 → 安裝當下預快取的核心資產從未被用到，首次安裝後立即離線會缺檔。改為預快取帶版本碼 URL，並寫程式交叉檢查 sw.js 清單與 index.html 引用完全一致（防回歸）。</li>
+        <li><strong>「離線可用」名不副實</strong>：SW 原本跳過所有非同源請求，Chart.js / Three.js 皆來自 jsdelivr → 真離線時 2D 圖表與 3D 都載不到，僅靠瀏覽器 HTTP 快取碰運氣。加入 jsdelivr 白名單 runtime 快取；Chart.js 經 <code>&lt;script&gt;</code> 載入屬 opaque 回應（status 0），<code>cacheable()</code> 同時接受 200 與 opaque。</li>
+        <li><strong>離線 fallback 誤餵 HTML</strong>：原本任何請求失敗都回 index.html——腳本/樣式收到 HTML 會解析錯誤。改僅 <code>request.mode === 'navigate'</code> 時回退，其餘回 <code>Response.error()</code>。</li>
+        <li><strong>倉庫清理</strong>：移除 11 個過時 puppeteer 殘留（operate.js、test_*.js ×6、step*.png ×4、package*.json）——已被「DOM shim + 線上 curl」驗證流程取代，git 歷史仍保留。</li>
+        <li><strong>README 重寫</strong>：原文還在教人跑 operate.js、說照度單位是 lux（實為 %）、完全沒提教學鷹架/逆行頁/PDF 手冊/PWA。全文重寫並加上 deploy.yml 硬編碼清單警告。</li>
+        <li><strong>驗證</strong>：本機 Homebrew node 突然壞掉（llhttp dylib 缺失，與本案無關），改用 nvm node v24.11.1——<code>node --check</code> 通過；預快取清單交叉檢查「一致」；迷你 SW shim 實跑 fetch 路由 4/4（同源攔截/CDN 攔截/外域放行/非 GET 放行）。SW v11→v12。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 63 — 白話即時解讀：把照度數字翻成「這代表什麼」 <span class="badge badge-green">完成</span></h3>
@@ -895,6 +910,20 @@
           先把整個專案由 <code>/Users/henry/ailocal</code> 安全移到 <code>/Volumes/128G/shadowless-lamp-sim</code>。128G 是 exFAT，搬遷觸發兩個 git 問題並修復：清掉 3568 個 macOS <code>._</code> 伴隨檔（解 <em>non-monotonic index</em>）、設 <code>core.fileMode=false</code>（exFAT 不保留執行位元，否則全檔誤判修改）。<code>git fsck</code> 無錯、遠端與 HEAD 不變。後續驗證改以 <code>curl</code> 對 GitHub Pages 線上版進行，不再起本機預覽。<br><br>
           接著做 Phase 59 手機優化：每個參數滑桿兩側加 <strong>−／＋ 微調按鈕</strong>，解決手指拖曳難對準精確值的痛點。單擊跳一格、長按 380ms 後每 60ms 連續調整、抵達上下限自動停；手機觸控目標 44px。以單一 JS 通用注入（包一層 flex 容器、不改 7 段 HTML），按鈕僅派發 <code>input</code> 事件，完全沿用既有數值更新 / 閃光 / URL hash / 觸覺 / rAF 渲染流程，與手動拖曳零差異。<br><br>
           <code>node --check</code> 語法通過；index.css ?v=7→v8、SW v6→v7。部署後對線上版驗證資產更新與按鈕注入。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">換個模型，你幫我分析一下這個專案，並且看看是否可以幫我優化？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Fable 5 — Phase 64 全新視角健檢：PWA 離線修正 + 倉庫清理）</div>
+        <div class="content">
+          以新模型全新視角做數據化健檢（檔案大小、inline script 數、CDN 依賴、SW 快取鍵、git 追蹤清單、README 正確性），找出三個<strong>真問題</strong>並當場修正：<br><br>
+          ① <strong>SW 預快取永遠不命中</strong>——預快取存無版本碼 URL，頁面卻請求 <code>?v=N</code>，cache key 不同，等於白快取；改為帶版本碼預快取並加「sw.js ↔ index.html 版本碼交叉檢查」防回歸。② <strong>離線名不副實</strong>——SW 跳過所有非同源請求，Chart.js/Three.js 都在 jsdelivr，真離線必掛；加入 CDN runtime 快取（接受 opaque 回應）。③ <strong>離線 fallback 誤餵 HTML 給腳本請求</strong>——改僅導航請求回退 index.html。<br><br>
+          另外清除 11 個過時 puppeteer 殘留檔、重寫過時 README（lux→%、補教學鷹架/逆行頁/PDF/PWA、加 deploy.yml 硬編碼警告）。期間本機 Homebrew node 損壞（llhttp dylib，與專案無關），改用 nvm node v24.11.1 完成驗證：語法通過、預快取交叉檢查一致、迷你 SW shim 實跑 fetch 路由 4/4。SW v11→v12。
         </div>
       </div>
 

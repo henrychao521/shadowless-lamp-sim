@@ -1,131 +1,81 @@
 # Shadowless Lamp Optical Simulator
-## 外科手術無影燈光學設計與陰影稀釋模擬器
+## 外科手術無影燈光學模擬器（互動教學平台）
 
-純前端 Web 互動模擬，演示 **多 LED 光源 + 準直透鏡** 如何透過幾何重疊
-稀釋本影（umbra），形成現代手術用無影燈的核心光學原理。
+純前端互動教具：拖曳燈具與遮擋物，即時看見多顆 LED 如何「**稀釋**」陰影、達成無影。
+為國中／高中生活科技與光學單元設計，包含完整教學鷹架（學習目標 → 引導探究 → 即時白話回饋 → 自我檢核 → 108 課綱對應）。
 
-> ⚠️ **教學 / 研究用途**，非醫療器械軟體。對應標準 IEC 60601-2-41 僅做設計參考。
+**🔗 線上使用**：https://henrychao521.github.io/shadowless-lamp-sim/
 
----
-
-## 兩個視圖
-
-### 1. 2D 幾何剖面分析（`simulation.js`）
-
-Canvas 2D + Chart.js — 觀察「光線追跡」與「水平照度分布曲線」即時變化：
-
-- 燈頭高度 / 障礙物位置與半徑 / LED 數量 / 光束張角 — 都可拉桿即時調整
-- 顯示中心照度（lux）數值與曲線
-
-### 2. 3D 空間模擬與熱圖（`simulation3d.js`）
-
-Three.js + IESSpotLight + UnrealBloom + SSAO — 真實感渲染：
-
-- 多顆 IES 真實光錐疊加投射到手術平面
-- Realistic Mode：開啟全域光暈 + 環境光遮蔽
-- Smart Compensation：偵測遮擋時自動加亮其他 LED
-- 障礙物移動可拖曳，即時看到本影/半影變化
+> ⚠️ **教學／研究用途**，非醫療器械軟體。IEC 60601-2-41 僅作設計參考對照。
 
 ---
 
-## 系統需求
+## 功能總覽
 
-- 任意現代瀏覽器（Chrome / Safari / Firefox）
-- 任意靜態 HTTP server（不用後端）
-- Node.js 18+（**僅自動測試**用到 puppeteer）
+### 主模擬器（`index.html`）
+- **2D 幾何剖面分析**（`simulation.js`）：Canvas 即時光線追跡 + Chart.js 相對照度分佈曲線（%），含 IEC 50% 基準線與 PASS/FAIL 徽章
+- **3D 空間模擬與熱圖**（`simulation3d.js`，懶載入）：Three.js 多光錐疊加、Realistic Mode（Bloom/SSAO）、Smart Compensation 補光演示
+- **雙設計哲學對照**：LED 陣列式（Trumpf iLED 型）↔ 多面反射式（DomeLux 型），含工程取捨導讀
+- **7 條參數滑桿**：燈高、遮擋物 X/Y/Z/半徑、LED 數量、發散角——支援 ± 微調按鈕（長按連續）與點擊數值直接輸入
+
+### 教學鷹架（Phase 61–63）
+- 📚 **學習目標**：3 條可評量目標（解釋稀釋原理、判讀影響因素、連結工程取捨）
+- 🔬 **試試看**：5 個「先猜再看」引導探究任務，一鍵套用對應預設場景
+- ✅ **自我檢核**：4 題點開看解答
+- 📖 **名詞小幫手**：本影／半影／相對照度／發散角等國中語言詞彙卡
+- 💬 **白話即時解讀**：中心照度數字即時翻譯成意義（三色分級對應 IEC 門檻）
+
+### 延伸頁面
+- 🔭 **光路逆行互動演示**（`optics-reciprocity.html`）：同一塊拋物面凹鏡，反過來用就從望遠鏡變成探照燈／無影燈；含障礙物孔徑遮擋演示（擋住部分光路，交會處仍不留影）
+- 📄 **操作手冊**（`操作介紹.pdf`）：A4 繁中 4 頁，含全參數表與快捷鍵
+- 🛠 **開發紀錄**（`dev-log.html`）：60+ 階段開發歷程與對話逐字稿
+
+### 工程特性
+- **PWA 可安裝、真離線可用**：Service Worker 預快取核心資產（含版本碼比對）+ jsdelivr CDN（Chart.js/Three.js）runtime 快取
+- 手機優化：44px 觸控目標、浮動指標條、手勢換頁、Safe Area、面板遮罩
+- 無障礙：WAI-ARIA tablist、鍵盤快捷鍵、aria-live 播報、skip link、減動效支援
+- URL hash 場景分享：教師可把調好的場景一鍵複製連結給學生
+
+---
 
 ## 快速開始
 
 ```bash
-# 不用 npm install — 主程式所有依賴都 CDN
+# 無建置流程、無後端——所有依賴皆 CDN
 python3 -m http.server 8080
-# 或
-npx serve .
-
-# 開瀏覽器：
 open http://localhost:8080
 ```
 
-## 自動截圖測試（puppeteer）
+> 注意：Service Worker 的快取路徑以 GitHub Pages 的 `/shadowless-lamp-sim/` 為根，
+> 本機預覽時 SW 不會生效（不影響模擬功能）。
 
-如果想跑 puppeteer 自動產生步驟截圖：
+## 部署
 
-```bash
-npm install              # 裝 puppeteer
-# 確認 server 已啟動（port 8080）
-node operate.js          # 跑 4 個步驟、產生 step1~4.png
-```
+push 到 `main` → GitHub Actions（`.github/workflows/deploy.yml`）自動部署到 `gh-pages`。
 
-腳本檔：
-- `operate.js` — 完整 4 步驟（realistic → smart compensation → 移動障礙 → 改光束張角）
-- `test_realistic.js` / `test_screen*.js` — 個別功能截圖
-- `test_console.js` / `test_error.js` — debug 用
-
----
+> ⚠️ `deploy.yml` 採**硬編碼檔案清單**：新增要上線的檔案時，必須同時加進
+> 三處（cp 至暫存、cp 至 gh-pages、git add），否則 workflow 綠燈但線上 404。
 
 ## 程式檔結構
 
 ```
 shadowless-lamp-sim/
-├── index.html          # 主 UI（含完整研究文獻 collapsible section）
+├── index.html               # 主 UI + 教學鷹架 + 理論報告（collapsible）
 ├── index.css
-├── simulation.js       # 2D 光線追跡 + Chart.js 照度曲線
-├── simulation3d.js     # 3D Three.js 光錐疊加 + 後處理
-├── operate.js          # Puppeteer 自動測試流程
-├── test_*.js           # 個別自動截圖測試
-├── step1_realistic.png # 設計步驟示意（自動產生）
-├── step2_smart_comp.png
-├── step3_obstacle_move.png
-├── step4_beam_spread.png
-├── surgery_light.txt   # 完整研究筆記（光學原理 + 標準規範）
-└── package.json        # 僅 puppeteer dep
+├── simulation.js            # 2D 光線追跡 + Chart.js 照度曲線
+├── simulation3d.js          # 3D Three.js 光錐疊加 + 後處理（懶載入）
+├── optics-reciprocity.html  # 光路逆行互動演示（獨立頁）
+├── sw.js                    # Service Worker（PWA 離線）
+├── manifest.json / icon.svg # PWA
+├── 操作介紹.html / .pdf      # 操作手冊（Chrome headless 產 PDF）
+├── dev-log.html             # 開發紀錄 × 對話逐字稿
+├── 對話完整紀錄.md           # 完整逐字稿備份（不部署）
+└── surgery_light.txt        # 研究筆記（光學原理 + 標準規範）
 ```
 
----
+## 教學素材
 
-## 教學素材：surgery_light.txt
-
-含完整的「外科手術無影燈之光學與機械設計原理、國際標準規範及計算機模擬技術報告」，
-涵蓋：
-
-- 機械結構與流體力學設計（多軸懸吊、無菌層流相容）
-- 光學設計核心原理（矩陣式多點光源 vs 反射式多焦疊加）
-- IES 光度檔與 IEC 60601-2-41 / IES LM-79 標準
-- ZEMAX / LightTools 光學模擬流程
-- Ag-Cu-Al TFMG 反射鍍膜技術
-
-可作為大學部光學 / 醫工選修課的補充教材。
-
----
-
-## 已知限制
-
-- 2D 視圖採二維幾何近似，未計入透鏡 Fresnel 損耗 / 漫射
-- 3D Realistic Mode 用 Bloom + SSAO 模擬視覺感受，**不是物理精確光學模擬**
-- 無 GPU 也能跑（pure CPU canvas + WebGL），但移動裝置可能掉幀
-
----
-
-## 排除（`.gitignore`）
-
-- `node_modules/`
-- `*.pdf` — 廠商技術手冊（版權）
-- `*.ies` — 廠商提供的 IES 光度資料檔
-- `debug_screenshot_*.png` — 自動測試產生，每次跑會重產
-
-> 如果你要自己玩，準備自己的 IES 檔（如 LDP / LTD 系列）放專案根目錄，
-> simulation3d.js 內 `IESLoader` 會自動載入。
-
----
-
-## 設計參考
-
-- IEC 60601-2-41 — 醫療電氣設備：手術燈與診斷燈
-- IES LM-79 — Light Source Measurement 標準
-- Three.js IESSpotLight 範例：https://threejs.org/examples/?q=ies
-
----
-
-## License
-
-教學 / 研究用私人專案，目前未授權對外使用。
+`index.html` 內建完整理論報告（點擊展開）：機械結構與流體力學設計、光學設計核心原理
+（矩陣式多點光源 vs 反射式多焦疊加）、IES 光度檔與 IEC 60601-2-41 標準、顯色生理學與
+熱控、智慧自適應補償技術，並附引用文獻連結。適合國高中生活科技課堂，亦可作為大學部
+光學／醫工選修的補充教材。
