@@ -3,9 +3,11 @@
 
 // 每次更新靜態資產內容時遞增版本號，activate 會刪除舊快取、強制重新預快取，
 // 確保使用者下次造訪即取得最新版本
-// （Phase 65：simulation.js ?v=5→v6 — 線上實測發現使用者瀏覽器跑的是釘死在快取層的
-//   Phase 53 前舊版（25611B vs 27571B），URL 未變導致永不失效；一併改預快取 no-cache）
-const CACHE_NAME = 'sls-cache-v13';
+// （Phase 65：線上實測發現 GitHub Pages 新加坡邊緣節點對 simulation.js 回應
+//   「新標頭＋舊內文」且不把 query 納入快取鍵 → ?v=N 永遠打不掉陳舊副本。
+//   改以「檔名」承載版本（simulation-v6.js），路徑必在 CDN 快取鍵內，保證取新。
+//   另：預快取一律 cache:'no-cache' 強制重新驗證。）
+const CACHE_NAME = 'sls-cache-v14';
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 // ⚠️ 帶版本碼的資產必須與 index.html 的引用完全一致（Phase 64 修正）：
@@ -16,7 +18,7 @@ const LOCAL_ASSETS = [
     '/shadowless-lamp-sim/',
     '/shadowless-lamp-sim/index.html',
     '/shadowless-lamp-sim/index.css?v=12',
-    '/shadowless-lamp-sim/simulation.js?v=6',
+    '/shadowless-lamp-sim/simulation-v6.js',
     '/shadowless-lamp-sim/simulation3d.js?v=6',
     '/shadowless-lamp-sim/optics-reciprocity.html',
     '/shadowless-lamp-sim/icon.svg',
