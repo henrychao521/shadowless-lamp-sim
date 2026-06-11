@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>無影燈光學模擬器 — 探究學習單</title>
+<style>
+    /* A4 列印版型（黑白印表機友善：白底深字、淺灰框線） */
+    @page { size: A4; margin: 14mm 15mm 16mm 15mm; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: "STHeiti", "Heiti TC", "PingFang TC", "Noto Sans TC", sans-serif;
+        font-size: 11pt; line-height: 1.65; color: #1a1a1a;
+    }
+    .page { page-break-after: always; }
+    .page:last-child { page-break-after: auto; }
+
+    header.sheet { border-bottom: 2.5pt solid #1a1a1a; padding-bottom: 6pt; margin-bottom: 10pt; }
+    header.sheet h1 { font-size: 16pt; letter-spacing: 1pt; }
+    header.sheet .sub { font-size: 9.5pt; color: #444; margin-top: 2pt; }
+    .id-row { display: flex; gap: 14pt; margin-top: 6pt; font-size: 10.5pt; }
+    .id-row span { border-bottom: 1pt solid #888; min-width: 70pt; display: inline-block; }
+
+    .url-box {
+        background: #f2f2f2; border: 1pt solid #bbb; border-radius: 4pt;
+        padding: 5pt 8pt; font-size: 10pt; margin: 8pt 0 10pt;
+    }
+    .url-box b { letter-spacing: 0.3pt; }
+
+    .task {
+        border: 1.2pt solid #555; border-radius: 5pt;
+        padding: 8pt 10pt; margin-bottom: 9pt;
+        page-break-inside: avoid;
+    }
+    .task h2 {
+        font-size: 12pt; margin-bottom: 4pt;
+        display: flex; align-items: baseline; gap: 6pt;
+    }
+    .task h2 .no {
+        background: #1a1a1a; color: #fff; border-radius: 3pt;
+        font-size: 9.5pt; padding: 1pt 6pt; flex: 0 0 auto;
+    }
+    .steps { font-size: 10.5pt; }
+    .steps li { margin: 2.5pt 0 2.5pt 18pt; }
+    .blank { border-bottom: 1pt solid #888; display: inline-block; min-width: 60pt; height: 12pt; vertical-align: bottom; }
+    .blank.w { min-width: 150pt; }
+    .lines { margin-top: 4pt; }
+    .lines div { border-bottom: 0.8pt solid #999; height: 17pt; }
+    .predict { background: #f7f7f7; border-left: 3pt solid #555; padding: 4pt 8pt; margin: 4pt 0; font-size: 10.5pt; }
+    .predict b { letter-spacing: 0.5pt; }
+    .check-opts { margin-left: 4pt; }
+    .check-opts label { margin-right: 16pt; }
+    .box { font-family: "Zapf Dingbats", sans-serif; }
+
+    .qa { margin-bottom: 8pt; page-break-inside: avoid; }
+    .qa p.q { font-weight: 700; font-size: 11pt; margin-bottom: 2pt; }
+
+    .teacher h2 { font-size: 13pt; border-left: 4pt solid #1a1a1a; padding-left: 7pt; margin: 10pt 0 5pt; }
+    .teacher p, .teacher li { font-size: 10.5pt; }
+    .teacher ul, .teacher ol { margin-left: 20pt; }
+    .note { background: #f2f2f2; border-radius: 4pt; padding: 6pt 9pt; margin-top: 5pt; font-size: 10pt; }
+
+    footer.sheet { margin-top: 8pt; font-size: 8.5pt; color: #666; text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- ════════ 第 1 頁：任務一～三 ════════ -->
+<div class="page">
+    <header class="sheet">
+        <h1>外科手術無影燈光學模擬器 — 探究學習單</h1>
+        <div class="sub">生活科技．光與照明／工程設計與問題解決　｜　搭配線上互動模擬器使用</div>
+        <div class="id-row">班級：<span></span>　座號：<span></span>　姓名：<span></span>　日期：<span></span></div>
+    </header>
+
+    <div class="url-box">🔗 模擬器網址：<b>https://henrychao521.github.io/shadowless-lamp-sim/</b>（手機、平板、電腦皆可使用）</div>
+
+    <p style="font-size:10.5pt; margin-bottom:8pt;">📌 <b>使用方法</b>：每個任務都「<b>先寫下你的預測，再動手操作驗證</b>」。預測錯了完全沒關係——發現「跟我想的不一樣」正是科學探究最有價值的時刻！</p>
+
+    <div class="task">
+        <h2><span class="no">任務 1</span>燈愈多就愈無影嗎？</h2>
+        <ol class="steps">
+            <li>點開站上「🔬 試試看」卡，按「🔦 少燈對比」，記下中心照度：<span class="blank"></span> %</li>
+            <li class="predict"><b>先猜：</b>改按「💡 高效多燈」後，中心照度會
+                <span class="check-opts"><label>□ 上升</label><label>□ 下降</label><label>□ 不變</label></span></li>
+            <li>按「💡 高效多燈」驗證，記下中心照度：<span class="blank"></span> %　→　我的預測 <label>□ 正確</label><label>□ 不正確</label></li>
+            <li>想一想：為什麼「很多顆燈」能讓陰影變淡？用「角度」這個詞寫出你的解釋：
+                <div class="lines"><div></div><div></div></div></li>
+        </ol>
+    </div>
+
+    <div class="task">
+        <h2><span class="no">任務 2</span>遮擋物移到正中央最暗？</h2>
+        <ol class="steps">
+            <li class="predict"><b>先猜：</b>把「遮擋物水平位置」從 0 慢慢拖到 +30cm，照度曲線的「最低點」會
+                <span class="check-opts"><label>□ 留在中央</label><label>□ 跟著遮擋物移動</label><label>□ 往反方向移動</label></span></li>
+            <li>動手拖動滑桿驗證（可用滑桿旁的 −／＋ 鈕微調），觀察到曲線最低點：<span class="blank w"></span></li>
+            <li>遮擋物偏到一側時，哪一側的工作面反而變暗？為什麼？
+                <div class="lines"><div></div><div></div></div></li>
+        </ol>
+    </div>
+
+    <div class="task">
+        <h2><span class="no">任務 3</span>發散角的兩難（工程取捨）</h2>
+        <ol class="steps">
+            <li>把「透鏡準直發散角」調到 <b>1°</b>，記錄：光斑大小感覺 <span class="blank"></span>、中心照度 <span class="blank"></span> %</li>
+            <li>再調到 <b>15°</b>，記錄：光斑大小感覺 <span class="blank"></span>、中心照度 <span class="blank"></span> %</li>
+            <li>大發散角（泛光）補陰影比較強，但它付出的「代價」是什麼？
+                <div class="lines"><div></div><div></div></div></li>
+        </ol>
+    </div>
+
+    <footer class="sheet">無影燈光學模擬器探究學習單　第 1 頁／共 3 頁</footer>
+</div>
+
+<!-- ════════ 第 2 頁：任務四～五 + 自我檢核 ════════ -->
+<div class="page">
+    <div class="task">
+        <h2><span class="no">任務 4</span>把燈拉低，還合格嗎？</h2>
+        <ol class="steps">
+            <li>先按「⚠️ 嚴苛遮擋」，再把「無影燈高度」從 100cm 慢慢降到 60cm。</li>
+            <li class="predict"><b>先猜：</b>中心照度會跌破 IEC 標準的 50% 紅線嗎？<span class="check-opts"><label>□ 會</label><label>□ 不會</label></span></li>
+            <li>實測結果：燈高 60cm 時中心照度 <span class="blank"></span> %，IEC 徽章顯示 <label>□ PASS</label><label>□ FAIL</label></li>
+            <li>如果你是手術室的工程師，燈不能再升高的情況下，你會調整哪個參數來補救？為什麼？
+                <div class="lines"><div></div><div></div></div></li>
+        </ol>
+    </div>
+
+    <div class="task">
+        <h2><span class="no">任務 5</span>延伸挑戰：光路逆行（望遠鏡 ⇌ 無影燈）</h2>
+        <ol class="steps">
+            <li>點站上右上角「🔭 光路逆行演示」，打開「🚧 障礙物演示」。</li>
+            <li class="predict"><b>先猜：</b>障礙物變寬時，光線交會處（成像點／術野）會
+                <span class="check-opts"><label>□ 出現缺口（影子）</label><label>□ 只是整體變暗</label></span></li>
+            <li>拖動「障礙物寬度」驗證，觀察結果：<span class="blank w"></span></li>
+            <li>牛頓式望遠鏡的斜鏡明明擋在主鏡前，為什麼看星星不會缺一塊？這跟無影燈是同一個原理嗎？
+                <div class="lines"><div></div><div></div></div></li>
+        </ol>
+    </div>
+
+    <div class="task">
+        <h2><span class="no">總結</span>自我檢核（不看網站，用自己的話寫）</h2>
+        <div class="qa" style="margin-top:4pt;">
+            <p class="q">Q1　無影燈能「完全消除」陰影嗎？它真正做的事情是什麼？</p>
+            <div class="lines"><div></div><div></div></div>
+        </div>
+        <div class="qa">
+            <p class="q">Q2　為什麼 LED 要排在「凹弧面」上，而不是排成平面？</p>
+            <div class="lines"><div></div><div></div></div>
+        </div>
+        <div class="qa">
+            <p class="q">Q3　這次探究中，哪一個結果跟你原本的預測最不一樣？你學到了什麼？</p>
+            <div class="lines"><div></div><div></div></div>
+        </div>
+    </div>
+
+    <footer class="sheet">無影燈光學模擬器探究學習單　第 2 頁／共 3 頁</footer>
+</div>
+
+<!-- ════════ 第 3 頁：教師指引 ════════ -->
+<div class="page teacher">
+    <header class="sheet">
+        <h1>教師指引（本頁發放前可抽除）</h1>
+        <div class="sub">課綱對應．參考答案要點．常見迷思．評量建議</div>
+    </header>
+
+    <h2>課綱對應（108 課綱・生活科技）</h2>
+    <p>扣合「<b>科技的本質</b>」與「<b>工程設計與問題解決</b>」：以無影燈為例體驗光學原理如何轉化為產品，並透過參數調整理解工程設計中「沒有完美解、只有取捨」。適用「光與照明」「設計與製作」單元，建議 1 節課（含討論）。</p>
+
+    <h2>各任務參考答案要點</h2>
+    <ol>
+        <li><b>任務 1</b>：多燈照度上升。關鍵語：「不同<b>角度</b>」——每顆燈從不同方向照向術野，某方向被擋住時其他方向補上，本影被稀釋成淡半影。</li>
+        <li><b>任務 2</b>：最低點跟著遮擋物移動（且偏移時遮擋物正下方偏外側更暗——該處能「繞過」遮擋物的燈更少）。</li>
+        <li><b>任務 3</b>：大發散角光斑大、補影強，代價是能量分散、中心照度與聚焦深度下降——典型 trade-off。</li>
+        <li><b>任務 4</b>：嚴苛遮擋＋低燈高通常跌破 50%（FAIL）。補救方向：增加 LED 數量或加大發散角（各有代價，鼓勵說理由，不設標準答案）。</li>
+        <li><b>任務 5</b>：只會整體變暗、不出現缺口——交會處每一點都由整片鏡面各方向供光（孔徑遮擋原理）。與牛頓式斜鏡擋在主鏡前仍見完整星空為同一原理。</li>
+    </ol>
+
+    <h2>常見迷思與澄清</h2>
+    <ul>
+        <li>「無影燈把影子<b>消滅</b>了」→ 應為「<b>稀釋</b>」：只要有遮擋就有影子，多光源把深暗本影打散成幾乎看不見的半影。</li>
+        <li>「模擬器預設場景顯示 IEC FAIL，是不是壞了？」→ 2D 剖面把所有 LED 壓在同一切面、會<b>高估遮擋</b>；真實 3D 環形陣列側向燈可繞過（站上有說明，可引導切到 3D 分頁對照）。</li>
+        <li>「燈愈多一定愈好」→ 引導從成本、散熱、維修（站上「設計哲學對照表」）反思。</li>
+    </ul>
+
+    <h2>評量建議</h2>
+    <ul>
+        <li>形成性：任務 1–5 的「預測 vs 實測」對照（重視說理，不以猜對為分數）。</li>
+        <li>總結性：自我檢核 Q1–Q2 答出「稀釋、不同角度交會補光」核心概念即達標；Q3 反思品質可作加分。</li>
+        <li>延伸：請學生用站上「複製連結」功能保存一組自己設計的「最差場景」與「補救後場景」連結，附在作業中。</li>
+    </ul>
+
+    <div class="note">💡 課堂操作建議：教師機投影用「🎬 自動掃描演示」鈕吸引注意；學生分組用手機操作（滑桿旁 −／＋ 鈕與點數值直接輸入適合小螢幕精準調整）。全站支援離線（PWA），網路不穩的教室可預先安裝。</div>
+
+    <footer class="sheet">無影燈光學模擬器探究學習單　第 3 頁／共 3 頁（教師指引）</footer>
+</div>
+
+</body>
+</html>
