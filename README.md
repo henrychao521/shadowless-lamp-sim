@@ -62,7 +62,7 @@ push 到 `main` → GitHub Actions（`.github/workflows/deploy.yml`）自動部�
 shadowless-lamp-sim/
 ├── index.html               # 主 UI + 教學鷹架 + 理論報告（collapsible）
 ├── index.css
-├── simulation.js            # 2D 光線追跡 + Chart.js 照度曲線
+├── simulation-v6.js         # 2D 光線追跡 + Chart.js 照度曲線（版本以檔名承載）
 ├── simulation3d.js          # 3D Three.js 光錐疊加 + 後處理（懶載入）
 ├── optics-reciprocity.html  # 光路逆行互動演示（獨立頁）
 ├── sw.js                    # Service Worker（PWA 離線）
