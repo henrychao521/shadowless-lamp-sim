@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=12">
+    <link rel="stylesheet" href="index.css?v=13">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
     <!-- 版本改以「檔名」承載（simulation-v6.js）：GitHub Pages CDN 對部分資產不把
          query 納入快取鍵，?v=N 破壞快取在邊緣節點無效（Phase 65 教訓）-->
@@ -302,6 +302,8 @@
                         </div>
                         <!-- Phase 63：白話即時解讀 — 把中心照度數字翻成「這代表什麼」 -->
                         <p class="metric-interpret" id="metric-interpret" aria-live="polite"></p>
+                        <!-- Phase 66：2D 剖面限制說明 — 預設場景顯示 FAIL 是剖面幾何的特性，避免誤解 -->
+                        <p class="iec-2d-note">ℹ️ 注意：2D 剖面把所有 LED 壓在<strong>同一個切面</strong>上，會<strong>高估遮擋</strong>。真實無影燈是 3D 環形陣列，側向燈光可從遮擋物旁繞過，較容易通過 IEC 50%——切到「<strong>3D 空間模擬與熱圖</strong>」分頁可看到完整配置的效果。</p>
                     </div>
                     <div class="chart-wrapper" id="chart-wrapper">
                         <canvas id="illuminanceChart" role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），三條折線分別顯示遮擋場景照度、無遮擋基準，以及 IEC 60601 50% 標準線"></canvas>
@@ -546,6 +548,31 @@
                 console.info('[sls] Service Worker not available:', e.message);
             });
         });
+
+        // ── Phase 66：新版本更新提示（消除回訪者「看到舊版」的困惑）──
+        // HTML 採快取優先（stale-while-revalidate），回訪者本次載入的可能是上一版；
+        // 新 SW skipWaiting+claim 啟用時會觸發 controllerchange——此時提示使用者一鍵重整。
+        // 首次安裝（頁面原本不受控）不提示。
+        (function() {
+            var wasControlled = !!navigator.serviceWorker.controller;
+            var shown = false;
+            navigator.serviceWorker.addEventListener('controllerchange', function() {
+                if (!wasControlled || shown) return;
+                shown = true;
+                var bar = document.createElement('div');
+                bar.className = 'sw-update-toast';
+                bar.setAttribute('role', 'status');
+                var msg = document.createElement('span');
+                msg.textContent = '✨ 模擬器已更新到新版本';
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = '立即重新整理';
+                btn.addEventListener('click', function() { location.reload(); });
+                bar.appendChild(msg);
+                bar.appendChild(btn);
+                document.body.appendChild(bar);
+            });
+        })();
     }
     </script>
     <script>

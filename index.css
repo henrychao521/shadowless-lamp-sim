@@ -526,6 +526,31 @@ input[type="range"]::-moz-range-thumb:active {
 .metric-interpret.mi-warn { border-left-color: var(--accent-amber); background: rgba(245,158,11,0.1); }
 .metric-interpret.mi-bad  { border-left-color: var(--accent-red);   background: rgba(239,68,68,0.1); }
 
+/* ── Phase 66：2D 剖面限制說明 + SW 更新提示條 ── */
+.iec-2d-note {
+    width: 100%; margin-top: 0.4rem;
+    font-size: 0.78rem; line-height: 1.6; color: var(--text-muted);
+}
+.iec-2d-note strong { color: var(--text-secondary); }
+.sw-update-toast {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    z-index: 1200; display: flex; align-items: center; gap: 0.75rem;
+    padding: 0.6rem 1rem; border-radius: 12px;
+    background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-highlight);
+    box-shadow: var(--shadow-soft); color: var(--text-primary); font-size: 0.9rem;
+    animation: toast-in 0.25s ease-out;
+}
+.sw-update-toast button {
+    padding: 0.35rem 0.8rem; border: none; border-radius: 8px;
+    background: var(--accent-blue); color: #fff; font-weight: 700; font-size: 0.85rem;
+    cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+}
+.sw-update-toast button:hover { background: var(--accent-blue-hover); }
+@keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .sw-update-toast { animation: none; } }
+@media print { .iec-2d-note, .sw-update-toast { display: none !important; } }
+
 .divider {
     border: none;
     height: 1px;
