@@ -26,7 +26,7 @@ jobs:
 
           # Copy site files to temp
           mkdir -p /tmp/site
-          cp index.html index.css simulation-v6.js ui-enhancements-v1.js simulation3d.js dev-log.html /tmp/site/
+          cp index.html index.css simulation-v6.js ui-enhancements-v1.js simulation3d.js dev-log.html dev-log-transcript.html /tmp/site/
           cp optics-reciprocity.html /tmp/site/
           cp "操作介紹.pdf" "學習單.pdf" /tmp/site/
           cp manifest.json icon.svg sw.js /tmp/site/
@@ -45,7 +45,7 @@ jobs:
           cp /tmp/site/index.css .
           cp /tmp/site/simulation-v6.js /tmp/site/ui-enhancements-v1.js .
           cp /tmp/site/simulation3d.js .
-          cp /tmp/site/dev-log.html .
+          cp /tmp/site/dev-log.html /tmp/site/dev-log-transcript.html .
           cp /tmp/site/optics-reciprocity.html .
           cp "/tmp/site/操作介紹.pdf" "/tmp/site/學習單.pdf" .
           cp /tmp/site/manifest.json .
@@ -56,7 +56,7 @@ jobs:
             cp "/tmp/site/手術無影燈光學設計與模擬.docx" .
           fi
 
-          git add index.html index.css simulation-v6.js ui-enhancements-v1.js simulation3d.js dev-log.html optics-reciprocity.html "操作介紹.pdf" "學習單.pdf" manifest.json icon.svg sw.js .nojekyll
+          git add index.html index.css simulation-v6.js ui-enhancements-v1.js simulation3d.js dev-log.html dev-log-transcript.html optics-reciprocity.html "操作介紹.pdf" "學習單.pdf" manifest.json icon.svg sw.js .nojekyll
           # Add docx if present (git handles binary files fine)
           git ls-files --error-unmatch "手術無影燈光學設計與模擬.docx" 2>/dev/null && \
             git add "手術無影燈光學設計與模擬.docx" || \

@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>對話逐字稿 — shadowless-lamp-sim 開發紀錄</title>
+<meta name="description" content="shadowless-lamp-sim 開發紀錄 — 3D 無影燈模擬器的設計過程、手機優化與對話逐字稿">
+<meta name="theme-color" content="#0b1120">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='14' r='8' fill='%230ea5e9' opacity='.9'/%3E%3Ccircle cx='16' cy='14' r='5' fill='%23fff' opacity='.95'/%3E%3Crect x='14.5' y='22' width='3' height='6' rx='1.5' fill='%2314b8a6'/%3E%3Cellipse cx='16' cy='14' rx='12' ry='12' fill='none' stroke='%230ea5e9' stroke-width='1.5' opacity='.35'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0b1120; --panel: rgba(15,23,42,0.9); --card: rgba(30,41,59,0.7);
+    --teal: #14b8a6; --blue: #0ea5e9; --amber: #f59e0b; --red: #ef4444;
+    --green: #22c55e; --text: #f8fafc; --muted: #94a3b8; --border: rgba(51,65,85,0.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+  a { color: var(--blue); }
+  nav { position: sticky; top: 0; z-index: 50; background: var(--panel); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.75rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem; }
+  nav h1 { font-size: 1rem; font-weight: 700; color: var(--teal); }
+  nav .links { display: flex; gap: 1rem; font-size: 0.85rem; }
+  nav .links a { color: var(--muted); text-decoration: none; } nav .links a:hover { color: var(--text); }
+  .container { max-width: 900px; margin: 0 auto; padding: 2rem 1.25rem; }
+  .hero { text-align: center; padding: 2.5rem 0 2rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+  .hero h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; }
+  .hero p { color: var(--muted); font-size: 0.95rem; }
+  .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.72rem; font-weight: 700; border: 1px solid; margin: 0.15rem; }
+  .badge-green { background: rgba(34,197,94,0.15); border-color: var(--green); color: var(--green); }
+  .badge-blue  { background: rgba(14,165,233,0.15); border-color: var(--blue); color: var(--blue); }
+  .badge-amber { background: rgba(245,158,11,0.15); border-color: var(--amber); color: var(--amber); }
+  .badge-red   { background: rgba(239,68,68,0.15); border-color: var(--red); color: var(--red); }
+  .badge-teal  { background: rgba(20,184,166,0.15); border-color: var(--teal); color: var(--teal); }
+  section { margin-bottom: 3rem; }
+  section > h2 { font-size: 1.2rem; font-weight: 700; color: var(--teal); margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.5rem; }
+  .phase-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+  .phase-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+  .phase-card p { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.5rem; }
+  .phase-card ul { font-size: 0.88rem; color: var(--muted); padding-left: 1.25rem; }
+  .phase-card li { margin-bottom: 0.25rem; }
+  .phase-card li strong { color: var(--text); }
+  .meta { font-size: 0.78rem; color: #475569; margin-bottom: 0.75rem; }
+  .commit-hash { font-family: monospace; background: rgba(51,65,85,0.5); padding: 0.1rem 0.4rem; border-radius: 4px; font-size: 0.78rem; color: var(--blue); }
+  .timeline { position: relative; padding-left: 1.5rem; }
+  .timeline::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .tl-item { position: relative; margin-bottom: 1.5rem; }
+  .tl-item::before { content: ''; position: absolute; left: -1.6rem; top: 0.4rem; width: 10px; height: 10px; border-radius: 50%; background: var(--teal); border: 2px solid var(--bg); }
+  .tl-item .tl-time { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.25rem; }
+  .tl-item .tl-content { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem 1rem; font-size: 0.88rem; }
+  .tl-item .tl-content strong { color: var(--text); }
+  .tl-item .tl-content p { color: var(--muted); margin-top: 0.3rem; }
+  .tl-item.error::before { background: var(--red); }
+  .tl-item.success::before { background: var(--green); }
+  .tl-item.warn::before { background: var(--amber); }
+  .transcript { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .msg { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+  .msg:last-child { border-bottom: none; }
+  .msg .role { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.4rem; }
+  .msg.user .role { color: var(--blue); }
+  .msg.ai .role { color: var(--teal); }
+  .msg .content { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+  .msg.user { background: rgba(14,165,233,0.04); }
+  pre { background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 6px; padding: 0.75rem; font-size: 0.78rem; overflow-x: auto; color: #a5f3fc; margin: 0.5rem 0; }
+  .status-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .status-table th { text-align: left; padding: 0.5rem 0.75rem; background: rgba(30,41,59,0.8); color: var(--muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  .status-table td { padding: 0.6rem 0.75rem; border-top: 1px solid var(--border); }
+  .status-table tr:hover td { background: rgba(51,65,85,0.2); }
+  footer { text-align: center; padding: 2rem; color: #334155; font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 3rem; }
+  @media (max-width: 600px) {
+    .container { padding: 1rem 0.75rem; }
+    .hero h2 { font-size: 1.3rem; }
+    .phase-card { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <h1>🔦 shadowless-lamp-sim 開發紀錄</h1>
+  <div class="links">
+    <a href="index.html">← 返回模擬器</a>
+    <a href="https://github.com/henrychao521/shadowless-lamp-sim" target="_blank">GitHub ↗</a>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h2>💬 對話逐字稿</h2>
+    <p>shadowless-lamp-sim 開發過程的完整對話紀錄（使用者原文與 AI 回應摘要）。</p>
+    <p style="margin-top:0.5rem; font-size:0.82rem; color:#475569;">← 返回 <a href="dev-log.html">開發紀錄主頁</a>　｜　完整備份另見 repo 內《對話完整紀錄.md》</p>
+  </div>
+
+  <section>
+    <h2>💬 對話逐字稿（2026-05-26 ～ 05-30）</h2>
+    <div class="transcript">
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry（使用者）</div>
+        <div class="content">幫我研究這個專案，並分析如何可以讓這個專案呈現的3D介面更符合真實狀況？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          已詳細閱讀 simulation3d.js、README.md 及機械/光學參數設定。結論：此專案 3D 視圖目前是「視覺感受合理 + 幾何近似」，要更接近真實，主要瓶頸在光學物理性、PBR 材質、解剖/環境細節、體積散射四大塊。<br><br>
+          分析七大改善方向：①光學物理（燈數、photometric units、IES）②PBR 材質（sheen/SSS/clearcoat）③場景解剖（病人 GLTF、醫生手套）④體積光散射（raymarching）⑤陰影品質（VSM/PCSS）⑥後處理管線（SSAO 順序）⑦互動標示。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">逐步開始實作，然後評估是否可以在github page上呈現？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">逐步實作六項改動（後處理順序、Bloom、IBL、PBR 材質、牆面、normalBias），確認純靜態方案完全可部署到 GitHub Pages，並加入 GitHub Actions CI workflow。所有改動 commit 並建立 PR。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">你直接幫我部署吧</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          嘗試透過 GitHub API 直接啟用 Pages，發現 repo 是 private（Free 方案限制）。詢問使用者後改為 public，Pages 啟用。<br>
+          <strong>遭遇 GitHub 平台事故（10:57 UTC 開始）：</strong>codeload.github.com 無法下載任何 action tarball，多次嘗試不同方案（configure-pages@v4/v5、peaceiris、純 shell deploy）均失敗。同時 Pages legacy build 卡在 building 狀態超過 30 分鐘。<br>
+          誤判為帳號 Actions 被暫停（因 "Your account is suspended" 訊息），實為認證系統故障的誤導性訊息。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">https://henrychao521.github.io/shadowless-lamp-sim/ 404error</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">檢查發現缺少 .nojekyll，Jekyll 嘗試處理 ES Module 語法失敗。加入 .nojekyll 後 build 仍卡住（平台事故）。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">先前為什麼會出錯？幫我整理出錯的原因，將資料存在桌面上。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">整理六項錯誤原因並存為 Markdown 文件至桌面。初版誤判根本原因為帳號暫停。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">https://www.githubstatus.com/incidents/gnftqj9htp0g</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">讀取 GitHub 官方事故頁面：確認為平台認證系統事故（10:57–12:37+ UTC），所有錯誤均由此引起，帳號完全正常。更新桌面分析文件修正誤判。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">你看一下現在是否可行了？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">事故恢復，重新觸發 workflow：checkout@v4 ✅、shell deploy ✅。觸發 Pages rebuild，HTTP 200，網站正式上線！</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">然後處理好之後，幫我同步更新 https://henrychao521.github.io/ 頁面</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">更新個人站三個檔案：shared.js 加入 PROJECT_META、index.html 加入精選卡片（藍色漸層）+ 計數 24→25、projects.html 計數更新。本地預覽驗證 DOM 正確後 push。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">先沒關係，旁邊的程式還在執行，是否可以先讓他停下呢？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">列出執行中的 preview server：family-album（port 5173）。停止後確認 preview list 為空。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">然後我要出去一小時，你持續幫我優化介面（包含手機操作的優化），優化的內容請用網頁進行開發紀錄，同時幫我記錄我們的對話逐字稿。每階段處理後就上傳，我會透過page來確認內容。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">啟動自我調速 Loop，計劃手機介面優化（控制面板折疊、滑桿觸控優化、3D canvas 響應式高度、header 改善），每階段建立 dev-log.html 並 push 到 gh-pages。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 3 實作）</div>
+        <div class="content">
+          <strong>index.html</strong>：加入 <code>.panel-toggle</code> 折疊按鈕（含 aria-expanded / aria-controls）、雙模觸控提示（.touch-hint-desktop / .touch-hint-mobile）、inline JS 偵測觸控裝置並控制展開/收合邏輯。<br>
+          <strong>index.css</strong>：新增 .panel-toggle 樣式、@media 768px 區塊（controls-panel 收合、滑桿 28px thumb、tab 全寬、canvas-3d 55vw、圖例 flex-wrap）、@media 390px 區塊（iPhone SE）。<br>
+          <strong>dev-log.html</strong>：建立完整開發紀錄頁面並 push（commit 50fb19d）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 4 CSS bug 修正）</div>
+        <div class="content">
+          重新閱讀 index.css 後發現嚴重問題：<strong>CSS 層疊順序 Bug</strong>。<br>
+          原始結構：<code>@media 1024px、@media 768px、@media 390px</code> 放在第 138–273 行，而 <code>.controls-panel</code>（第 276 行）、<code>.tab-btn</code>（第 399 行）等基礎樣式放在後面。<br>
+          由於同優先級的 CSS 規則「後定義的優先」，所有手機的媒體查詢覆寫實際上被桌機基礎樣式覆蓋，導致 Phase 3 大部分手機優化未實際生效！<br><br>
+          修正：完整重寫 index.css，將三個 <code>@media</code> 區塊移至檔案末尾，確保手機樣式可正確覆蓋桌機預設值。同時補上 <code>--accent-amber</code> 變數、canvas <code>touch-action: none</code>、橫向斷點。<br><br>
+          simulation3d.js：加入 <code>isMobile</code> 偵測，停用 SSAO / 減輕 Bloom / 改用 PCFShadowMap / 限制 pixelRatio 2。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">有個問題，這個外科手術的操作介面，下方會有一些位置的光線照度百分比低於 50%，雖然小範圍，但也會影響醫師判斷吧？我們目前的模型真的正確嗎？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          誠實點出模型的簡化：目前 IEC 判定<strong>只檢查中心 bin（x=0）</strong>，並未逐點檢查整個術野是否都 ≥ 50% E_center。真實 IEC 60601-2-41 要求中心照度 ≥ 40,000 lux <em>且</em>術野內所有點 ≥ 50%。曲線兩側偶有低於 50% 的點，確實會影響判斷，這正是無影燈要靠多角度補光稀釋本影的原因。模型在幾何示意上正確，但合規判定是簡化版。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">（附 5 張實地照片）這是我實際拍攝外科手術間的無影燈，但覺得設計上跟目前的設計看起來不太一樣，可以重新檢視他的光學設計模擬與解說嗎？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          照片中的是<strong>多面反射式無影燈（DomeLux 型）</strong>：單一中央光源 + 環形排列的拋物面反射鏡片，每片把光導向術野不同角度——與目前模型的「LED 陣列式」（多顆獨立 LED，如 Trumpf iLED）是兩種不同設計哲學。照片中的「Bulb Failure I / II」面板正印證了單一光源的雙燈泡備援設計。<br><br>
+          關鍵洞察：<strong>兩者的 2D 幾何陰影稀釋效果相同</strong>——陰影稀釋只取決於光線抵達術野的角度分布，與光源是 LED 還是反射面無關。真正差異在工程取捨（故障模式、色溫、效率、體積、成本）。提出 A（純文字解說）/ B（在模擬中新增可切換的反射式模式 + 分析）兩方案。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">B 選項，並模擬分析說明其中的差異與優劣。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 51 雙光源設計模式）</div>
+        <div class="content">
+          <strong>simulation.js</strong>：將 LED 產生邏輯重構為統一「發光單元」模型，兩模式共用相同弧線位置與瞄準角度（確保陰影曲線一致，凸顯幾何等價）。多面反射模式下另建中央光源（燈高 ×0.55，位於反射碗開口內）與內部光路。<code>drawCanvas()</code> 依模式繪製：反射碗弧線、依<strong>反射定律</strong>（鏡面法線 n ∝ d_out − d_in，切線垂直於 n）畫出各反射面小鏡片、光源→反射面淡琥珀內部光路、中央光源徑向漸層光暈 + 亮核。<br><br>
+          新增 <code>updateModeUI()</code>：依模式即時更新圖例文字、滑桿標籤、模式分析卡片（標題 + 優點 + 缺點 + 教學註記）。<br><br>
+          <strong>index.html</strong>：新增「切換多面反射式光源（DomeLux 型）🪞」勾選框；模式分析卡片；9 列「設計哲學對照表」（結構/原理/故障模式/色溫/效率/壽命/耗電/燈體/成本，色彩標記優劣，可橫向捲動）。<br>
+          <strong>index.css</strong>：<code>.mode-analysis-card</code> 與 <code>.design-compare-table</code> 樣式（cmp-good 綠 / cmp-warn 琥珀 / cmp-bad 紅 / cmp-same 置中藍）。<br>
+          <strong>狀態分享</strong>：新增 <code>rf=</code> URL hash 參數。Preview 實測：兩模式切換、UI 文字同步、hash 編碼、表格樣式皆正常。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">各項內容請繼續執行修正，完成後提供我檢視的網址。</div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">目前修正的內容與我提供的真實設備圖片，有什麼差異呢？（附 5 張 DomeLux 實拍照片）</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          逐項對照真實 DomeLux 與現行模擬：真實設備為<strong>單一中央燈泡 + 數千片微鏡格密鋪的深拋物碗 + 雙燈頭衛星式</strong>；現行 2D 為<strong>剖面切片</strong>，反射面稀疏（數片～數十片掛在一條以手術面為圓心的圓弧上）、單燈頭。<br><br>
+          方向正確之處：把「單燈泡＋多面反射鏡（DomeLux）」與「LED 陣列（iLED）」分成兩模式的產品對應是對的，用反射定律算各鏡片傾角也對。最大落差在<strong>視覺密度與碗形</strong>（真實是迪斯可球般密鋪的深碗）、以及 <strong>360° 環繞與雙燈頭互補</strong>（2D 單剖面壓縮掉，部分需 3D 視圖補足）。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">可以將它與牛頓式反射鏡進行類比嗎？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude</div>
+        <div class="content">
+          可以，且是很好的教學切入點。兩者共用凹拋物面「<strong>焦點 ↔ 平行光</strong>」性質與<strong>光路可逆</strong>——一句話：<em>無影燈的反射碗就是牛頓式望遠鏡主鏡反過來用</em>（最直接的日常類比是探照燈／車頭燈反射鏡）。<br><br>
+          但要點出三個差異：① 望遠鏡<em>收光成像</em>、無影燈<em>出光投射</em>（方向相反）；② 牛頓式的招牌 45° 斜鏡，無影燈沒有對應元件；③ 望遠鏡要單一銳焦（光滑鏡面），無影燈反而把鏡面切成數千片微鏡格刻意散焦，投出重疊光斑來補影。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">除了增加小卡，設計一個光路逆行的類推模擬測試頁面。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 54 光路逆行互動演示頁）</div>
+        <div class="content">
+          建立獨立互動頁 <code>optics-reciprocity.html</code>：用同一塊拋物面凹鏡演示「收光成像（牛頓式望遠鏡）↔ 出光投射（探照燈／無影燈）」的可逆性。Canvas 即時繪製行進中的箭頭（天藍＝平行光側、琥珀＝焦點側），「⇄ 光路逆行」鈕一鍵交換光源與接收器、流向隨之反轉；可調焦距/碗深與光線數量，拋物面以微鏡格刻痕呼應實際反射碗。<br><br>
+          收光模式可開啟<strong>牛頓式 45° 斜鏡 + 目鏡</strong>示意疊加層；因本演示為快焦比深碗，逐線 45° 折射在邊緣光線會出現幾何退化（光線與鏡面平行），故改採近焦點窄束的示意折射，安全且清楚。<br><br>
+          主頁側欄另加「光學原理類比」小卡與連結；<code>sw.js</code> 預快取新頁、<code>CACHE_NAME</code> v2→v3。驗證：node --check 語法通過、Preview getImageData 掃描確認場景繪製（~12k 亮點）、切換模式/斜鏡/滑桿皆無 console error。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">本機部分，把整個專案移到 128G 存放。不用啟動本機預覽，直接讓他在 GitHub Pages 運作即可。然後開始優化。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（維運搬遷 + Loop 繼續 — Phase 59 滑桿 ±微調按鈕）</div>
+        <div class="content">
+          先把整個專案由 <code>/Users/henry/ailocal</code> 安全移到 <code>/Volumes/128G/shadowless-lamp-sim</code>。128G 是 exFAT，搬遷觸發兩個 git 問題並修復：清掉 3568 個 macOS <code>._</code> 伴隨檔（解 <em>non-monotonic index</em>）、設 <code>core.fileMode=false</code>（exFAT 不保留執行位元，否則全檔誤判修改）。<code>git fsck</code> 無錯、遠端與 HEAD 不變。後續驗證改以 <code>curl</code> 對 GitHub Pages 線上版進行，不再起本機預覽。<br><br>
+          接著做 Phase 59 手機優化：每個參數滑桿兩側加 <strong>−／＋ 微調按鈕</strong>，解決手指拖曳難對準精確值的痛點。單擊跳一格、長按 380ms 後每 60ms 連續調整、抵達上下限自動停；手機觸控目標 44px。以單一 JS 通用注入（包一層 flex 容器、不改 7 段 HTML），按鈕僅派發 <code>input</code> 事件，完全沿用既有數值更新 / 閃光 / URL hash / 觸覺 / rAF 渲染流程，與手動拖曳零差異。<br><br>
+          <code>node --check</code> 語法通過；index.css ?v=7→v8、SW v6→v7。部署後對線上版驗證資產更新與按鈕注入。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">換個模型，你幫我分析一下這個專案，並且看看是否可以幫我優化？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Fable 5 — Phase 64 全新視角健檢：PWA 離線修正 + 倉庫清理）</div>
+        <div class="content">
+          以新模型全新視角做數據化健檢（檔案大小、inline script 數、CDN 依賴、SW 快取鍵、git 追蹤清單、README 正確性），找出三個<strong>真問題</strong>並當場修正：<br><br>
+          ① <strong>SW 預快取永遠不命中</strong>——預快取存無版本碼 URL，頁面卻請求 <code>?v=N</code>，cache key 不同，等於白快取；改為帶版本碼預快取並加「sw.js ↔ index.html 版本碼交叉檢查」防回歸。② <strong>離線名不副實</strong>——SW 跳過所有非同源請求，Chart.js/Three.js 都在 jsdelivr，真離線必掛；加入 CDN runtime 快取（接受 opaque 回應）。③ <strong>離線 fallback 誤餵 HTML 給腳本請求</strong>——改僅導航請求回退 index.html。<br><br>
+          另外清除 11 個過時 puppeteer 殘留檔、重寫過時 README（lux→%、補教學鷹架/逆行頁/PDF/PWA、加 deploy.yml 硬編碼警告）。期間本機 Homebrew node 損壞（llhttp dylib，與專案無關），改用 nvm node v24.11.1 完成驗證：語法通過、預快取交叉檢查一致、迷你 SW shim 實跑 fetch 路由 4/4。SW v11→v12。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">幫我把無影燈加入 GitHub Page henrychao521.github.io 首頁，讓其他人可以快速找到。 → 可以，請幫我完整且詳細的更新，接下來 30 分鐘請你反覆檢查這個系統，並讓他符合優質的教學模擬平台需求。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（個人站首頁卡更新 + Phase 61 教學鷹架）</div>
+        <div class="content">
+          先查證：無影燈模擬器其實<strong>早已在個人站首頁</strong>（漸層藍大卡 + NEW 標籤）且在 projects.html 教育類分類，重複新增反而會變兩張卡。故改為<strong>更新文案</strong>：把堆術語的描述改為學生視角的教學價值，並修正原「智慧 PWM 補光演算法」不精確說法。<br><br>
+          接著針對「優質教學模擬平台」做品質迭代：先派兩個子代理（教學設計審查 + 技術/無障礙/正確性審查）盤點。最大落差是缺<strong>學習鷹架</strong>。Phase 61 於頁首下新增教學指引區——一句話原理、學習目標、🔬 試試看（5 個先猜再看的探究任務，按鈕直接套場景）、✅ 自我檢核（4 題點開看解答）、108 課綱對應；全用原生 &lt;details&gt; 確保無障礙、手機單欄、列印隱藏。<br><br>
+          技術面修掉真實 bug：IES 廠商版權檔未隨線上部署 → 加 onError 靜默降級（不影響模擬）；並核實「Chart 洩漏」為誤報。驗證以 node --check + 標籤平衡 + DOM shim（不起本機預覽）。index.css ?v=10、simulation3d.js ?v=6、SW v9。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（維運備份 + Loop 繼續 — Phase 60 數值徽章直接輸入）</div>
+        <div class="content">
+          先處理備份：依你選定的「同一個 repo 新增檔案 + 完整逐字稿（每句原文）」，解析本機工作階段 transcript（JSONL），產生 <code>對話完整紀錄.md</code>（約 245 KB）——含專案概觀、Phase 0～60 實作發展歷程表 + 工程教訓、對話完整逐字稿（29 則使用者訊息每句原文、AI 回應全文、工具操作摘要）。過濾系統注入訊息、修正匯入相黏、去重後 push 至 main 作為備份（此檔不併入 gh-pages 線上資產）。<br><br>
+          接著 Phase 60 手機優化：Phase 59 的 ± 鈕適合微調，但要一次跳到特定值（如燈高 137cm、LED 41 顆）仍須連點。讓參數標籤裡的<strong>數值徽章可點擊 → 就地展開 number 輸入框</strong>直接鍵入；輸入後夾在上下限、對齊 step 網格（含浮點修正），Enter 套用／Esc 取消／失焦套用，僅派發 <code>input</code> 事件沿用既有流程，與拖曳一致。徽章加虛線底線提示、手機加大觸控目標。<br><br>
+          通用 JS 注入（依 <code>val_&lt;sliderid&gt;</code> 對應），不改 7 段 HTML；index.css ?v=8→v9、SW v7→v8。依你指示不起本機預覽，改以 <code>node --check</code> + 自製 DOM shim 實跑邏輯，15 項斷言全過（開框/種值/提交/上限夾制/step 對齊/Esc 取消）。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">可以繼續執行。另外幫我生成一份系統操作介紹的 PDF。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 58 系統操作介紹 PDF 手冊）</div>
+        <div class="content">
+          產出《系統操作介紹》PDF（A4／繁體中文／4 頁），完整對照實際 UI：① 系統概觀（2D 幾何剖面、3D 空間熱圖兩分頁 + 光路逆行延伸頁）；② 控制面板全參數——7 條滑桿（燈具高度、障礙物 X/Y/Z、半徑、光源數、光束張角）含範圍/預設值、三個模式開關（真實感/智慧補償/反射鏡）、預設場景與按鈕；③ 量測（中心殘餘照度 % + IEC 50% 徽章、照度分佈圖、設計對照表、3D 操作）；④ 鍵盤快捷鍵表、光路逆行頁與障礙物演示、URL 分享/截圖/PWA 離線。<br><br>
+          以 <code>Chrome --headless --print-to-pdf</code> 由來源 HTML 產生（CJK 字型、彩色標題與表格皆正常），來源 HTML 一併保留以利日後維護重生。並在主模擬器頁首加上琥珀色「📄 操作手冊」下載連結（與青藍「🔭 逆行演示」區隔，桌機全名／手機精簡、列印隱藏），同時把 PDF 加進 deploy.yml 三處清單（避免 Phase 56 線上 404 重演）。<br><br>
+          快取破壞 index.css ?v=6→v7、SW v5→v6。PDF 轉 PNG 檢視首頁正確、共 4 頁；Preview 375px 手機實測頁首三元素並排不溢出。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">光路逆行互動演示，有辦法說明演示在光路前加障礙物，但卻又能在投影面或是觀看位置看到全景的現象嗎？</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 57 障礙物孔徑遮擋演示）</div>
+        <div class="content">
+          可以——這正是<strong>孔徑遮擋</strong>原理，也是無影燈無影的核心。在頁面加了「🚧 障礙物演示」：於會聚光路放入不透明橫桿，擋掉中央光線後，<strong>所有光線交會的「成像點／術野」仍完整受光、只是變暗，不留影子</strong>；附寬度滑桿與「通過光線 N/總數 · 亮度約 NN%」讀數。<br><br>
+          關鍵在於交會處每一點都由整片鏡面各方向供光，遮住一部分等於每點都少收一些 → 變暗而非缺塊。並誠實點出：把光平行射出當探照燈（不交會）就<strong>沒有</strong>此免疫力、會投下實影，這正是無影燈刻意讓眾多鏡面光斑重疊匯聚於術野的原因（呼應主模擬器的陰影稀釋）。故演示限定在「收光・會聚」方向（開啟時自動切換並停用牛頓斜鏡）。<br><br>
+          牛頓式斜鏡／支架本身就擋在主鏡前、卻仍見完整星空；醫師的手擋進光束、術野仍全亮——同一原理。Preview 桌機＋手機實測通過，SW 快取 v4→v5。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">（附截圖）optics-reciprocity.html 顯示 GitHub Pages 404 — File not found。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 56 修正逆行演示頁線上 404）</div>
+        <div class="content">
+          追查 404：頁面本身沒問題（main 有檔、語法正確），問題在<strong>部署腳本漏檔</strong>。<code>deploy.yml</code> 以硬編碼檔案清單逐一 <code>cp</code> 至 gh-pages，Phase 54 新增 <code>optics-reciprocity.html</code> 時未加入清單——workflow 每次綠燈卻從未複製此檔，故 gh-pages 無檔、線上 404。<br><br>
+          將該檔補進 deploy.yml 三處（暫存 cp、gh-pages cp、git add），重新部署後 <code>curl</code> 確認回 <strong>HTTP 200</strong>。先前 Phase 54/55 回報的「部署成功」即被此盲點誤導。
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry</div>
+        <div class="content">另外，光路逆行互動演示請讓他可以透過主模擬器直接連進去觀看。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 55 逆行演示 header 直達入口）</div>
+        <div class="content">
+          原本 Phase 54 的演示連結只放在側欄類比小卡，手機版被折疊的控制面板遮住，不夠「直達」。於主模擬器頂部 header 加上永遠可見的「🔭 光路逆行演示」膠囊按鈕。<br><br>
+          關鍵考量：<code>.header-badges</code> 在手機（≤390px）與列印模式皆 <code>display:none</code>，若把連結放進 badges 區會在手機消失——故把 <code>.header-demo-link</code> 設為 <code>.app-header</code> 的獨立子元素、置於 badges 之外，桌機顯示完整名稱、超小螢幕改用精簡「逆行演示」。<br><br>
+          因改動 <code>index.css</code>：版本碼 <code>?v=5→v6</code>、SW <code>CACHE_NAME v3→v4</code>。驗證：Preview 清除 SW/快取後重載，桌機（badges flex、全名）與 375px 手機（badges none、連結仍可見於右上、精簡標籤、href 指向 optics-reciprocity.html）皆確認通過。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 53 反射式光源可見性 + 快取修正）</div>
+        <div class="content">
+          強化反射式中央光源呈現時，從 Preview 的 canvas 像素取樣發現燈泡不見了——原因是光源設在 0.55×燈高（y=55）與預設頭部模型（y=50）重疊且畫在其下。修正：光源上移至 0.9×燈高、改於遮擋物後繪製、加大光暈 + 加「中央光源（單一燈泡）」標籤。<br><br>
+          除錯過程又發現更關鍵的問題：<strong>瀏覽器始終載入舊版 JS</strong>。逐一排除 Service Worker（localhost 未註冊）、HTTP 強制重抓後，定位到 <code>simulation.js?v=4</code> 是手動快取版本碼，未隨改動遞增——瀏覽器/SW 依 URL 快取，持續供應舊 <code>?v=4</code>。將 <code>?v=4→v5</code>（preload/import/script）+ <code>index.css?v=5</code> + SW <code>CACHE_NAME v1→v2</code> 後，重新取樣確認光源亮核（亮度 741）已出現在遮擋物上方，修正生效。<br><br>
+          這也代表 Phase 51/53 對 simulation.js 的更新，先前因版本碼未變動而未送達已造訪過的瀏覽器；本次 bump 一併解決。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 52 對照表手機優化）</div>
+        <div class="content">
+          先確認 Phase 51 的 GitHub Actions 部署成功（Deploy + pages-build 皆 success，已上線）。接著回到手機優化重點：Phase 51 的設計對照表在 375px 手機下 scrollWidth 480 &gt; 容器 320，水平捲動時「比較項目」欄會滑出視窗。<br><br>
+          <strong>index.css</strong>：對照表首欄改 <code>position:sticky; left:0</code> + 不透明底色（<code>#16202f</code> 內文 / <code>#202a3b</code> 表頭角格，為卡片半透明色疊在頁底的等效色）+ <code>box-shadow</code> 補回首欄分隔線；新增手機捲動提示樣式 + ≤768px 縮小字型/間距。<br>
+          <strong>index.html</strong>：表格上方加入「← 左右滑動檢視完整對照（首欄項目固定）→」提示（僅手機顯示）。<br><br>
+          Preview 以 375px mobile preset 實測：首欄 sticky、left:0、不透明底色、z-index 堆疊、box-shadow 分隔線、提示 display:block、表格確實 overflow（480&gt;320）皆正確，無 console 錯誤。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 50 CSS 包含 + overscroll 防鏈結 + PWA 安全區域）</div>
+        <div class="content">
+          <strong>CSS 包含（contain: layout style）on .visualization-area</strong>：CSS Containment Level 2 的 <code>contain: layout style</code> 告知瀏覽器，此元素的佈局計算和樣式作用範圍完全自封閉。好處：Canvas 模擬每幀 redraw 時，瀏覽器不需要重新計算文件其他部分（控制面板、論文區、頁尾）的 layout，減少 reflow 範圍。<code>style</code> containment 防止 CSS counter / CSS inheritance 的副作用溢出。<br><br>
+          <strong>overscroll-behavior: contain on .controls-panel</strong>：手機面板展開後（<code>overflow-y: auto</code>），當使用者捲動到面板底部繼續往下滑，預設行為是觸發父層（body）的 pull-to-refresh 或頁面捲動（捲動鏈結）。<code>overscroll-behavior: contain</code> 阻斷此傳播：面板內捲動在邊界停止，不再傳遞至 body，防止誤觸頁面捲動。<br><br>
+          <strong>PWA install bar safe-area-inset</strong>：Phase 49 的安裝提示條固定在頁面底部，在 iPhone X+ / iPhone 16 系列（有 Home Indicator）的 PWA standalone 模式下，底部 34px 的 Home Indicator 會遮住按鈕。改用 <code>padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px))</code> 並加入左右安全邊距（<code>max(1rem, env(safe-area-inset-left))</code>），確保安裝條在所有 iPhone 機型的安全區域內完整顯示。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 49 PWA 安裝提示條 + accent-color + smooth scroll）</div>
+        <div class="content">
+          <strong>beforeinstallprompt PWA 安裝提示條</strong>：Chrome Android / Edge 在 PWA 符合安裝條件時會觸發 <code>beforeinstallprompt</code> 事件。呼叫 <code>e.preventDefault()</code> 阻止預設的迷你資訊欄，改為顯示自訂的 <code>.pwa-install-bar</code>（固定在畫面底部）。使用者點「安裝應用程式」後呼叫 <code>deferredPrompt.prompt()</code>，再等候 <code>userChoice</code> Promise 決定後清除 prompt。<code>appinstalled</code> 事件也會關閉提示條，防止已安裝時再次顯示。<br><br>
+          <strong>accent-color</strong>：在 <code>:root</code> 加入 <code>accent-color: #0ea5e9</code>。Chrome 93+ / Safari 15.4+ 支援此屬性，讓原生表單控制項（checkbox ✓ 填充、radio 選取點、range thumb、progress bar）自動呈現品牌藍，無需另行覆寫 <code>::-webkit-</code> 偽元素樣式。模擬器中的「真實光學模式」和「智慧補償模式」checkbox 立即受惠。<br><br>
+          <strong>scroll-behavior: smooth</strong>：加入 <code>html { scroll-behavior: smooth; }</code>，讓 CSS 錨點導航（如點擊 <code>&lt;a href="#..."&gt;</code>）和 JS <code>scrollIntoView()</code>（未明確指定 behavior 時）使用平滑捲動。在 <code>@media (prefers-reduced-motion: reduce)</code> 區塊加入 <code>html { scroll-behavior: auto; }</code> 降級為即時跳轉，符合前庭功能無障礙規範。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 48 Sticky 論文標題列 + manifest id）</div>
+        <div class="content">
+          <strong>Sticky .paper-header</strong>：論文概覽區（關於本文章）是展開式折疊區塊。原本若使用者捲動閱讀內文，標題列會捲出視窗外，無法從文件任意位置收合。加入 <code>position: sticky; top: var(--header-height, 60px); z-index: 10; backdrop-filter: blur(8px)</code>，使標題列在捲動時黏在 App header 正下方，使用者隨時可點擊收合，不需捲回頂端。<br><br>
+          <strong>backdrop-filter: blur(8px)</strong>：sticky 標題列懸浮在內容上方時，背景文字會透過半透明背景 <code>rgba(15,23,42,0.9)</code> 顯示。加入 blur 磨砂效果，防止文字重疊造成閱讀困難，視覺上也與 App header 風格一致。<br><br>
+          <strong>manifest.json id 欄位</strong>：Web App Manifest v3 引入 <code>id</code> 欄位，用來唯一識別 PWA 的安裝識別碼。若不設定，Chrome / Edge 預設使用 <code>start_url</code> 作為識別碼，但規格建議明確設定，以確保跨瀏覽器版本更新時不會觸發「新 PWA」的安裝提示。設定 <code>"id": "/shadowless-lamp-sim/"</code> 與 <code>start_url</code> 一致，確保已安裝的 PWA 平滑升級。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 47 WAI-ARIA Tablist 鍵盤導航 + T 鍵）</div>
+        <div class="content">
+          <strong>WAI-ARIA Tablist 鍵盤模式</strong>：WAI-ARIA 1.1 規範要求 tablist widget 支援方向鍵導航（Roving tabindex 或 Arrow key 導航模式）。我們使用 "automatic activation" 模式：按方向鍵即同時移動焦點並啟用 tab（等同於 click）。新增獨立 IIFE 監聽 <code>.view-tabs</code> 的 keydown 事件，處理 ArrowRight / ArrowLeft / ArrowDown / ArrowUp / Home / End，每次找到 next 索引後 <code>e.preventDefault()</code>（避免頁面捲動）並執行 <code>tabs[next].click() + focus()</code>。<br><br>
+          <strong>T 鍵全域快捷</strong>：在 keydown 的 switch 中加入 <code>case 't': case 'T'</code>。根據 <code>#view-2d.classList.contains('active')</code> 決定目標 tab，click + focus 完成切換。updateKeyHelp toast 也加入 T 鍵說明。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 46 Canvas ARIA + Tablist + applyMode debounce）</div>
+        <div class="content">
+          <strong>Canvas ARIA</strong>：<code>&lt;canvas&gt;</code> 元素對螢幕閱讀器預設為透明（無語義），需要手動提供 <code>role="img" aria-label="..."</code>。rayCanvas 提供完整的光路圖描述（LED、光線、遮擋物）；illuminanceChart 描述圖表軸線和三條折線的含義。VoiceOver 使用者現在能理解這兩個圖形的用途。<br><br>
+          <strong>tablist aria-orientation="horizontal"</strong>：WAI-ARIA 標準要求水平 tablist 明確標注方向，讓螢幕閱讀器告知使用者使用左右方向鍵（←/→）切換 tabs，而非上下鍵。<br><br>
+          <strong>applyMode debounce</strong>：與 Phase 40 的 syncHeaderHeight debounce 一致，applyMode 也改為 100ms debounce。在桌機拖曳視窗大小（常見開發場景）時不再密集修改 panel maxHeight 和 overflowY，減少 layout 計算次數。初始呼叫 <code>applyMode()</code> 保持立即執行（不受 debounce 影響）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 45 Preload + 超小螢幕 + 圖表按鈕）</div>
+        <div class="content">
+          <strong>rel="preload" simulation.js</strong>：simulation.js（~50KB）目前在 body 末尾被發現並下載，晚於 Chart.js 和 index.css。加入 <code>&lt;link rel="preload" as="script"&gt;</code> 告知瀏覽器在解析 &lt;head&gt; 時就啟動下載，利用 HTML parser 處理 CDN 請求期間的空窗期，縮短首次可見模擬的等待時間。<br><br>
+          <strong>390px logo-icon 隱藏</strong>：iPhone SE（375px）和部分 Android 入門機（360px）螢幕極窄，logo 圖示佔 ~40px（含 gap），讓 h1 文字空間更緊縮。<code>display:none</code> 不影響 ARIA 和功能，純視覺優化。<br><br>
+          <strong>chart-expand-btn 24→32px</strong>：原 24px 是一個"邊緣"尺寸，手指點擊時容易滑過。32px 是 Google Material Design 和 Apple HIG 都認可的最小觸控目標，同時也符合 WCAG 2.5.8 的 24px 最小建議（以充分 margin 實現）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 44 手機面板空間 + aria-live）</div>
+        <div class="content">
+          <strong>面板 h2/說明隱藏</strong>：分析面板展開時的垂直空間使用。h2「模擬參數控制面板」佔 ~20px，p「即時調整無影燈陣列與遮擋物參數，觀察本影與半影的光子分佈變化。」多行約 45px，合計 ~65px。toggle 按鈕文字「⚙️ 模擬參數」已充分說明面板功能，在受限的 57vh（手機）或 78vh（橫向）高度中，這 65px 可以讓 1–2 個控制群組完整顯示而無需捲動。一行 CSS 修正：<code>.controls-panel h2, .panel-desc { display: none; }</code>。<br><br>
+          <strong>aria-live 照度顯示</strong>：<code>#center-illuminance-display</code> 是用戶操作後最重要的反饋元素，但沒有 live region 標記，螢幕閱讀器不會主動朗讀其變化。加入 <code>aria-live="polite"</code>（等當前朗讀完成再報告）和 <code>aria-atomic="true"</code>（整個元素一起朗讀，包括 badge），讓視覺障礙使用者調整滑桿後能聽到「中心殘餘照度: 72.3% ✅ IEC PASS」。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 43 橫向模式 + scroll-padding + 字型）</div>
+        <div class="content">
+          <strong>橫向模式面板高度</strong>：<code>mobileCap()</code> 新增 <code>window.innerWidth &gt; window.innerHeight</code> 判斷。iPhone 橫向高度約 390px，原本 57vh = 222px 只能顯示約 3 個控制群組，需要大量內部捲動。改為 landscape 時 78vh = 304px，可顯示更多控制項，體驗明顯改善。<br><br>
+          <strong>scroll-padding-top</strong>：在 CSS <code>html</code> 元素加入 <code>scroll-padding-top: calc(var(--header-height, 60px) + 0.75rem)</code>。所有 scrollIntoView({ block:'start' }) 和 <code>#hash</code> 錨點導航都會自動計算 sticky header 偏移，目標元素不再被 header 蓋住。var(--header-height) 由 JS 動態更新，scroll-padding 也自動同步。<br><br>
+          <strong>info-card 字型 0.82rem</strong>：微調臨床物理意義卡片的說明文字，從 0.8rem 提升至 0.82rem，在 Mobile 320–390px 螢幕上更清晰。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 42 演示體驗優化）</div>
+        <div class="content">
+          <strong>Demo 面板自動收合</strong>：手機使用者開啟面板調整參數後，如果此時點擊「🎬 自動掃描演示」，面板佔 57vh 遮蓋了視覺化區域，使用者無法清楚觀看光路動態。startDemo() 最前面加入手機寬度判斷，若面板展開則觸發 click 收合，然後才開始動畫。演示結束後面板維持收合狀態（使用者可手動重新打開）。<br><br>
+          <strong>演示觸覺反饋</strong>：startDemo → vibrate([10, 40, 10])（雙點輕振，有明確"開始"感）；stopDemo → vibrate(8)（單短振）。<br><br>
+          <strong>滑動提示淡出</strong>：.mmb-hint「← 左右滑動切換視圖 →」在使用者第一次切換 tab 後就不再需要顯示（使用者已知曉手勢）。switchView() 末尾加入 opacity 0.4s fade-out + setTimeout display:none，讓 metric bar 更簡潔。後續 switchView 呼叫因為元素已 display:none，style 覆寫不會出現視覺問題。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 41 2D Canvas aspect-ratio 修正）</div>
+        <div class="content">
+          <strong>發現問題</strong>：rayCanvas buffer 是 1600×800（2:1），手機版容器 <code>min-height: 260px</code>，在 ~337px 寬的手機上容器比例 ≈ 1.3:1，<code>object-fit:contain</code> 造成 2:1 內容的上下各 ~46px 黑色留白，合計浪費 ~92px 的垂直空間。<br><br>
+          <strong>修正</strong>：在 <code>@media (max-width: 768px)</code> 中 <code>.canvas-container { min-height: 0; aspect-ratio: 2/1; }</code>。容器高度 = 寬度 / 2，canvas 100%×100% 無縫填充，零 letterbox。390px 寬手機節省約 92px 垂直空間，讓照度圖更快進入視野。<br>
+          <code>aspect-ratio</code> 在 2021 年後的主流瀏覽器（Chrome 88+、Safari 15+、FF 89+）均原生支援，無需 padding-bottom hack。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 40 焦點管理 + Resize 防抖 + 預設震動）</div>
+        <div class="content">
+          <strong>焦點管理</strong>：ESC keydown handler 的 <code>toggleEl.click()</code> 後加入 <code>setTimeout(() =&gt; toggleEl.focus(), 50)</code>；backdrop click 的 <code>closePanel()</code> 後加入 <code>setTimeout(() =&gt; btn.focus(), 50)</code>。50ms 延遲讓動畫開始後再移動焦點，避免焦點移動中斷 CSS transition。符合 WAI-ARIA 1.1 的 Disclosure Pattern：觸發按鈕關閉後應聚焦於自身。<br><br>
+          <strong>syncHeaderHeight 防抖</strong>：原版直接 <code>window.addEventListener('resize', syncHeaderHeight)</code>，在拖動瀏覽器視窗大小時每個 mousemove 都觸發 offsetHeight 讀取（強制 reflow）。改為 150ms debounce，連續 resize 事件只在 150ms 靜止後執行一次，降低 layout thrashing。<br><br>
+          <strong>預設場景觸覺反饋</strong>：<code>applyPreset()</code> 頭部加 <code>if (navigator.vibrate) navigator.vibrate(12)</code>。12ms 為輕觸確認，與 IEC 閾值穿越的雙/三重震動（25–70ms）形成清晰差異，建立觸覺回饋層次。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 39 Web Share API）</div>
+        <div class="content">
+          <strong>問題識別</strong>：「複製連結」按鈕在手機上需要使用者手動開啟 LINE/訊息 App 再貼上，增加摩擦。手機瀏覽器有 Web Share API 可直接呼叫系統分享表單。<br><br>
+          <strong>實作</strong>：初始化時檢查 <code>navigator.share</code> 支援：若支援（iOS Safari 12.1+、Chrome Android 61+），改變按鈕文字為「📤 分享此設定連結」，點擊呼叫 <code>navigator.share({ title, text, url })</code>；分享成功顯示「✅ 已分享！」反饋。若不支援（桌機），維持原有剪貼簿複製流程和「✅ 已複製！」反饋。使用者取消分享時（promise reject）靜默處理。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 38 手機面板 Backdrop 遮罩）</div>
+        <div class="content">
+          <strong>問題識別</strong>：手機版控制面板展開後只能透過頂部 toggle 按鈕收合，不符合手機 App 「點擊外部關閉彈出層」的普遍 UX 慣例。在面板佔螢幕 57vh 時，使用者自然反應是點下方視覺化區域，但這樣不會關閉面板。<br><br>
+          <strong>Backdrop 遮罩實作</strong>：<br>
+          HTML：在 <code>.app-container</code> 內最前方加入 <code>&lt;div class="panel-backdrop"&gt;</code>（<code>aria-hidden="true"</code>）。<br>
+          CSS：<code>position:fixed; inset:0; z-index:88; opacity:0; pointer-events:none</code>，加入 .active 後 fade-in 到 opacity:1（0.28s ease）。<br>
+          Z-index 層次：backdrop(88) &lt; controls-panel(89) &lt; panel-toggle(90)，確保面板可見且可互動，遮罩只覆蓋視覺化區域。<br>
+          JS：openPanel() 在手機模式顯示遮罩；closePanel() 隱藏遮罩；applyMode() 切換到桌機自動清除；backdrop click → closePanel() + vibrate(8ms)。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 37 color-scheme + ESC + Slider Active）</div>
+        <div class="content">
+          新 Session 啟動，先完成 Phase 36 的未提交 commit（sw.js + index.html SW 注冊 + deploy.yml），push 到 main，然後進入 Phase 37。<br><br>
+          <strong>color-scheme: dark</strong>：CSS <code>:root</code> 加入 <code>color-scheme: dark</code>，HTML <code>&lt;head&gt;</code> 加入 <code>&lt;meta name="color-scheme" content="dark"&gt;</code>。效果：瀏覽器原生 UI（捲軸、系統表單控制項等）自動套用深色主題；iOS Safari 狀態列背景更準確反映應用主題；部分瀏覽器可省略背景色推斷計算。<br><br>
+          <strong>ESC 關閉手機面板</strong>：在 keydown 處理函式最前面（INPUT 標籤攔截之前）加入 ESC 特殊處理：<code>if (e.key === 'Escape' &amp;&amp; window.innerWidth &lt;= 768)</code> 時若面板為 open 狀態就觸發 toggle.click() 關閉。即使使用者焦點在 range input 上（正在拖曳滑桿），也能即時關閉面板。同步更新鍵盤說明 Toast，新增 Esc 快捷鍵說明。<br><br>
+          <strong>滑桿 :active 觸控視覺反饋</strong>：新增 <code>::-webkit-slider-thumb:active</code> 和 <code>::-moz-range-thumb:active</code> CSS 規則：scale(1.4) + 6px 半透明光暈（rgba(14,165,233,0.22)）。在手機觸控拖曳滑桿時，拇指滑塊明顯放大，提供清晰的"正在操作中"視覺確認。<br><br>
+          <strong>overscroll-behavior 兩軸防護</strong>：將 body 的 <code>overscroll-behavior-y: none</code> 改為 <code>overscroll-behavior: none</code>，同時鎖定 X 軸，防止 iOS Safari 橫向橡皮筋彈跳（可能在某些觸控姿勢下意外觸發）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 36 Service Worker 離線快取）</div>
+        <div class="content">
+          <strong>sw.js 新增</strong>：完整 Service Worker，實作 Install / Activate / Fetch 三個生命週期。快取策略為 Cache-First + 背景 stale-while-revalidate：快取命中時立即回傳（離線/弱網秒開），背景異步更新到最新版本；快取未命中時網路取得並存入快取；完全離線時回傳快取的 index.html。<br><br>
+          CDN 資源（Three.js / Chart.js / Google Fonts 等非同源請求）完全繞過 SW，交由瀏覽器正常快取策略處理，避免跨域快取問題。僅攔截同源 GET 請求。<br><br>
+          <strong>index.html 更新</strong>：在 window.load 事件後執行 <code>navigator.serviceWorker.register('/shadowless-lamp-sim/sw.js', { scope: '/shadowless-lamp-sim/' })</code>，失敗時（HTTP 環境、私密模式）靜默降級，不影響功能。<br>
+          <strong>deploy.yml 更新</strong>：sw.js 加入三個部署步驟（cp 到 /tmp/site、cp 到 gh-pages、git add）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 35 ARIA Tab + 懶載入 3D）</div>
+        <div class="content">
+          <strong>ARIA 無障礙 Tab 模式</strong>：<code>.view-tabs</code> 加入 <code>role="tablist"</code>，兩個按鈕加入 <code>role="tab"、aria-selected、aria-controls</code>，兩個 tabpanel 加入 <code>role="tabpanel"、aria-labelledby、tabindex="0"</code>。switchView() 同步維護 aria-selected。螢幕閱讀器現在可正確辨識 tab 介面模式。<br><br>
+          <strong>懶載入 3D 模組</strong>：移除靜態 <code>&lt;script type="module" src="simulation3d.js?v=4"&gt;</code>（原本頁面載入時就立刻執行），改為在 switchView('3d') 首次呼叫時執行 <code>import('./simulation3d.js?v=4')</code>。<br>
+          效果：只使用 2D 模式的手機使用者（多數首次訪問者）不再下載 Three.js（~600KB gzip），節省初始頁面載入流量。首次切換到 3D 時，canvas-loading spinner 顯示，Three.js 載入完成後場景初始化，spinner 自動消失，行為與原版一致。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 34 rAF 防抖渲染）</div>
+        <div class="content">
+          觀察到 simulation.js 在每個 <code>input</code> 事件中同步執行 <code>runSimulation()</code>，包含 Canvas 光路圖繪製和 Chart.js 圖表更新。在低端手機上快速拖曳滑桿可能導致掉幀。<br><br>
+          新增 <code>scheduleSimulation()</code> 函式：使用 <code>requestAnimationFrame</code> 調度渲染，若前一個 rAF 還未執行就取消並重排，確保同一個動畫幀內的多次 <code>input</code> 事件只觸發一次 <code>runSimulation()</code>。<br>
+          低成本的即時操作（<code>encodeHash()</code>、val-pulse 重啟動畫、boundary vibrate）仍在 <code>input</code> 事件中同步執行，確保使用者立即看到數值更新和動畫。<br>
+          這是一個精確的效能優化：不改變渲染邏輯，只改變呼叫時機。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 33 面板高度限制 + 捲動隔離）</div>
+        <div class="content">
+          觀察到手機版控制面板展開後高度 ~970px，在 667px 手機上把視覺化區域推到 300px 以下，使用者每次調整參數後都要大幅捲動才能看到光路圖。<br><br>
+          <strong>修改 openPanel()</strong>：加入 <code>mobileCap()</code> = <code>Math.floor(window.innerHeight * 0.57)</code>。動畫目標改為 <code>Math.min(scrollHeight, cap)</code>，動畫結束後設定 <code>overflowY = 'auto'</code>，讓面板可獨立捲動（搭配 Phase 31 的 <code>overscroll-behavior:contain</code>，不會傳導至頁面）。<br>
+          <strong>修改 closePanel()</strong>：用 <code>panel.offsetHeight</code>（當前可見高度）取代 <code>scrollHeight</code> 作為動畫起始點，避免在 overflow:auto 下 scrollHeight 包含不可見高度導致動畫起跳值過大。<br>
+          <strong>修改 applyMode()</strong>：resize 事件（手機旋轉）重新計算 cap，確保橫向模式下 cap 正確更新。<br>
+          <strong>標尺清理</strong>：@media 768px 隱藏 <code>.range-labels span:nth-child(2)</code>（中間說明標籤），只留左右最小/最大值，減少視覺雜訊。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 32 Sticky 控制面板按鈕）</div>
+        <div class="content">
+          觀察到手機使用者捲動到 3D Canvas 或照度圖後，面板折疊按鈕滾出視窗，無法在不捲回頂部的情況下開關控制面板或查看當前照度。<br><br>
+          <strong>解決方案</strong>：<br>
+          1. JS 動態量測 <code>.app-header.offsetHeight</code>，寫入 CSS 自定義屬性 <code>--header-height</code>（在 DOMContentLoaded / resize / fonts.ready 三個時機同步）。<br>
+          2. 手機版 .panel-toggle 加入 <code>position: sticky; top: var(--header-height); z-index: 90;</code>，使其黏附在 sticky header 下方，跟隨使用者捲動時始終可見。<br>
+          3. 按鈕加入 <code>.toggle-metric</code> span，simulation.js 在每次 updateChart() 時同步更新「XX% ✅/❌」，顏色隨 IEC 閾值即時變色。<br>
+          4. 視覺：sticky 模式下增加 backdrop-blur 和深色背景（避免下方內容透出）；面板展開時圓角調整（按鈕底部改為直角，與面板頂部無縫銜接）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 31 觸控延遲 + 44px 觸控目標）</div>
+        <div class="content">
+          <strong>touch-action: manipulation</strong>：在 CSS 全局層（緊跟 * 重置之後）加入規則，讓所有 button、input[type="range"]、input[type="checkbox"]、a、label[for]、[role="button"]、[tabindex] 元素啟用 manipulation 模式。<br>
+          效果：①消除行動裝置 300ms 點擊延遲（瀏覽器不需等待確認是否為雙擊縮放）；②保留頁面級捏放縮放（不影響無障礙需求）；③比 <code>user-scalable=no</code> 更精確的控制（僅作用於特定元素）。<br><br>
+          <strong>WCAG 2.5.5 最小觸控目標（44×44px）</strong>：在 @media (max-width: 768px) 中為 .preset-btn / .demo-btn / .share-btn 加入 <code>min-height: 44px</code>，原本只有 ~26px 高度的預設按鈕和演示按鈕現在符合 WCAG AA 建議。<br><br>
+          <strong>overscroll-behavior-y: contain</strong>：控制面板 <code>.controls-panel.open</code> 在手機展開後，捲動到面板頂/底邊界時不再將捲動事件傳導至頁面（防止面板內容捲完後意外觸發整頁捲動）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 30 手機浮動指標條 + IEC 觸覺反饋）</div>
+        <div class="content">
+          會話壓縮後恢復，優先完成 Phase 29 未 commit 的圖表放大功能，push 到 main。<br><br>
+          <strong>Phase 30 — 手機浮動指標條</strong>：觀察到手機使用者在面板折疊後調整滑桿，無法即時看到照度變化（需要捲動到下方圖表）。在 <code>.visualization-area</code> 頂部（view-tabs 之前）加入 <code>.mobile-metric-bar</code>，顯示「中心照度 XX% ✅ IEC PASS」。桌機 display:none，手機才顯示。<br>
+          simulation.js updateChart() 除更新原有的 <code>#center-illuminance-val</code> 和 <code>#iec-compliance-badge</code>，同步更新新的 <code>#mmb-center-val</code> 和 <code>#mmb-iec-badge</code>。<br><br>
+          <strong>IEC 閾值觸覺反饋</strong>：新增 <code>prevIECPass</code> 變數追蹤前一次 IEC 狀態。穿越 50% 閾值時（PASS↔FAIL 任意方向）呼叫 <code>navigator.vibrate()</code>，型態差異化：達標用輕快雙振 <code>[25, 20, 50]</code>，跌破用警示重振 <code>[70, 25, 35]</code>。第一次渲染（prevIECPass=null）不震動，避免頁面載入觸發。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 29 圖表點擊放大）</div>
+        <div class="content">
+          照度分佈圖表在手機上固定 220px 高度，密集的三條折線（實際照度 / 基準 / IEC 閾值）在小螢幕上難以閱讀。加入 <strong>⤢ 放大按鈕</strong>（圖表右下角，24×24px 絕對定位）。<br><br>
+          點擊後：<code>.chart-wrapper.expanded</code> → height: 380px（0.35s cubic-bezier 過渡動畫），圖示從 ⤢ 切換到 ⤡；再點還原。同時 <code>window.dispatchEvent(new Event('resize'))</code>（50ms 後）通知 Chart.js 重繪以正確填充新尺寸。<br>
+          桌機也可用（transition 動畫清晰可見），但主要受益使用者是手機學生。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 28 補丁：smart_comp_group + 最終彙整）</div>
+        <div class="content">
+          發現 <code>smart_comp_group</code> 未加入 <code>.control-3d-only</code>，若使用者在 3D 模式勾選 realistic_mode 顯示 smart_comp 後切回 2D，該控制項不會跟著淡化。補上 class 修正。<br><br>
+          <strong>本 Loop 完整彙整（Phase 17–28）</strong>：<br>
+          17：PWA Manifest（可加入主畫面）<br>
+          18：Swipe 換 Tab + 全螢幕按鈕<br>
+          19：4 個快速教學預設<br>
+          20：IEC 合規徽章 + 列印樣式<br>
+          21：截圖下載（合成 PNG）<br>
+          22：鍵盤快捷鍵 + 首次訪問引導<br>
+          23：🐛 修正 keyBtn listener 重複堆疊<br>
+          24：▶ 3D 自動旋轉 Demo 模式<br>
+          25：🎬 遮擋物掃描動畫（rAF + easeInOut）<br>
+          26：iOS Safe Area + 照度圖捲動提示<br>
+          27：WCAG 無障礙（skip link + focus-visible）<br>
+          28：3D-only 控制項情境感知淡化
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 28 3D-Only 控制項智慧淡化）</div>
+        <div class="content">
+          觀察到 obstacle_z 和 realistic_mode 等控制項在 2D tab 下其實無效，但 UI 沒有任何提示，容易讓使用者困惑（移動 Z 軸滑桿但 2D 畫面沒有反應）。<br><br>
+          解決方案：<code>.control-3d-only</code> class 標記 3D 專屬控制項。switchView() 在切換 tab 時為 controls-panel 加入/移除 <code>.panel-3d-active</code>。<br>
+          CSS：<code>.controls-panel:not(.panel-3d-active) .control-3d-only</code> → <code>opacity: 0.45; pointer-events: none</code>（淡化 + 禁用交互）；切換回 3D 時 <code>opacity: 1; pointer-events: auto</code>（0.3s 過渡）。<br>
+          同時將 "[僅限 3D]" 的 &lt;small&gt; 標籤替換為 <code>.tag-3d</code> 徽章（teal 邊框），視覺更清晰。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 27 鍵盤無障礙）</div>
+        <div class="content">
+          <strong>Skip to content link</strong>：在 &lt;body&gt; 第一個元素加入 <code>&lt;a href="#controls-panel-body" class="skip-link"&gt;跳至主內容&lt;/a&gt;</code>。平時透過 <code>top: -100%</code> 完全隱藏，鍵盤使用者按 Tab 第一個停留點時 <code>:focus</code> 使其滑入畫面（top:0）。<br><br>
+          <strong>:focus-visible 全局覆蓋</strong>：<code>:focus-visible</code> 偽類加入 <code>outline: 2px solid var(--accent-blue)</code>，確保在深色背景上一眼可見（預設的藍色可能幾乎不可見）。<code>input[type="range"]:focus-visible</code> 改為 3px / 4px offset。<br><br>
+          <strong>Print 媒體排除</strong>：skip-link 和 download-section 都加入 <code>display:none !important</code>，避免出現在列印輸出中。<br><br>
+          符合 WCAG 2.1 AA 規範中的 2.4.1（略過重複區塊）和 2.4.7（焦點可見）。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 26 iOS Safe Area + 捲動提示）</div>
+        <div class="content">
+          <strong>viewport-fit=cover</strong>：meta viewport 加入 <code>viewport-fit=cover</code>，啟用 CSS 環境變數 <code>env(safe-area-inset-*)</code>。<br>
+          <strong>iOS Safe Area</strong>：<code>.app-header</code> 的 padding-top 改為 <code>max(1rem, calc(0.75rem + env(safe-area-inset-top, 0px)))</code>，確保 Dynamic Island（iPhone 14 Pro+）不遮擋標題。<code>.paper-reference-container</code> 加入 <code>padding-bottom: env(safe-area-inset-bottom, 0)</code>，確保 Home Indicator 不遮擋最底部按鈕。<br><br>
+          <strong>照度圖捲動提示</strong>：在 2D canvas 容器底部加入 <code>.scroll-hint</code> 絕對定位標籤「↓ 照度分佈圖」（桌機 display:none，手機版 display:block）。首次手機訪問後 2.5s 淡入，3s 後淡出，localStorage <code>sls_chart_hint</code> 記憶避免重複顯示。提示手機使用者下方還有照度分析圖表。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 25 自動掃描演示動畫）</div>
+        <div class="content">
+          在控制面板加入 <strong>🎬 自動掃描演示按鈕</strong>，一鍵觸發 6 秒來回掃描動畫。<br><br>
+          動畫邏輯：requestAnimationFrame 精確計時，<code>obstacle_x</code> 在 -25cm → +25cm → -25cm 之間以 <code>easeInOut cubic</code> 緩動曲線（smooth-step）自動移動，每幀透過 <code>slider.dispatchEvent(new Event('input'))</code> 觸發完整的模擬更新鏈（runSimulation + val-pulse + encodeHash）。<br><br>
+          使用者可隨時以 pointerdown 或再次點擊按鈕中斷演示，恢復手動控制。<br>
+          按鈕活動狀態：demo-glow 脈動光暈動畫（琥珀色），文字切換為「⏹ 停止演示」。<br><br>
+          教學效果：2D 光路圖即時反映陰影如何隨遮擋物左右移動而稀釋，結合圖表的照度曲線動態起伏，視覺衝擊力強，無需教師手動拖動。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 24 3D 自動旋轉 Demo 模式）</div>
+        <div class="content">
+          在 3D card header 加入 <strong>▶ 自動旋轉按鈕</strong>（<code>.autorotate-btn</code>，30px，teal 邊框）。<br><br>
+          <strong>simulation3d.js 側</strong>：在初始化末尾加入 <code>controls.autoRotateSpeed = 0.75</code> 和 <code>controls.addEventListener('start', ...)</code> 事件（使用者手動互動後自動停止旋轉並同步按鈕狀態）。透過 <code>window.sls3d.setAutoRotate(enabled)</code> 暴露 API（因為 ES module 的 controls 變數無法從外部腳本直接訪問）。<br><br>
+          <strong>index.html 側</strong>：click listener 呼叫 <code>window.sls3d.setAutoRotate(isActive)</code>，按鈕切換 ▶ ↔ ⏹ 圖示，active 狀態顯示 teal 脈動光暈動畫（rotate-pulse keyframes）。<br><br>
+          適用場景：課堂投影、展示時開啟自動旋轉，讓學生從各角度觀察 3D 無影燈幾何結構；觸摸/拖曳後自動停止，恢復手動控制。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 23 Phase 22 Bug 修正）</div>
+        <div class="content">
+          讀取 Phase 22 的程式碼後發現 <strong>Event Listener 堆疊 Bug</strong>：<br>
+          <code>keyBtn.addEventListener('click', showKeyHelp)</code> 被放在 <code>document.addEventListener('keydown', ...)</code> 的回呼函式<em>內部</em>，導致每次鍵盤按下時都會重複為 ⌨️ 按鈕附加一個新的 click listener，造成重複觸發。<br><br>
+          修正：將 <code>keyBtn.addEventListener</code> 移到 keydown 處理器<em>外部</em>（IIFE 直接呼叫），確保 click listener 只附加一次。同時將 simulation.js/3d.js 的 <code>?v=</code> 參數從 3 升至 4，強制瀏覽器清除快取並重新抓取最新版本。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 22 鍵盤快捷鍵 + 首次訪問引導）</div>
+        <div class="content">
+          <strong>鍵盤快捷鍵</strong>：document keydown 監聽（忽略 input/textarea 中的輸入，忽略 Ctrl/Meta/Alt 組合鍵）。<br>
+          快捷鍵對應：<code>1</code> IEC標準、<code>2</code> 高效多燈、<code>3</code> 少燈對比、<code>4</code> 嚴苛遮擋（呼叫 preset-btn.click()）；<code>P</code> 手機面板開關；<code>F</code> 全螢幕切換；<code>?</code> 顯示快捷鍵說明 Toast。<br>
+          標題列加入 ⌨️ 按鈕，連結到相同的 showKeyHelp() 函式。<br><br>
+          <strong>首次訪問引導 Toast（手機版）</strong>：window.innerWidth ≤ 768 且 <code>!localStorage.getItem('sls_visited')</code> 時，800ms 後淡入 Toast（bottom:1.25rem，fixed定位，blur背景），5.5s 後自動淡出。提示內容：點擊面板按鈕、左右滑動切換視圖。寫入 localStorage 確保只顯示一次。<br><br>
+          <code>.onboard-toast</code> CSS：固定底部、translateX(-50%) 水平居中、opacity 0→1 + translateY 1rem→0 的入場動畫、blur backdrop-filter。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 21 截圖下載按鈕）</div>
+        <div class="content">
+          在照度圖表的 card-header 加入 📸 截圖按鈕（<code>.screenshot-btn</code>）。<br><br>
+          點擊後 JS 建立一個 1600×(800+400+60) px 的合成畫布：<br>
+          • 深色背景 <code>#0b1120</code><br>
+          • 頂部標題「外科手術無影燈光學模擬器」+ 網址字樣<br>
+          • <code>c.drawImage(rayCanvas)</code> 繪製 2D 幾何光路圖<br>
+          • <code>c.drawImage(chartCanvas)</code> 繪製照度分佈圖<br>
+          合成後 <code>canvas.toDataURL('image/png')</code> 生成 PNG，動態建立 &lt;a download&gt; 並點擊觸發下載。<br><br>
+          按鈕按下後 1.5s 內顯示 ✅ 確認反饋。學生可下載截圖提交作業、教師可存檔課堂紀錄。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 20 IEC 徽章 + 列印樣式）</div>
+        <div class="content">
+          <strong>IEC PASS/FAIL 徽章</strong>：在 <code>.metric-highlight</code> 內的中心照度值右側加入 <code>.iec-badge</code> span。simulation.js 的 updateChart() 函式在每次計算後同步更新：≥50% 顯示 <code>✅ IEC PASS</code>（teal 邊框），&lt;50% 顯示 <code>❌ IEC FAIL</code>（red 邊框）。學生立即明白目前配置是否符合 IEC 60601-2-41 標準。<br><br>
+          <strong>列印樣式 @media print</strong>：教師可直接 Ctrl+P 列印教學講義。<br>
+          隱藏：controls-panel、view-tabs（2D/3D 切換）、share-row、preset-row、fullscreen-btn。<br>
+          強制顯示：2D 光路圖（#view-2d display:flex）、照度圖表。<br>
+          展開：paper-content.collapsed 的 max-height 強制設為 none，參考文獻全文顯示。<br>
+          顏色：背景 white，文字 #111，卡片淡灰背景。<br>
+          <code>-webkit-print-color-adjust: exact</code> 保留彩色光路與圖表色彩。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 19 快速預設場景按鈕）</div>
+        <div class="content">
+          考量教學情境，教師通常需要快速切換不同的示範場景（IEC 標準配置 vs. 多燈 vs. 少燈）。為此加入 <strong>快速場景按鈕列</strong>。<br><br>
+          四個預設定義（物件陣列形式）：<br>
+          • <code>📋 IEC標準</code>：100cm燈高、正中遮擋 X=0、Y=50、R=10.5、25顆LED、6°散射（IEC 60601-2-41 標準測試條件）<br>
+          • <code>💡 高效多燈</code>：61顆LED、4°散射、偏移遮擋 X=12 — 演示密集矩陣的最大無影效果<br>
+          • <code>🔦 少燈對比</code>：5顆LED、15°廣角 — 少燈廣角時陰影明顯，對比效果強<br>
+          • <code>⚠️ 嚴苛遮擋</code>：燈高80cm、偏移 X=18、Y=65、R=14（大型遮擋）— 壓力測試照度下降<br><br>
+          applyPreset() 透過 <code>el.dispatchEvent(new Event('input'))</code> 觸發既有的滑桿事件鏈（runSimulation + encodeHash + val-pulse + haptic），因此 URL hash 同步、3D 更新、動畫反饋一次到位。按鈕點擊後 800ms 高亮（.preset-active），1.8s 淡入/淡出提示文字。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 17 PWA Manifest）</div>
+        <div class="content">
+          會話壓縮後重新載入，繼續自我調速 Loop。分析剩餘優化空間後決定實作 PWA Manifest。<br><br>
+          新增 <code>manifest.json</code>（name：外科手術無影燈光學模擬器、short_name：無影燈模擬、display:standalone、background_color #0b1120、theme_color #0ea5e9、lang zh-TW、orientation any）。<br>
+          新增 <code>icon.svg</code> — 自行繪製含圓角背景、外環發光、主燈核心、支架、LED 光點的手術燈圖示。<br>
+          index.html 更新：<code>&lt;link rel="manifest"&gt;</code>、<code>&lt;link rel="apple-touch-icon"&gt;</code>、iOS standalone meta（apple-mobile-web-app-capable、status-bar-style black-translucent、title 無影燈模擬）。<br>
+          favicon 從 data URI 改為外部 <code>icon.svg</code>（不再需要 URL encoding 的超長字串）。<br>
+          deploy.yml 補上 <code>manifest.json</code> 與 <code>icon.svg</code> 兩個新部署目標。<br><br>
+          效果：Chrome 手機版顯示「新增至主畫面」提示；iOS Safari 可加入主畫面並以 standalone 模式啟動，看起來就是一個 App，不顯示瀏覽器 UI。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 18 Swipe Tabs + 全螢幕按鈕）</div>
+        <div class="content">
+          <strong>手指滑動切換 Tab</strong>：在 <code>.visualization-area</code> 加入 touchstart / touchend 偵測。閾值 55px 橫向位移、最大角度 38°（排除縱向滑動）、最長時間 400ms（排除拖動）。當觸控目標為 <code>CANVAS</code> 元素時跳過（避免干擾 OrbitControls 3D 旋轉）。左滑 → 3D、右滑 → 2D，呼叫既有 <code>switchView()</code>。<br><br>
+          <strong>3D 全螢幕按鈕</strong>：在 3D card header legend 區右端加入 <code>.fullscreen-btn ⛶</code>（30×30px，半透明藍色邊框，flex shrink 0，margin-left:auto 靠右）。JS 封裝 requestFullscreen + webkit/moz/ms 前綴、fullscreenchange 事件同步圖示（⛶ ↔ ✕）。CSS 加入 <code>#canvas3d:fullscreen</code> 規則（width/height 100vw/100vh，消除 border-radius）。若瀏覽器不支援 fullscreen API 則自動隱藏按鈕。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 16 CDN 切換）</div>
+        <div class="content">
+          Three.js import map 從 <code>unpkg.com</code> 換成 <code>cdn.jsdelivr.net</code>。unpkg 在台灣有時需要 500ms+ 才能取得模組；jsDelivr 使用 Cloudflare + Fastly，亞太地區 CDN PoP 較多，Three.js 模組載入通常可降至 80–200ms。相同的 three@0.160.0 版本與 API。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 15 ResizeObserver）</div>
+        <div class="content">
+          simulation3d.js 中將 <code>window.addEventListener('resize')</code> 替換為 <code>new ResizeObserver(handleCanvasResize).observe(container)</code>。ResizeObserver 直接監聽 #canvas3d DOM 節點，能正確偵測面板開合、sidebar 大小變化等非 window 的容器尺寸改變，確保 Three.js renderer 始終正確填充容器。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 14 IEC 閾值 + Badge）</div>
+        <div class="content">
+          圖表加入 IEC 60601 50% 紅虛線（第三 dataset），讓學生一眼看出是否符合標準。標題列加入「✨ 真實模式」琥珀 badge，勾選 realistic_mode 時淡入顯示。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 13 效能 + 過捲動）</div>
+        <div class="content">
+          加入四個 <code>rel="preconnect"</code>（fonts.googleapis.com、fonts.gstatic.com crossorigin、unpkg.com、cdn.jsdelivr.net），讓瀏覽器提前建立 Three.js CDN 和字型連線。body 加入 <code>overscroll-behavior-y: none</code> 消除 iOS 橡皮筋回彈，讓 App 質感更佳。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 12 Tab 偏好 + 文獻動畫）</div>
+        <div class="content">
+          switchView() 加入 localStorage 儲存偏好 tab，頁面載入時自動恢復。參考文獻折疊從 onclick + max-height:2000px 改為 scrollHeight 精確動畫 + requestAnimationFrame 歸零 + ARIA 鍵盤操作。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 11 Bug 修正 + 觸感增強）</div>
+        <div class="content">
+          讀取 simulation3d.js 時發現 <strong>既有 Bug</strong>：lamp_height 不在第 758 行的事件綁定陣列中，導致使用者在 3D tab 移動燈高滑桿時，3D 場景不會更新（燈頭停在原位）。修正：將 <code>'lamp_height'</code> 加入陣列。<br><br>
+          同步加入：每個 3D 事件處理器也觸發 <code>val-pulse</code> 動畫（包含 obstacle_z），以及 <code>navigator.vibrate(18)</code> 觸控震動（當滑桿觸碰最小/最大值時，Android Chrome 支援）。simulation.js 的 2D 滑桿也加入相同的 haptic feedback。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 10 部署修正 + Favicon）</div>
+        <div class="content">
+          發現 deploy.yml 漏掉 dev-log.html — 用戶無法在 Pages 看到開發紀錄！也漏掉 .docx 下載檔案。修正 workflow，改用個別 cp 指令，加入 dev-log.html 和 .docx，移除 operate.js（Puppeteer 腳本不需公開部署）。<br>
+          同時加入 SVG 內嵌 favicon（data URI）到 index.html 和 dev-log.html，不需額外 .ico 資源請求。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 9 SEO + URL hash 補完 + 無障礙）</div>
+        <div class="content">
+          加入完整 Open Graph / Twitter Card meta tags，改善社群連結預覽。<br>
+          URL hash 補上 obstacle_z 和 realistic_mode（在 DOMContentLoaded 閉包內附加監聽器，避免閉包外存取問題）。<br>
+          加入 prefers-reduced-motion CSS — 保護前庭功能敏感使用者。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 8 複製連結按鈕）</div>
+        <div class="content">
+          確認 GitHub Actions 全部 ✅（Phase 7 workflow success，Pages build deploying）。<br>
+          加入 「📋 複製連結分享此設定」按鈕至控制面板。Clipboard API 優先，
+          失敗則執行 textarea execCommand fallback（iOS Safari 相容）。
+          按下後 .share-feedback 淡入「✅ 已複製！」，2.2s 後淡出。
+          搭配 Phase 7 URL hash：教師可調好遮擋參數後一鍵分享給全班學生。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 7 URL 狀態 + 數值動畫）</div>
+        <div class="content">
+          <strong>URL hash 分享</strong>：simulation.js 加入 encodeHash() 與 restoreFromHash()。每次 input 事件後 replaceState 更新 hash（短格式 h/ox/oy/or/n/s），頁面載入時自動還原。使用者可直接複製網址（例如：<code>…/#h=80&ox=15&oy=60&or=8&n=45&s=4</code>）分享特定遮擋場景給學生或同事。<br><br>
+          <strong>數值閃光</strong>：@keyframes value-pulse（藍→白glow→藍，0.45s），每次 input 事件對相應 val_* span 觸發。手機使用者滑動時能從餘光察覺數值已更新，不需停下來確認 label。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 6 載入提示 + Tab 捲動）</div>
+        <div class="content">
+          <strong>3D 載入 Spinner</strong>：canvas-3d 容器加 <code>position:relative</code>，內部加入 <code>.canvas-loading</code> 覆蓋層（position:absolute, inset:0）。CSS 旋轉環動畫 (<code>.loading-ring</code>)。simulation3d.js 加入 <code>dismissLoading()</code>，第一幀 <code>composer.render()</code> 後觸發 opacity 過渡，transitionend 後移除節點。<br><br>
+          <strong>Tab 切換捲動</strong>：switchView 加入 <code>tabs.scrollIntoView</code>，手機版自動定位到畫面正確位置。
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Loop 繼續 — Phase 5 動畫精確化 + 圖表優化）</div>
+        <div class="content">
+          <strong>控制面板動畫升級</strong>（index.html）：<br>
+          <code>max-height: 9999px</code> 是 CSS 動畫的反模式 — 瀏覽器需要從 0 補間到 9999px，即使實際內容只有 400px，導致開頭一段時間沒有動畫效果，最後瞬間「彈出」。<br>
+          新方法：JS 使用 <code>panel.scrollHeight</code> 測量實際高度，openPanel() 設定精確目標高度，transitionend 事件後清除固定值（允許面板內容變化）；closePanel() 先固定高度再雙幀歸零，確保過渡動畫正確觸發。easing 改為 cubic-bezier Material Design 曲線。<br><br>
+          <strong>Chart.js 手機響應式</strong>（simulation.js）：<br>
+          偵測 window.innerWidth &lt; 768，對手機套用：隱藏 X/Y 軸標題（節省空間）、縮小字型至 10px、tick 數量減至 5、圖例字型 10px / boxWidth 12、縮短 dataset 標籤（「實際相對照度 (%)」→「照度 (%)」）。
+        </div>
+      </div>
+
+    <div class="phase-card">
+      <h3>Phase 28 — 3D-Only 控制項情境感知淡化 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>問題</strong>：obstacle_z、realistic_mode 在 2D tab 下移動滑桿但畫面無反應，使用者困惑</li>
+        <li><code>.control-3d-only</code> class 標記 3D 專屬控制群組</li>
+        <li>switchView() 動態加入/移除 <code>.panel-3d-active</code> class</li>
+        <li>2D 模式：<code>opacity: 0.45; pointer-events: none</code>（0.3s 過渡）</li>
+        <li>3D 模式：<code>opacity: 1; pointer-events: auto</code>（完全可用）</li>
+        <li><code>.tag-3d</code> teal 徽章取代 &lt;small&gt;[僅限 3D]&lt;/small&gt;，視覺更醒目</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 27 — 鍵盤無障礙（Skip Link + Focus Ring）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>Skip to content</strong>：.skip-link — 平時 top:-100% 隱藏，Tab 焦點時 top:0 滑入</li>
+        <li><code>:focus-visible { outline: 2px solid var(--accent-blue) }</code> — 深色背景可見焦點環</li>
+        <li>range input 增大：3px 焦點環、4px offset</li>
+        <li>Print media：skip-link display:none（不出現在列印稿）</li>
+        <li>符合 WCAG 2.1 AA 2.4.1（略過重複區塊）+ 2.4.7（焦點可見性）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 26 — iOS Safe Area + 捲動提示 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>viewport-fit=cover</strong>：啟用 CSS env(safe-area-inset-*) 變數</li>
+        <li>app-header: <code>padding-top: max(1rem, calc(0.75rem + env(safe-area-inset-top)))</code>（Dynamic Island 相容）</li>
+        <li>paper-reference-container: <code>padding-bottom: env(safe-area-inset-bottom)</code>（Home Indicator 相容）</li>
+        <li><strong>捲動提示</strong>：2D canvas 底部「↓ 照度分佈圖」；首次手機訪問 2.5s 後淡入 3s</li>
+        <li>localStorage <code>sls_chart_hint</code> 確保只顯示一次</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 25 — 自動掃描演示動畫 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>🎬 自動掃描演示</strong>：6s 來回掃描 obstacle_x（-25 ↔ +25 cm），easeInOut 緩動</li>
+        <li>requestAnimationFrame 精確計時，每幀 dispatchEvent('input') 觸發完整模擬更新</li>
+        <li>pointerdown 或再次點擊可隨時中斷，恢復手動控制</li>
+        <li>.demo-btn：琥珀色主題；active 時 demo-glow 脈動光暈</li>
+        <li>教師一鍵展示陰影稀釋原理，學生可即時看到光路圖和照度曲線動態變化</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 24 — 3D 自動旋轉 Demo 模式 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · simulation3d.js + index.html + index.css</div>
+      <ul>
+        <li><strong>▶ 按鈕</strong>：3D card header 右側（.autorotate-btn，teal 配色）</li>
+        <li>active 狀態：rotate-pulse 脈動光暈動畫，按鈕變 ⏹</li>
+        <li><strong>simulation3d.js</strong>：<code>controls.autoRotateSpeed = 0.75</code>；OrbitControls start 事件自動停止；<code>window.sls3d.setAutoRotate()</code> API 暴露</li>
+        <li>ES module 隔離問題用 window.sls3d 橋接，外部腳本可在模組載入後呼叫</li>
+        <li>使用者觸碰 3D canvas 後自動停止旋轉（OrbitControls start 事件），按鈕狀態同步</li>
+        <li>適合課堂投影、展示場景，讓學生從各角度觀察燈具幾何</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 22 — 鍵盤快捷鍵 + 首次訪問引導 Toast <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>鍵盤快捷鍵</strong>：<code>1-4</code> 套用預設、<code>F</code> 全螢幕、<code>P</code> 手機面板、<code>?</code>/⌨️ 顯示說明</li>
+        <li>showKeyHelp() Toast 顯示 5s，再按 ? 可立即關閉</li>
+        <li>標題列 ⌨️ 按鈕連結到相同說明 Toast（桌機使用者發現快捷鍵的入口）</li>
+        <li><strong>首次訪問 Toast</strong>：手機版 + 未訪問過 → 800ms 後顯示，5.5s 自動淡出</li>
+        <li>localStorage <code>sls_visited</code> 確保引導只顯示一次</li>
+        <li>.onboard-toast：fixed bottom、translateX(-50%) 居中、blur backdrop-filter</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 21 — 截圖下載按鈕 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>📸 按鈕</strong>：位於照度圖表 card-header 右側（.screenshot-btn，30px，teal 邊框）</li>
+        <li><strong>合成畫布</strong>：1600×(800+400+60) px，深色背景 + 標題 + 光路圖 + 照度圖</li>
+        <li><code>canvas.toDataURL('image/png')</code> → 動態 &lt;a download&gt; → 觸發下載</li>
+        <li>按下後 1.5s 顯示 ✅ 確認；可供學生截圖交作業、教師存課堂紀錄</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 20 — IEC 合規徽章 + 列印樣式 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · simulation.js + index.html + index.css</div>
+      <ul>
+        <li><strong>IEC PASS/FAIL 徽章</strong>：中心照度右側即時顯示 ✅ IEC PASS（≥50%）或 ❌ IEC FAIL（&lt;50%）</li>
+        <li>updateChart() 每次計算後同步更新徽章樣式（.iec-pass teal / .iec-fail red）</li>
+        <li><strong>@media print 列印樣式</strong>：隱藏所有互動 UI，強制顯示 2D 光路圖和照度圖表</li>
+        <li>展開 paper-content.collapsed（max-height: none!important），列印時包含完整參考文獻</li>
+        <li>print-color-adjust: exact — 保留彩色光路、圖表色彩，教材視覺清晰</li>
+        <li>頁面分隔：paper-reference-container page-break-before: always</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 19 — 快速預設場景按鈕 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>4 個教學預設</strong>：IEC標準 / 高效多燈（61顆）/ 少燈廣角對比 / 嚴苛遮擋壓力測試</li>
+        <li><strong>applyPreset()</strong>：setSlider() 呼叫 dispatchEvent 觸發整條事件鏈（runSimulation + encodeHash + val-pulse + haptic）</li>
+        <li><strong>視覺反饋</strong>：.preset-active 高亮 800ms + #preset-feedback 文字提示 1.8s 淡入淡出</li>
+        <li><strong>flex-wrap 排版</strong>：4 按鈕在任意螢幕寬度自動換行，各佔相等寬度（flex:1）</li>
+        <li>教師一鍵切換場景，無需逐個調整滑桿，節省課堂示範時間</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 17 — PWA Manifest + 可安裝 App <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · icon.svg + manifest.json 新增</div>
+      <ul>
+        <li><strong>icon.svg</strong>：手術燈 SVG 圖示（192×192 viewBox，圓角背景 #0b1120，外環 0ea5e9，LED 光點 fbbf24，支架 14b8a6）</li>
+        <li><strong>manifest.json</strong>：name / short_name / display:standalone / background_color / theme_color / orientation:any / lang:zh-TW / categories:education</li>
+        <li><strong>index.html PWA meta</strong>：<code>rel="manifest"</code>、<code>rel="apple-touch-icon"</code>、iOS standalone 三個 meta 標籤</li>
+        <li><strong>favicon 改為外部檔案</strong>：從 data URI 改為 <code>href="icon.svg"</code>，更易維護</li>
+        <li><strong>deploy.yml 更新</strong>：manifest.json + icon.svg 加入部署清單</li>
+        <li>效果：Android Chrome 顯示「新增至主畫面」橫幅；iOS Safari 主畫面啟動隱藏 Safari UI，體驗如原生 App</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 18 — 手勢滑動換頁 + 3D 全螢幕按鈕 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css 修改</div>
+      <ul>
+        <li><strong>Swipe Tab 切換</strong>：在 <code>.visualization-area</code> 偵測 touchstart/touchend；閾值 55px、最大角度 38°、最長 400ms；Canvas 元素觸控自動略過（不干擾 OrbitControls）</li>
+        <li><strong>左滑 → 3D / 右滑 → 2D</strong>：與 switchView() 整合，包含 localStorage 記憶與手機捲動對齊</li>
+        <li><strong>⛶ 全螢幕按鈕</strong>：30px 圓角按鈕置於 3D card header 最右側；requestFullscreen 全前綴相容（webkit / moz / ms）</li>
+        <li><strong>全螢幕模式</strong>：<code>#canvas3d:fullscreen</code> CSS — 100vw × 100vh，無圓角，使 3D 場景填滿整個螢幕</li>
+        <li><strong>圖示切換</strong>：fullscreenchange 事件將圖示在 ⛶（進入）↔ ✕（離開）之間切換</li>
+        <li>不支援的舊瀏覽器自動隱藏按鈕，向後相容</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 50 — CSS 包含 + overscroll 防鏈結 + PWA 安全區域 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.css</div>
+      <ul>
+        <li><strong>contain: layout style on .visualization-area</strong>：CSS Containment Level 2，告知瀏覽器模擬區的佈局和樣式是自封閉的。Canvas 每幀重繪不觸發控制面板或論文區的 reflow，縮短主線程繪製耗時。Chrome 85+ / Firefox 69+ / Safari 15.4+ 支援</li>
+        <li><strong>overscroll-behavior: contain on .controls-panel（mobile）</strong>：面板在 <code>overflow-y: auto</code> 狀態下，捲動到邊界時原本會傳遞到 body 觸發 pull-to-refresh 或頁面捲動。<code>contain</code> 值阻斷捲動鏈結，讓面板滾動行為自我完結</li>
+        <li><strong>PWA install bar safe-area padding</strong>：Phase 49 安裝提示條加入 <code>env(safe-area-inset-bottom)</code>（底部）和 <code>max(1rem, env(safe-area-inset-left/right))</code>（左右），確保 iPhone notch / Dynamic Island / Home Indicator 機型在 PWA standalone 模式的完整顯示</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 49 — PWA 安裝提示條 + accent-color + smooth scroll <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html + index.css</div>
+      <ul>
+        <li><strong>PWA 安裝提示條（beforeinstallprompt）</strong>：攔截 Chrome/Edge 的 PWA 安裝觸發事件，顯示自訂底部安裝條（<code>.pwa-install-bar</code>，z-index:100）。包含說明文字、「安裝應用程式」按鈕（呼叫 <code>deferredPrompt.prompt()</code>）和「✕」關閉按鈕。<code>appinstalled</code> 事件自動隱藏提示條。iOS Safari 不支援此 API，但不顯示提示條，不影響功能</li>
+        <li><strong>accent-color</strong>：<code>:root { accent-color: #0ea5e9 }</code>（品牌藍），無需覆寫 <code>::-webkit-</code> 偽元素即可讓「真實光學模式」和「智慧補償模式」checkbox 呈現品牌色彩。Chrome 93+、Safari 15.4+、Firefox 92+ 均支援</li>
+        <li><strong>scroll-behavior: smooth</strong>：<code>html { scroll-behavior: smooth }</code> 啟用 CSS 平滑捲動（錨點導航 + 無明確 behavior 的 scrollIntoView）。在 <code>@media (prefers-reduced-motion: reduce)</code> 中補加 <code>html { scroll-behavior: auto }</code> 確保前庭功能敏感使用者不受影響</li>
+        <li><strong>pwa-slide-up 動畫</strong>：安裝條出現時從底部滑入（<code>@keyframes pwa-slide-up</code> translateY(100%)→(0)）。此動畫受既有 <code>prefers-reduced-motion: reduce</code> 的 <code>animation-duration: 0.001ms !important</code> 約束，自動縮短為即現</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 48 — Sticky 論文標題列 + manifest id 欄位 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.css + manifest.json</div>
+      <ul>
+        <li><strong>Sticky .paper-header</strong>：加入 <code>position: sticky; top: var(--header-height, 60px); z-index: 10</code>。論文折疊區的標題列在捲動時會黏在 App header 下方（sticky 容器為 <code>.paper-section</code>），使用者閱讀長文時無需捲回頂端即可點擊收合</li>
+        <li><strong>backdrop-filter: blur(8px)</strong>：sticky 懸浮時標題列背景為半透明 <code>rgba(15,23,42,0.9)</code>，內容文字可能透映。加入 blur 磨砂效果，與 App header 風格一致，並防止底層文字干擾標題可讀性。<code>-webkit-backdrop-filter</code> 保持 Safari 相容</li>
+        <li><strong>manifest.json id 欄位</strong>：依 Web App Manifest Level 3 規範，<code>"id": "/shadowless-lamp-sim/"</code> 明確宣告 PWA 識別碼，讓 Chrome / Edge 在 manifest 更新時正確識別已安裝的 PWA（避免觸發重新安裝提示）。值與 <code>start_url</code> 相同，符合最小改動原則</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 47 — WAI-ARIA Tablist 鍵盤導航 + T 鍵快捷 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html</div>
+      <ul>
+        <li><strong>WAI-ARIA Tablist 鍵盤導航</strong>：在 <code>.view-tabs</code> 加入 <code>keydown</code> 監聽。WAI-ARIA 1.1 tablist 規範要求支援：<br>
+          → <code>ArrowRight / ArrowDown</code>：移動到下一個 tab（循環）<br>
+          → <code>ArrowLeft / ArrowUp</code>：移動到上一個 tab（循環）<br>
+          → <code>Home</code>：跳至第一個 tab<br>
+          → <code>End</code>：跳至最後一個 tab<br>
+          所有方向鍵均呼叫 <code>tabs[next].click()</code>（自動啟用模式）和 <code>tabs[next].focus()</code>，確保焦點隨 tab 移動</li>
+        <li><strong>T 鍵全域切換 Tab</strong>：在主鍵盤快捷鍵 switch 中加入 <code>case 't': case 'T'</code>，根據當前 active view 切換到另一個 tab，並呼叫 <code>targetTab.focus()</code> 讓鍵盤使用者清楚知道焦點位置</li>
+        <li><strong>鍵盤說明 Toast 更新</strong>：加入「T 切換 Tab」提示，讓使用者在按 ? 時能看到此快捷鍵</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 46 — Canvas ARIA + Tablist Orientation + applyMode Debounce <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html</div>
+      <ul>
+        <li><strong>rayCanvas aria-label</strong>：<code>role="img" aria-label="二維幾何光路追跡空間：LED 陣列光源（橘點）向下方射出光線，繞過球形遮擋物（手術頭部）照射底部工作面，顯示有效光線（藍）與被遮擋光線（紅）"</code>。VoiceOver / NVDA 現在可朗讀此 Canvas 的語義描述</li>
+        <li><strong>illuminanceChart aria-label</strong>：<code>role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），三條折線分別顯示遮擋場景照度、無遮擋基準，以及 IEC 60601 50% 標準線"</code></li>
+        <li><strong>tablist aria-orientation</strong>：<code>.view-tabs</code> 加入 <code>aria-orientation="horizontal"</code>。雖然 tablist 預設為 horizontal，明確標注有助於螢幕閱讀器確認鍵盤操作方向（left/right 切換 tabs）</li>
+        <li><strong>applyMode resize debounce（100ms）</strong>：面板 toggle IIFE 中 <code>window.addEventListener('resize', applyMode)</code> 改為 <code>clearTimeout</code> + <code>setTimeout(applyMode, 100)</code>。拖曳視窗大小時不再密集觸發 DOM style 設定（maxHeight / overflowY / display）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 45 — Preload 提前下載 + 超小螢幕 + 圖表按鈕 WCAG <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html + index.css</div>
+      <ul>
+        <li><strong>rel="preload" as="script"</strong>：在 <code>&lt;head&gt;</code> 加入 <code>&lt;link rel="preload" as="script" href="simulation.js?v=4"&gt;</code>。瀏覽器在解析 HTML 時即預先下載 simulation.js，而非等到 parser 到達 body 底部的 <code>&lt;script&gt;</code> 標籤才開始下載。對慢速網路（如學校 WiFi）可節省 100–300ms 的首次模擬渲染延遲。simulation.js 不是 ES module，<code>as="script"</code> 正確匹配其載入方式</li>
+        <li><strong>超小螢幕 logo-icon 隱藏</strong>：在 <code>@media (max-width: 390px)</code> 加入 <code>.logo-icon { display: none }</code>，省去 24px 圓形裝飾圖示所佔的橫向空間，讓超小螢幕（iPhone SE = 375px、舊款 Android = 360px）的標題更不容易截斷</li>
+        <li><strong>圖表放大按鈕擴大至 32×32</strong>：<code>.chart-expand-btn</code> 在手機版從 24×24px 改為 32×32px。原本 24px 略低於 WCAG 2.5.8（建議 24px）且操作不夠精確；32px 是 iOS/Android 推薦的最小觸控目標</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 44 — 手機面板空間優化 + aria-live 照度顯示 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.css + index.html</div>
+      <ul>
+        <li><strong>手機面板 h2/說明文字隱藏</strong>：在 <code>@media (max-width: 768px)</code> 加入 <code>.controls-panel h2, .panel-desc { display: none; }</code>。<br>
+          背景：面板 h2「模擬參數控制面板」（10字）和 p「即時調整無影燈陣列…」（24字）在手機上佔約 65px，但面板 toggle 按鈕文字「⚙️ 模擬參數」已提供足夠的識別線索。隱藏後控制群組可在有限的 57/78vh 內顯示更多條目，減少 panel 內部捲動</li>
+        <li><strong>aria-live 照度顯示</strong>：<code>#center-illuminance-display</code> 加入 <code>aria-live="polite" aria-atomic="true"</code>，螢幕閱讀器（NVDA / VoiceOver）在調整滑桿後會以「禮貌（polite）」模式（不中斷當前發聲）朗讀照度值變化，提升鍵盤盲用使用者體驗</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 43 — 橫向模式面板高度 + scroll-padding + 字型微調 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html + index.css</div>
+      <ul>
+        <li><strong>橫向（landscape）模式面板高度</strong>：<code>mobileCap()</code> 加入方向判斷：<code>window.innerWidth &gt; window.innerHeight</code> 時（landscape）返回 <code>innerHeight × 0.78</code>，否則維持 <code>innerHeight × 0.57</code>。背景：iPhone landscape 高度約 390px，57% 僅 222px 對 8 個控制群組極度擁擠；78% = 304px 仍可捲動但明顯改善</li>
+        <li><strong>scroll-padding-top</strong>：在 CSS 的 <code>html</code> 元素加入 <code>scroll-padding-top: calc(var(--header-height, 60px) + 0.75rem)</code>。瀏覽器錨點導航（<code>#id</code>）和 <code>scrollIntoView</code> 都會自動避開 sticky header 的高度，不再被 header 遮蓋目標元素</li>
+        <li><strong>info-card 字型</strong>：<code>.info-card p</code> 從 0.8rem 微調至 0.82rem，提高行動裝置閱讀舒適度</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 42 — 演示體驗優化：面板自動收合 + 滑動提示淡出 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.html</div>
+      <ul>
+        <li><strong>演示開始自動收合面板</strong>：<code>startDemo()</code> 最前面判斷 <code>window.innerWidth &lt;= 768</code>，若面板展開則觸發 toggle click 收合，讓整個視覺化區域在演示期間不被遮擋</li>
+        <li><strong>演示觸覺反饋</strong>：演示開始觸發 <code>vibrate([10, 40, 10])</code>（雙點輕振，表示"開始"）；演示結束觸發 <code>vibrate(8)</code>（單短振，表示"停止"）</li>
+        <li><strong>滑動提示自動淡出</strong>：<code>switchView()</code> 在任何 tab 切換時（含 localStorage 恢復）以 0.4s opacity 淡出 <code>.mmb-hint</code>（「← 左右滑動切換視圖 →」），讓使用者首次切換後不再持續顯示已知的手勢提示，保持 metric bar 的簡潔</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 41 — 2D Canvas Aspect-Ratio 修正（消除 Letterbox 留白）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-27 · index.css</div>
+      <ul>
+        <li><strong>問題</strong>：rayCanvas 的內部 buffer 是 1600×800（2:1 比例），但手機版 <code>.canvas-container</code> 設定 <code>min-height: 260px</code>，在寬度 ~337px 的手機上容器比例為 337:260（≈1.3:1），而非 2:1。<code>object-fit: contain</code> 將畫面內容按 2:1 填入容器，造成上下各約 46px 的黑色 letterbox 留白，浪費約 92px 垂直空間</li>
+        <li><strong>修正</strong>：在 <code>@media (max-width: 768px)</code> 中改 <code>.canvas-container { min-height: 0; aspect-ratio: 2 / 1; }</code></li>
+        <li>效果：容器自動跟隨寬度計算高度（width ÷ 2），canvas 以 100%×100% 精確填充容器，完全無 letterbox。390px 寬手機上 canvas 容器由 260px 縮至 ~168px，節省 ~92px 垂直空間供圖表使用</li>
+        <li><code>aspect-ratio</code> 支援：Chrome 88+、Safari 15+、Firefox 89+（2021 年後所有主流瀏覽器）。舊版瀏覽器降級為 <code>min-height: 0</code>（無 letterbox 約束但仍可正常顯示）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 40 — 焦點管理 + Resize 防抖 + 預設場景觸覺反饋 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html</div>
+      <ul>
+        <li><strong>焦點返回管理（ARIA 合規）</strong>：ESC 關閉面板後執行 <code>toggleEl.focus()</code>（50ms setTimeout 等動畫完成）；backdrop 點擊關閉後執行 <code>btn.focus()</code>。螢幕閱讀器使用者現在能清楚感知面板已關閉（焦點回到觸發按鈕）</li>
+        <li><strong>syncHeaderHeight resize 防抖</strong>：原本 resize 事件每次都讀取 <code>offsetHeight</code>（強制 reflow），在拖曳視窗大小時每幀觸發多次。改為 <code>clearTimeout</code> + <code>setTimeout(fn, 150)</code> 防抖，resize 停止 150ms 後才執行一次測量</li>
+        <li><strong>預設場景觸覺反饋</strong>：<code>applyPreset()</code> 最前面加入 <code>navigator.vibrate(12)</code>，按下任意預設場景按鈕時在 Android Chrome 上觸發 12ms 輕觸確認震動，與 IEC 閾值震動（25–70ms 重型）形成明確差異</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 39 — Web Share API 原生分享（手機）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html</div>
+      <ul>
+        <li><strong>問題</strong>：手機使用者「分享連結」的常見行為是透過系統分享表單（LINE、訊息、AirDrop 等），而非剪貼簿複製。舊版的「📋 複製連結」UX 在手機上需要再手動開啟 LINE 貼上，多了兩步。</li>
+        <li><strong>Web Share API 偵測</strong>：初始化時檢查 <code>navigator.share</code>，iOS Safari 12.1+、Chrome Android 61+ 均支援</li>
+        <li><strong>手機模式</strong>：按鈕文字改為「📤 分享此設定連結」，<code>navigator.share({ title, text, url })</code> 呼叫系統原生分享表單。成功時顯示短暫「✅ 已分享！」回饋。</li>
+        <li><strong>桌機模式</strong>：保持原有的 Clipboard API 複製 → 舊式 execCommand 降級行為，顯示「✅ 已複製！」</li>
+        <li><code>navigator.share()</code> 失敗（使用者取消）時靜默處理，不顯示錯誤</li>
+        <li>效果：手機學生可直接以 LINE 傳送特定參數的模擬器網址，方便課堂討論與作業繳交</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 38 — 手機面板 Backdrop 遮罩（點外關閉）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.css + index.html</div>
+      <ul>
+        <li><strong>問題</strong>：手機版控制面板展開後，若要收合只能點擊頂部的折疊按鈕，與手機 App 的「點面板外側關閉」慣例不符，尤其是在面板佔 57vh 時，使用者自然傾向點下方視覺化區域</li>
+        <li><strong>HTML</strong>：在 <code>.app-container</code> 最前方新增 <code>&lt;div class="panel-backdrop" id="panel-backdrop" aria-hidden="true"&gt;&lt;/div&gt;</code></li>
+        <li><strong>CSS 遮罩樣式</strong>：<code>position:fixed; inset:0; background:rgba(0,0,0,0.32); z-index:88</code>，預設 <code>opacity:0; pointer-events:none</code>（不影響正常操作），加入 <code>.active</code> class 後 opacity:1 + pointer-events:auto（0.28s ease 淡入）</li>
+        <li><strong>CSS z-index 層次設計</strong>：<br>
+          ① <code>.controls-panel</code> 在 <code>@media 768px</code> 加入 <code>position:relative; z-index:89</code>（高於遮罩，面板內容可見且可互動）<br>
+          ② <code>.panel-backdrop</code>：<code>z-index:88</code>（遮蓋視覺化區 z-index:auto，但低於面板）<br>
+          ③ <code>.panel-toggle</code>：已有 <code>z-index:90</code>（最高層，始終可點擊）</li>
+        <li><strong>JS 整合</strong>：<code>openPanel()</code> 在手機版時加入 <code>backdrop.classList.add('active')</code>；<code>closePanel()</code> 先移除 <code>active</code>；<code>applyMode()</code> 切換到桌機時自動清除遮罩</li>
+        <li><strong>點擊遮罩關閉</strong>：backdrop 的 click 事件呼叫 <code>closePanel()</code>，同時觸發短暫 8ms 震動提供觸覺確認</li>
+        <li>效果：任何在面板外側的點擊（視覺化區、Canvas、圖表）都會收合面板，符合 iOS/Android 的 Sheet/Modal 關閉慣例</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 37 — 深色模式系統整合 + ESC 關閉面板 + 滑桿 :active 反饋 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.css + index.html</div>
+      <ul>
+        <li><strong>color-scheme: dark</strong>：CSS <code>:root { color-scheme: dark }</code> + <code>&lt;meta name="color-scheme" content="dark"&gt;</code>，讓瀏覽器系統 UI（捲軸、表單控制項、日期選擇器等）自動渲染為深色，無需手動覆寫</li>
+        <li><strong>ESC 關閉面板</strong>：keydown 監聽器在 INPUT/TEXTAREA 攔截前先處理 Escape，手機版面板展開時按 ESC 自動收合（即使焦點在滑桿上亦有效）</li>
+        <li>鍵盤說明 Toast 新增 Esc 快捷鍵提示</li>
+        <li><strong>滑桿 :active 放大</strong>：<code>::-webkit-slider-thumb:active</code> 和 <code>::-moz-range-thumb:active</code> 在拖曳時 scale(1.4) + 6px 半透明光暈，強化觸控拖曳的即時視覺反饋</li>
+        <li><strong>overscroll-behavior: none（兩軸）</strong>：將 body 的 <code>overscroll-behavior-y: none</code> 改為 <code>overscroll-behavior: none</code>，同時防止橫向 iOS rubber-band 彈跳（雙軸防護）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 36 — Service Worker 離線快取（PWA 完整化）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · sw.js 新增 + index.html + deploy.yml</div>
+      <ul>
+        <li><strong>sw.js</strong>：新增 Service Worker，支援 Fetch、Install、Activate 三個生命週期事件</li>
+        <li><strong>快取策略：Cache-First + 背景網路更新</strong>（stale-while-revalidate）</li>
+        <li>快取資產：index.html / index.css / simulation.js / simulation3d.js / icon.svg / manifest.json</li>
+        <li>CDN 資產（Three.js / Chart.js / Google Fonts）跳過 SW 處理，交由瀏覽器正常快取策略</li>
+        <li>Install：<code>skipWaiting()</code> 讓新版 SW 立即生效</li>
+        <li>Activate：刪除舊版快取 key，<code>clients.claim()</code> 立即接管現有頁面</li>
+        <li>Fetch：快取命中時立即回傳（秒開），背景更新資產；快取未命中時網路取得並存入快取；完全離線時回傳快取的 index.html</li>
+        <li>只攔截同源 GET 請求（非同源 CDN 資源直接放行，避免跨域快取問題）</li>
+        <li><strong>index.html 註冊</strong>：window.load 事件後 <code>navigator.serviceWorker.register('/shadowless-lamp-sim/sw.js')</code>，失敗時靜默降級</li>
+        <li><strong>deploy.yml</strong>：sw.js 加入部署清單（source cp + dest cp + git add）</li>
+        <li>效果：首次訪問後，2D 模擬器完全離線可用（包括 Canvas 光路圖和 Chart.js 照度圖）</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 35 — ARIA Tab 無障礙模式 + 懶載入 3D 模組 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html</div>
+      <ul>
+        <li><strong>ARIA Tab 模式</strong>：.view-tabs 加入 <code>role="tablist" aria-label="模擬視圖"</code></li>
+        <li>兩個 tab 按鈕：<code>id="tab-2d/tab-3d"、role="tab"、aria-selected="true/false"、aria-controls="view-2d/view-3d"</code></li>
+        <li>兩個 tabpanel：<code>role="tabpanel"、aria-labelledby="tab-2d/tab-3d"、tabindex="0"</code>（使 tabpanel 可直接聚焦）</li>
+        <li>switchView() 更新：同步更新 aria-selected（active tab = true，其他 = false）</li>
+        <li>效果：螢幕閱讀器可正確朗讀「目前第 1 個分頁，共 2 個，2D 幾何剖面分析（已選）」</li>
+        <li><strong>懶載入 3D 模組</strong>：移除 <code>&lt;script type="module" src="simulation3d.js?v=4"&gt;</code> 靜態載入</li>
+        <li>改為在 switchView() 首次切換到 3D 時執行 <code>import('./simulation3d.js?v=4')</code>（動態 import）</li>
+        <li><code>window._sls3dLoading = true</code> 確保只載入一次（後續切換不重複 import）</li>
+        <li>效能影響：只使用 2D 的使用者（包括大多數手機首次訪問）不下載 Three.js bundle（jsDelivr 的 three@0.160.0 約 600KB gzip）</li>
+        <li>降級處理：若 import 失敗（網路問題），catch 重設 <code>window._sls3dLoading</code> 允許下次重試，canvas-loading spinner 持續顯示提醒使用者</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 34 — rAF 防抖渲染（滑桿拖曳效能優化）<span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · simulation.js</div>
+      <ul>
+        <li><strong>問題</strong>：滑桿快速拖曳時，<code>input</code> 事件每幀可能觸發多次（取決於瀏覽器），但每次都執行 Canvas 重繪 + Chart.js 更新（各約 5–15ms），在低端手機可能造成掉幀</li>
+        <li><strong>解決</strong>：將昂貴的 runSimulation()（Canvas drawCanvas + Chart.js update）延至 <code>requestAnimationFrame</code></li>
+        <li>實作 <code>scheduleSimulation()</code>：若上次 rAF 尚未執行則 <code>cancelAnimationFrame()</code> 取消並重排，確保同幀內的多次 input 事件合併為單次渲染</li>
+        <li>低成本操作（<code>encodeHash()</code>、val-pulse 動畫、vibrate）仍立即在 input 事件執行，保持視覺回饋即時性</li>
+        <li>理論效能提升：60fps 下拖曳滑桿時，runSimulation() 最多執行 60 次/秒（每幀一次），而非舊版可能的多次/幀</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 33 — 面板高度限制 + 內部捲動 + 標尺清理 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css</div>
+      <ul>
+        <li><strong>問題</strong>：控制面板展開後高度約 970px（含 8 個控制群組），在 667px 手機上會把視覺化區域推到 300px+ 以下折疊處</li>
+        <li><strong>openPanel() 修改</strong>：計算 <code>mobileCap = Math.floor(window.innerHeight * 0.57)</code>，面板動畫目標高度改為 <code>Math.min(scrollHeight, cap)</code></li>
+        <li>動畫結束後：手機版保持 <code>panel.style.maxHeight = cap + 'px'; overflowY = 'auto'</code>，讓使用者在面板內獨立捲動</li>
+        <li>桌機版：仍設定 <code>maxHeight = 'none'</code>，不受限制</li>
+        <li><strong>closePanel() 修改</strong>：先清除 overflowY，再用 <code>panel.offsetHeight</code>（可見高度）而非 scrollHeight 作為關閉動畫的起始值，確保動畫起點正確</li>
+        <li><strong>applyMode() 修改</strong>：視窗旋轉時重新計算 cap 並更新 maxHeight，適應橫向/縱向切換</li>
+        <li><strong>細滾輪樣式</strong>：<code>::-webkit-scrollbar</code> 寬度 4px，透明軌道，符合深色主題</li>
+        <li><strong>範圍標尺中間標籤隱藏</strong>：@media (max-width:768px) 下 <code>.range-labels span:nth-child(2) { display: none }</code>，移除過長的中間說明（如「10.5cm (IEC標準頭部)」），兩端標籤保留</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 32 — Sticky 控制面板按鈕 + 即時照度指示 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css + simulation.js</div>
+      <ul>
+        <li><strong>問題</strong>：使用者捲動到 3D canvas 或照度圖表區域後，控制面板折疊按鈕不在視窗內，無法快速返回調整參數</li>
+        <li><strong>Sticky 面板按鈕</strong>：@media (max-width:768px) 下加入 <code>position: sticky; top: var(--header-height)</code>（z-index:90，低於 header 的 100）</li>
+        <li><strong>動態 --header-height CSS 變數</strong>：JS 在 DOMContentLoaded + resize + fonts.ready 時量測 .app-header.offsetHeight 並寫入 <code>document.documentElement.style</code>，確保 Dynamic Island / 一般 iPhone 均正確定位</li>
+        <li><strong>視覺升級</strong>：sticky 狀態下 background 改為 rgba(11,17,32,0.92) + backdrop-filter:blur(8px)，底部圓角改為 0 0 10px 10px（與 header 接觸面方正）；展開時改為 10px 10px 0 0（與面板融合）</li>
+        <li><strong>.toggle-metric 即時照度</strong>：按鈕內加入 <code>&lt;span class="toggle-metric" id="toggle-metric-badge"&gt;</code></li>
+        <li>simulation.js updateChart() 同步更新：顯示「XX% ✅/❌」，顏色隨閾值（teal/amber/red）即時切換</li>
+        <li>效果：捲動到任何位置都能在 header 下方看到當前照度並一鍵重開面板</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 31 — 觸控延遲消除 + 44px 觸控目標 + 捲動隔離 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.css · commit 待提交</div>
+      <ul>
+        <li><strong>touch-action: manipulation</strong>：CSS 全局規則（緊跟 * 重置後），作用於所有可互動元素</li>
+        <li>效果：消除手機瀏覽器的 300ms 點擊延遲（不需等待確認雙擊），保留頁面縮放能力（比 user-scalable=no 更符合無障礙標準）</li>
+        <li>作用元素：button、input[type="range"]、input[type="checkbox"]、a、label[for]、[role="button"]、[tabindex]</li>
+        <li><strong>WCAG 2.5.5 觸控目標</strong>：@media (max-width:768px) 中加入 min-height:44px</li>
+        <li>受益元素：.preset-btn（原 ~26px）/ .demo-btn（原 ~38px）/ .share-btn（原 ~38px）</li>
+        <li>符合 WCAG 2.1 Level AA 成功準則 2.5.5（觸控目標大小 44×44 CSS px）</li>
+        <li><strong>overscroll-behavior-y: contain</strong>：.controls-panel.open — 面板捲動到頂/底邊界時不傳導至頁面捲動，避免手機使用者在面板內捲動時意外觸發頁面移動</li>
+      </ul>
+    </div>
+
+    <div class="phase-card">
+      <h3>Phase 30 — 手機浮動指標條 + IEC 閾值觸覺反饋 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-05-26 · index.html + index.css + simulation.js · commit 待提交</div>
+      <ul>
+        <li><strong>問題</strong>：手機版面板折疊後調整滑桿時，使用者需要捲動到下方照度圖才能看到當前 IEC 狀態，操作流程斷裂</li>
+        <li><strong>.mobile-metric-bar</strong>：視覺化區域頂端（view-tabs 上方）加入淡藍色指標條</li>
+        <li>顯示：「中心照度」標籤 + 數值（monospace，顏色隨閾值 teal/amber/red 變化）+ IEC PASS/FAIL badge + 「← 左右滑動切換視圖 →」提示</li>
+        <li>桌機：<code>display: none</code>；手機（≤768px）：<code>display: flex</code>，backdrop-filter blur</li>
+        <li><strong>simulation.js 同步</strong>：updateChart() 每次計算後同時更新 <code>#mmb-center-val</code> 和 <code>#mmb-iec-badge</code>，資料來源與主顯示完全一致</li>
+        <li><strong>IEC 閾值觸覺反饋</strong>：<code>prevIECPass</code> 變數追蹤上一次計算的 IEC 狀態</li>
+        <li>PASS → FAIL（照度跌破 50%）：<code>navigator.vibrate([70, 25, 35])</code>（長-短-中，警示型態）</li>
+        <li>FAIL → PASS（照度回升 ≥50%）：<code>navigator.vibrate([25, 20, 50])</code>（短-短-長，成功型態）</li>
+        <li>初始化時 prevIECPass = null 不震動，避免頁面載入時誤觸發</li>
+        <li>Android Chrome 支援 Vibration API；iOS Safari 靜默忽略（graceful degradation）</li>
+      </ul>
+    </div>
+
+      <div class="msg user">
+        <div class="role">👨‍🏫 Henry（Loop 自動繼續）</div>
+        <div class="content">（續教學品質佇列）dev-log 分頁、小幅打磨等。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Phase 69 — dev-log 分頁）</div>
+        <div class="content">
+          dev-log.html 已漲至 215KB，其中本逐字稿區段獨佔 118KB（55%）。把整段切出為本頁 <code>dev-log-transcript.html</code>（沿用同款樣式、加返回連結），主頁瘦身至 97KB 並留醒目連結。deploy.yml 三處補檔、兩檔標籤平衡驗證通過。<br><br>
+          <strong>新慣例</strong>：之後的新對話依時序增補於本頁尾端；完整逐字稿備份仍在 repo 內《對話完整紀錄.md》。
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  shadowless-lamp-sim · 開發紀錄由 Claude 自動維護 · 最後更新：<span id="ts"></span>
+</footer>
+<script>document.getElementById('ts').textContent = new Date().toLocaleString('zh-TW', {timeZone:'Asia/Taipei'});</script>
+</body>
+</html>
