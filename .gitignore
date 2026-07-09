@@ -27,3 +27,6 @@ debug_screenshot*.png
 # 本機 puppeteer 殘留（驗證流程已改用 DOM shim + 線上 curl，不再進 repo）
 package.json
 package-lock.json
+
+# Claude Code 本機設定
+.claude/
