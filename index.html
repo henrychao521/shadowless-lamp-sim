@@ -31,7 +31,7 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=14">
+    <link rel="stylesheet" href="index.css?v=15">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
     <!-- 版本改以「檔名」承載（simulation-v6.js）：GitHub Pages CDN 對部分資產不把
          query 納入快取鍵，?v=N 破壞快取在邊緣節點無效（Phase 65 教訓）-->
@@ -63,10 +63,10 @@
         </div>
         <!-- 永遠可見的入口：直接連進光路逆行互動演示（手機版 header-badges 隱藏，此連結獨立保留）-->
         <a href="optics-reciprocity.html" class="header-demo-link" title="開啟光路逆行互動演示頁">
-            🔭 <span class="demo-link-full">光路逆行演示</span><span class="demo-link-short">逆行演示</span>
+            <span class="demo-link-full">光路逆行演示</span><span class="demo-link-short">逆行演示</span>
         </a>
         <a href="操作介紹.pdf" class="header-guide-link" title="下載系統操作介紹手冊 (PDF)" target="_blank" rel="noopener">
-            📄 <span class="demo-link-full">操作手冊</span><span class="demo-link-short">手冊</span>
+            <span class="demo-link-full">操作手冊</span><span class="demo-link-short">手冊</span>
         </a>
     </header>
 
@@ -78,7 +78,7 @@
         </div>
         <div class="lg-panels">
             <details class="lg-card" open>
-                <summary>📚 學習目標</summary>
+                <summary>學習目標</summary>
                 <div class="lg-body">
                     <p>完成本單元的操作後，你應該能夠：</p>
                     <ol>
@@ -89,7 +89,7 @@
                 </div>
             </details>
             <details class="lg-card">
-                <summary>🔬 試試看（先猜再看）</summary>
+                <summary>試試看（先猜再看）</summary>
                 <div class="lg-body">
                     <p class="lg-tip">每個任務都<strong>先預測、再操作驗證</strong>——這才是科學探究。下方藍色按鈕會直接幫你套用對應場景。</p>
                     <ol class="lg-tasks">
@@ -97,9 +97,9 @@
                         <li><strong>遮擋物移到正中央最暗嗎？</strong>把「遮擋物水平位置」從 0 慢慢拖到 +30cm，觀察陰影曲線的最低點怎麼移動，想想為什麼偏移時某一側反而更暗。</li>
                         <li><strong>發散角的兩難。</strong>把「發散角」從 1° 調到 15°：光斑變大還是變小？中心照度呢？討論看看，泛光（大角度）補影較強，<em>代價</em>是什麼。</li>
                         <li><strong>把燈拉低。</strong>燈高從 100 降到 60cm，再套用 <button type="button" class="lg-preset" data-preset="preset-hard">⚠️ 嚴苛遮擋</button>，看中心照度會不會跌破 50% 的紅色基準線。</li>
-                        <li><strong>延伸任務（光路逆行）。</strong>開啟 <a href="optics-reciprocity.html">🔭 光路逆行演示</a>：先猜障礙物變寬時，交會處會出現「缺口」還是只是「整體變暗」？再拖動寬度滑桿驗證。</li>
+                        <li><strong>延伸任務（光路逆行）。</strong>開啟 <a href="optics-reciprocity.html">光路逆行演示</a>：先猜障礙物變寬時，交會處會出現「缺口」還是只是「整體變暗」？再拖動寬度滑桿驗證。</li>
                     </ol>
-                    <p class="lg-worksheet"><a href="學習單.pdf" target="_blank" rel="noopener">🖨️ 下載探究學習單（PDF，A4 三頁）</a>——上述任務的可列印版，含「先猜再看」書寫欄與教師指引頁（課綱對應、參考答案、常見迷思）。</p>
+                    <p class="lg-worksheet"><a href="學習單.pdf" target="_blank" rel="noopener">下載探究學習單（PDF，A4 三頁）</a>——上述任務的可列印版，含「先猜再看」書寫欄與教師指引頁（課綱對應、參考答案、常見迷思）。</p>
                 </div>
             </details>
             <details class="lg-card">
@@ -132,7 +132,7 @@
 
             <!-- Phase 62：名詞小幫手 — 降低專有名詞門檻（手機可點、原生無障礙）-->
             <details class="glossary-card">
-                <summary>📖 名詞小幫手（看不懂時點我）</summary>
+                <summary>名詞小幫手（看不懂時點我）</summary>
                 <dl class="glossary-list">
                     <dt>本影（Umbra）</dt><dd>完全被擋住、最暗的核心陰影。</dd>
                     <dt>半影（Penumbra）</dt><dd>只被擋掉一部分光、比較淡的陰影。無影燈就是把本影變成淡半影。</dd>
@@ -253,7 +253,7 @@
 
             <!-- 光學原理類比小卡：連結光路逆行互動演示頁 -->
             <div class="info-card" style="border-left:3px solid var(--accent-blue);">
-                <h3>🔭 光學原理類比：探照燈＝望遠鏡反過來用</h3>
+                <h3>光學原理類比：探照燈＝望遠鏡反過來用</h3>
                 <p style="font-size:0.86rem;color:var(--text-secondary);">多面反射式無影燈的反射碗，與<strong style="color:var(--text-primary);">牛頓式反射望遠鏡的主鏡</strong>共用同一個物理基礎：凹拋物面的「焦點 ↔ 平行光」性質。差別只在<strong style="color:var(--text-primary);">光路方向相反</strong>——望遠鏡<em>收光成像</em>、無影燈<em>出光投射</em>，即<strong style="color:var(--accent-blue);">光路可逆</strong>。</p>
                 <a href="optics-reciprocity.html" style="display:inline-flex;align-items:center;gap:0.4rem;margin-top:0.6rem;padding:0.5rem 0.85rem;font-size:0.85rem;font-weight:600;color:#fff;text-decoration:none;border-radius:8px;background:linear-gradient(120deg,var(--accent-blue),var(--accent-teal));">▶ 開啟光路逆行互動演示</a>
             </div>
@@ -318,7 +318,7 @@
                     <div class="card-header">
                         <h3>兩種無影燈設計哲學對照 (LED 陣列式 vs. 多面反射式)</h3>
                     </div>
-                    <p class="design-compare-lead">💭 <strong>這張表就是「工程設計」本身</strong>：兩種設計沒有誰絕對比較好，各有取捨（trade-off）。閱讀時請想——如果你是設計師，會為了哪個目標（成本、亮度、無影效果、散熱、維修）犧牲哪個？</p>
+                    <p class="design-compare-lead"><strong>這張表就是「工程設計」本身</strong>：兩種設計沒有誰絕對比較好，各有取捨（trade-off）。閱讀時請想——如果你是設計師，會為了哪個目標（成本、亮度、無影效果、散熱、維修）犧牲哪個？</p>
                     <p class="design-compare-hint" aria-hidden="true">← 左右滑動檢視完整對照（首欄項目固定）→</p>
                     <div class="design-compare-scroll">
                         <table class="design-compare-table">
@@ -343,7 +343,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="design-compare-foot">⚖️ 結論：兩者皆為合規的無影燈設計，<strong>2D 幾何陰影稀釋效果相同</strong>；真正差異在於可靠度、色彩、效率、體積等工程取捨。勾選左側「多面反射式」可即時切換 2D 剖面對照。</p>
+                    <p class="design-compare-foot">結論：兩者皆為合規的無影燈設計，<strong>2D 幾何陰影稀釋效果相同</strong>；真正差異在於可靠度、色彩、效率、體積等工程取捨。勾選左側「多面反射式」可即時切換 2D 剖面對照。</p>
                 </div>
             </div>
 
@@ -353,8 +353,8 @@
                     <div class="card-header">
                         <h3>三維空間無影燈物理模擬 (3D Physical Simulation)</h3>
                         <div class="legend" style="align-items: center; flex-wrap: wrap; gap: 0.5rem;">
-                            <span class="legend-item touch-hint-desktop">🖱️ 拖曳旋轉・滾輪縮放</span>
-                            <span class="legend-item touch-hint-mobile" style="display:none">👆 單指旋轉・雙指縮放</span>
+                            <span class="legend-item touch-hint-desktop">拖曳旋轉・滾輪縮放</span>
+                            <span class="legend-item touch-hint-mobile" style="display:none">單指旋轉・雙指縮放</span>
                             <span class="legend-item heatmap-legend-wrapper">
                                 <span style="margin-right: 6px;">相對照度:</span>
                                 <span class="heatmap-label">弱</span>
@@ -383,7 +383,7 @@
     <!-- 參考文獻區塊 -->
     <section class="paper-reference-container">
         <div class="paper-header" id="paper-toggle-btn" role="button" tabindex="0" aria-expanded="false" aria-controls="paper-content">
-            <h2>📄 參考文獻與理論基礎：外科手術無影燈技術報告 <span>(點擊展開/收合閱讀完整報告)</span></h2>
+            <h2>參考文獻與理論基礎：外科手術無影燈技術報告 <span>(點擊展開/收合閱讀完整報告)</span></h2>
         </div>
         <article id="paper-content" class="paper-content collapsed">
             <h2>外科手術無影燈之光學與機械設計原理、國際標準規範及計算機模擬技術報告</h2>
@@ -440,7 +440,7 @@
                 <li><strong>全景融合技術：</strong>在燈頭邊緣呈環形集成多個微型相機模組，自動挑選未遮擋視角進行實時圖像拼接與畫面穩定處理，生成無阻擋的教學錄像流。</li>
             </ul>
 
-            <h3>🔗 引用的文獻與真實連結</h3>
+            <h3>引用的文獻與真實連結</h3>
             <ul class="literature-list">
                 <li><a href="https://clearvulighting.com/healthcare" target="_blank">Healthcare & Surgical LED Lighting — orLED</a></li>
                 <li><a href="https://en.mplent.com/news/mplent-news-318.html" target="_blank">Under the shadowless surgical lamp: The "artificial sun" that illuminates the miracle of life</a></li>
@@ -462,7 +462,7 @@
             </ul>
 
             <div class="download-section">
-                <a href="./手術無影燈光學設計與模擬.docx" download class="download-btn">📥 下載完整系統原始報告 (DOCX 格式)</a>
+                <a href="./手術無影燈光學設計與模擬.docx" download class="download-btn">下載完整系統原始報告 (DOCX 格式)</a>
                 <p class="download-note">註：原檔為 DOCX 格式，因此提供原始檔下載，可保留完整的數學公式與排版格式。</p>
             </div>
         </article>
@@ -1305,7 +1305,7 @@
 
     <!-- Phase 49：PWA 安裝提示條（beforeinstallprompt 觸發後顯示） -->
     <div class="pwa-install-bar" id="pwa-install-bar" role="complementary" aria-label="安裝應用程式">
-        <p>📲 將無影燈模擬器加入主畫面，支援完整離線使用</p>
+        <p>將無影燈模擬器加入主畫面，支援完整離線使用</p>
         <button class="pwa-btn pwa-btn-install" id="pwa-install-btn">安裝應用程式</button>
         <button class="pwa-btn pwa-btn-dismiss" id="pwa-dismiss-btn" aria-label="關閉安裝提示">✕</button>
     </div>

@@ -1,25 +1,25 @@
 :root {
-    color-scheme: dark; /* 告知瀏覽器本站為深色，系統滾動條、表單控制項自動套用深色主題 */
-    accent-color: #0ea5e9; /* Phase 49：原生表單控制項（checkbox / radio）自動套用品牌藍 */
-    --bg-main: #0b1120;
-    --bg-panel: rgba(15, 23, 42, 0.75);
-    --bg-card: rgba(30, 41, 59, 0.6);
+    color-scheme: light;
+    accent-color: #e8412c;
+    --bg-main: #f6f4ee;
+    --bg-panel: #ffffff;
+    --bg-card: #ffffff;
 
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    --text-primary: #17171a;
+    --text-secondary: #17171a;
+    --text-muted: #4a4a4a;
 
-    --accent-blue: #0ea5e9;
-    --accent-blue-hover: #38bdf8;
-    --accent-teal: #14b8a6;
-    --accent-red: #ef4444;
-    --accent-amber: #f59e0b;
+    --accent-blue: #e8412c;
+    --accent-blue-hover: #b93322;
+    --accent-teal: #17171a;
+    --accent-red: #e8412c;
+    --accent-amber: #17171a;
 
-    --border-color: rgba(51, 65, 85, 0.5);
-    --border-highlight: rgba(14, 165, 233, 0.3);
+    --border-color: #17171a;
+    --border-highlight: #17171a;
 
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --shadow-glow: 0 0 15px rgba(14, 165, 233, 0.2);
+    --shadow-soft: none;
+    --shadow-glow: none;
 }
 
 * {
@@ -28,14 +28,11 @@
     padding: 0;
 }
 
-/* ── scroll-padding-top：錨點導航 / scrollIntoView 自動避開 sticky header ── */
-/* ── scroll-behavior smooth（Phase 49，僅在使用者未設定「減少動態效果」時啟用）── */
 html {
     scroll-padding-top: calc(var(--header-height, 60px) + 0.75rem);
     scroll-behavior: smooth;
 }
 
-/* ── 觸控優化：消除 300ms tap delay，不阻止頁面縮放 ── */
 button,
 input[type="range"],
 input[type="checkbox"],
@@ -47,7 +44,8 @@ label[for],
 }
 
 body {
-    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
     background-color: var(--bg-main);
     color: var(--text-primary);
     line-height: 1.6;
@@ -55,24 +53,18 @@ body {
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
-    /* Prevent iOS/Android rubber-band over-scroll on both axes */
     overscroll-behavior: none;
-    background-image:
-        radial-gradient(circle at 15% 50%, rgba(14, 165, 233, 0.05), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(20, 184, 166, 0.05), transparent 25%);
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M40 0L0 0 0 40' fill='none' stroke='%2317171a' stroke-opacity='0.15' stroke-width='1'/%3E%3C/svg%3E");
 }
 
 /* Header */
 .app-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     padding: 1rem 2rem;
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color);
-    box-shadow: var(--shadow-soft);
     position: sticky;
     top: 0;
     z-index: 100;
@@ -82,79 +74,82 @@ body {
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin-right: auto;
 }
 
 .logo-icon {
     width: 24px;
     height: 24px;
-    background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
-    border: 2px solid var(--accent-teal);
-    border-radius: 50%;
-    box-shadow: 0 0 10px var(--accent-blue);
+    background: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
 }
 
 .app-header h1 {
     font-size: 1.25rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    font-family: "Noto Sans TC", sans-serif;
+    letter-spacing: 0;
 }
 
 .app-header h1 span {
-    font-weight: 400;
+    font-weight: 700;
     color: var(--text-secondary);
     font-size: 0.9rem;
     margin-left: 0.5rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 
 .header-badges {
     display: flex;
     gap: 0.75rem;
+    margin-left: 1rem;
 }
 
 .badge {
     padding: 0.25rem 0.75rem;
-    background: rgba(51, 65, 85, 0.5);
+    background: var(--bg-panel);
     border: 1px solid var(--border-color);
-    border-radius: 999px;
+    border-radius: 0;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
-.badge.active {
-    background: rgba(14, 165, 233, 0.15);
-    border-color: var(--accent-blue);
-    color: var(--accent-blue);
-    box-shadow: 0 0 8px rgba(14, 165, 233, 0.2);
-}
-
-.key-hint-btn {
-    background: rgba(51, 65, 85, 0.5);
-    border: 1px solid var(--border-color);
-    color: var(--text-secondary);
-    cursor: pointer;
-    font-size: 0.75rem;
-    border-radius: 999px;
-    transition: background 0.2s;
-}
-.key-hint-btn:hover {
-    background: rgba(51, 65, 85, 0.8);
+    font-weight: 700;
     color: var(--text-primary);
 }
 
+.badge.active {
+    background: var(--accent-blue);
+    border-color: var(--border-color);
+    color: #ffffff;
+}
+
+.key-hint-btn {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    font-weight: 700;
+    border-radius: 0;
+    transition: background 0.2s;
+}
+.key-hint-btn:hover {
+    background: var(--text-primary);
+    color: #ffffff;
+}
+
 .badge.realistic-badge {
-    background: rgba(245, 158, 11, 0.15);
-    border-color: var(--accent-amber);
-    color: var(--accent-amber);
-    box-shadow: 0 0 8px rgba(245, 158, 11, 0.25);
+    background: var(--bg-panel);
+    border-color: var(--border-color);
+    color: var(--text-primary);
     animation: badge-appear 0.3s ease;
 }
 @keyframes badge-appear {
-    from { opacity: 0; transform: scale(0.8); }
-    to   { opacity: 1; transform: scale(1); }
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
-/* 永遠可見的 header 入口：直接連進光路逆行互動演示頁 */
 .header-demo-link,
 .header-guide-link {
     display: inline-flex;
@@ -162,34 +157,25 @@ body {
     gap: 0.35rem;
     margin-left: 0.75rem;
     padding: 0.35rem 0.85rem;
-    border-radius: 999px;
+    border-radius: 0;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
-    color: #e0f2fe;
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.85), rgba(20, 184, 166, 0.85));
-    border: 1px solid rgba(56, 189, 248, 0.6);
-    box-shadow: 0 0 10px rgba(14, 165, 233, 0.3);
+    color: var(--text-primary);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
     white-space: nowrap;
-    transition: transform 0.15s, box-shadow 0.2s, filter 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
-/* 操作手冊以琥珀色區隔，與逆行演示的青藍色形成對比 */
 .header-guide-link {
     margin-left: 0.5rem;
-    color: #fef3c7;
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.85), rgba(234, 88, 12, 0.85));
-    border: 1px solid rgba(251, 191, 36, 0.6);
-    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
 }
-.header-demo-link:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 0 16px rgba(14, 165, 233, 0.5);
-    transform: translateY(-1px);
-}
+.header-demo-link:hover,
 .header-guide-link:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
-    transform: translateY(-1px);
+    background: var(--accent-blue);
+    color: #ffffff;
+    border-color: var(--accent-blue);
 }
 .header-demo-link .demo-link-short,
 .header-guide-link .demo-link-short { display: none; }
@@ -200,71 +186,72 @@ body {
 .app-container {
     display: grid;
     grid-template-columns: 320px 1fr;
-    gap: 1.5rem;
-    padding: 1.5rem;
+    gap: 0;
+    padding: 0;
     flex: 1;
 }
 
-/* ── 手機：控制面板折疊按鈕（桌機隱藏） ── */
 :root {
-    --header-height: 60px; /* JS 動態更新，此為初始預估值 */
+    --header-height: 60px;
 }
 
 .panel-toggle {
     display: none;
     width: 100%;
     padding: 0.75rem 1.25rem;
-    background: rgba(14,165,233,0.12);
-    border: 1px solid var(--border-highlight);
-    border-radius: 10px;
-    color: var(--accent-blue);
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    color: var(--text-primary);
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     cursor: pointer;
     text-align: left;
-    letter-spacing: 0.3px;
     transition: background 0.2s;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0;
 }
-.panel-toggle:active { background: rgba(14,165,233,0.22); }
+.panel-toggle:active { background: var(--text-muted); color: #fff; }
 .panel-toggle .toggle-arrow { float: right; transition: transform 0.25s; }
 .panel-toggle.collapsed .toggle-arrow { transform: rotate(-90deg); }
 
-/* 折疊按鈕內的即時照度指示（手機版）*/
 .toggle-metric {
     display: inline-block;
     margin-left: 0.5rem;
     font-size: 0.72rem;
-    font-family: monospace;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-weight: 700;
-    color: var(--accent-teal);
-    background: rgba(20, 184, 166, 0.12);
-    border: 1px solid rgba(20, 184, 166, 0.35);
-    border-radius: 4px;
+    color: var(--text-primary);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
     padding: 0.05rem 0.4rem;
     vertical-align: middle;
-    transition: color 0.3s;
 }
 
 /* Sidebar Controls */
 .controls-panel {
     background: var(--bg-panel);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-right: 1px solid var(--border-color);
+    border-bottom: none;
+    border-top: none;
+    border-left: none;
+    border-radius: 0;
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
-    box-shadow: var(--shadow-soft);
     height: fit-content;
 }
 
 .controls-panel h2 {
     font-size: 1.1rem;
-    color: var(--accent-teal);
+    color: var(--text-primary);
     margin-bottom: 0.25rem;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.25rem;
 }
 
 .panel-desc {
@@ -281,18 +268,18 @@ body {
 
 .control-group label {
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     display: flex;
     justify-content: space-between;
 }
 
 .control-group label span {
     color: var(--accent-blue);
-    font-family: monospace;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-size: 1rem;
 }
 
-/* 分享連結按鈕 */
 .share-row {
     display: flex;
     flex-direction: column;
@@ -302,33 +289,33 @@ body {
 .share-btn {
     width: 100%;
     padding: 0.6rem 1rem;
-    background: rgba(20, 184, 166, 0.1);
-    border: 1px solid rgba(20, 184, 166, 0.35);
-    border-radius: 8px;
-    color: var(--accent-teal);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    color: var(--text-primary);
     font-size: 0.88rem;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    letter-spacing: 0.02em;
+    transition: background 0.2s, color 0.2s;
 }
-.share-btn:hover   { background: rgba(20, 184, 166, 0.18); }
-.share-btn:active  { transform: scale(0.97); }
+.share-btn:hover   { background: var(--text-primary); color: #ffffff; }
+.share-btn:active  { background: var(--accent-blue); color: #ffffff; }
 .share-feedback {
     font-size: 0.82rem;
-    color: var(--accent-teal);
-    font-weight: 600;
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     opacity: 0;
     transition: opacity 0.25s ease;
     height: 1.2em;
 }
 .share-feedback.visible { opacity: 1; }
 
-/* 滑桿數值更新時的短暫閃光提示 */
 @keyframes value-pulse {
-    0%   { color: var(--accent-blue); text-shadow: none; }
-    35%  { color: #fff; text-shadow: 0 0 8px rgba(14, 165, 233, 0.9); }
-    100% { color: var(--accent-blue); text-shadow: none; }
+    0%   { color: var(--accent-blue); }
+    35%  { color: #ffffff; background-color: var(--accent-blue); }
+    100% { color: var(--accent-blue); }
 }
 .val-pulse {
     animation: value-pulse 0.45s ease-out;
@@ -337,51 +324,61 @@ body {
 input[type="range"] {
     -webkit-appearance: none;
     width: 100%;
-    height: 6px;
-    background: rgba(51, 65, 85, 0.8);
-    border-radius: 3px;
+    height: 2px;
+    background: var(--border-color);
+    border-radius: 0;
     outline: none;
-    transition: 0.2s;
 }
 
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--accent-blue);
+    width: 12px;
+    height: 24px;
+    border-radius: 0;
+    background: #ffffff;
     cursor: pointer;
-    border: 2px solid #fff;
-    box-shadow: 0 0 5px rgba(14, 165, 233, 0.5);
-    transition: 0.2s;
+    border: 1px solid var(--border-color);
+    transition: 0.1s;
 }
 
 input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    background: var(--accent-blue-hover);
+    background: var(--border-color);
 }
 
 input[type="range"]::-webkit-slider-thumb:active {
-    transform: scale(1.4);
-    background: var(--accent-blue-hover);
-    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0.22);
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+
+input[type="range"]::-moz-range-thumb {
+    appearance: none;
+    width: 12px;
+    height: 24px;
+    border-radius: 0;
+    background: #ffffff;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    transition: 0.1s;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+    background: var(--border-color);
 }
 
 input[type="range"]::-moz-range-thumb:active {
-    transform: scale(1.4);
-    background: var(--accent-blue-hover);
-    box-shadow: 0 0 0 6px rgba(14, 165, 233, 0.22);
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
 }
 
 .range-labels {
     display: flex;
     justify-content: space-between;
     font-size: 0.7rem;
-    color: var(--text-muted);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    color: var(--text-secondary);
 }
 
-/* Phase 59：滑桿 ± 微調按鈕（手機精準調整） */
 .slider-row {
     display: flex;
     align-items: center;
@@ -400,41 +397,39 @@ input[type="range"]::-moz-range-thumb:active {
     align-items: center;
     justify-content: center;
     font-size: 1.3rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     line-height: 1;
     font-weight: 700;
-    color: var(--accent-blue);
-    background: rgba(14, 165, 233, 0.1);
-    border: 1px solid rgba(14, 165, 233, 0.35);
-    border-radius: 8px;
+    color: var(--text-primary);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-    transition: background 0.15s, transform 0.08s;
 }
-.slider-step-btn:hover  { background: rgba(14, 165, 233, 0.2); }
-.slider-step-btn:active { transform: scale(0.9); background: rgba(14, 165, 233, 0.32); }
+.slider-step-btn:hover  { background: var(--text-primary); color: #ffffff; }
+.slider-step-btn:active { background: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); }
 
-/* Phase 60：可點擊的數值徽章 → 直接輸入精確數值 */
 .val-editable {
     cursor: pointer;
-    text-decoration: underline dotted rgba(14, 165, 233, 0.6);
-    text-underline-offset: 3px;
-    border-radius: 4px;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--border-color);
+    border-radius: 0;
     padding: 0 2px;
-    transition: background 0.15s;
 }
-.val-editable:hover  { background: rgba(14, 165, 233, 0.14); }
-.val-editable:active { background: rgba(14, 165, 233, 0.26); }
+.val-editable:hover  { background: var(--border-color); color: #ffffff; }
+.val-editable:active { background: var(--accent-blue); color: #ffffff; }
 .val-edit-input {
     width: 5em;
     font: inherit;
     font-weight: 700;
     color: var(--accent-blue);
-    background: rgba(14, 165, 233, 0.08);
-    border: 1px solid var(--accent-blue);
-    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
     padding: 0 4px;
     -moz-appearance: textfield;
     appearance: textfield;
@@ -442,118 +437,122 @@ input[type="range"]::-moz-range-thumb:active {
 .val-edit-input::-webkit-outer-spin-button,
 .val-edit-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-/* ── Phase 61：教學鷹架（學習目標 / 試試看 / 自我檢核 / 課綱）── */
 .learning-guide { padding: 0 1.5rem; margin-top: 1.25rem; }
 .lg-hook {
     display: flex; gap: 0.75rem; align-items: flex-start;
-    background: linear-gradient(135deg, rgba(20,184,166,0.12), rgba(14,165,233,0.12));
-    border: 1px solid var(--border-highlight); border-left: 4px solid var(--accent-teal);
-    border-radius: 12px; padding: 0.9rem 1.1rem;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0; padding: 0.9rem 1.1rem;
 }
 .lg-hook-icon { font-size: 1.6rem; line-height: 1.5; flex: 0 0 auto; }
 .lg-hook p { color: var(--text-primary); font-size: 0.95rem; line-height: 1.7; }
-.lg-hook strong { color: var(--accent-teal); }
-.lg-hook em { color: var(--accent-amber); font-style: normal; font-weight: 700; }
-.lg-panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-top: 0.75rem; align-items: start; }
-.lg-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+.lg-hook strong { color: var(--text-primary); font-weight: 700; }
+.lg-hook em { color: var(--accent-blue); font-style: normal; font-weight: 700; }
+.lg-panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-top: 0.75rem; align-items: start; }
+.lg-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0; margin: -1px 0 0 -1px; }
 .lg-card > summary {
     cursor: pointer; list-style: none; padding: 0.7rem 1rem; font-weight: 700;
-    color: var(--text-primary); background: rgba(14,165,233,0.08); user-select: none;
+    color: var(--text-primary); background: var(--bg-main); border-bottom: 1px solid var(--border-color); user-select: none;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 .lg-card > summary::-webkit-details-marker { display: none; }
-.lg-card > summary::after { content: '▾'; float: right; color: var(--accent-blue); transition: transform 0.2s; }
-.lg-card[open] > summary::after { transform: rotate(180deg); }
-.lg-body { padding: 0.8rem 1rem 1rem; color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; }
+.lg-card > summary::after { content: '+'; float: right; color: var(--text-primary); }
+.lg-card[open] > summary::after { content: '-'; }
+.lg-body { padding: 0.8rem 1rem 1rem; color: var(--text-primary); font-size: 0.9rem; line-height: 1.7; }
 .lg-body ol { padding-left: 1.2rem; }
 .lg-body li { margin: 0.45rem 0; }
-.lg-body strong { color: var(--text-primary); }
-.lg-body em { color: var(--accent-amber); font-style: normal; }
-.lg-tip { background: rgba(245,158,11,0.1); border-radius: 8px; padding: 0.5rem 0.7rem; margin-bottom: 0.6rem; }
+.lg-body strong { color: var(--text-primary); font-weight: 700; }
+.lg-body em { color: var(--accent-blue); font-style: normal; }
+.lg-tip { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 0; padding: 0.5rem 0.7rem; margin-bottom: 0.6rem; }
 .lg-preset {
     display: inline-flex; align-items: center; gap: 0.2rem; margin: 0 0.15rem;
-    padding: 0.12rem 0.55rem; font-size: 0.82rem; font-weight: 700; color: var(--accent-blue);
-    background: rgba(14,165,233,0.12); border: 1px solid var(--border-highlight);
-    border-radius: 999px; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    padding: 0.12rem 0.55rem; font-size: 0.82rem; font-weight: 700; color: var(--text-primary);
+    background: #ffffff; border: 1px solid var(--border-color);
+    border-radius: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
-.lg-preset:hover  { background: rgba(14,165,233,0.24); }
-.lg-preset:active { transform: scale(0.95); }
-.lg-qa { border-bottom: 1px dashed var(--border-color); padding: 0.4rem 0; }
+.lg-preset:hover  { background: var(--text-primary); color: #ffffff; }
+.lg-preset:active { background: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); }
+.lg-qa { border-bottom: 1px solid var(--border-color); padding: 0.4rem 0; }
 .lg-qa:last-child { border-bottom: none; }
-.lg-qa > summary { cursor: pointer; color: var(--text-primary); font-weight: 600; }
-.lg-qa > p { margin-top: 0.4rem; color: var(--accent-teal); }
+.lg-qa > summary { cursor: pointer; color: var(--text-primary); font-weight: 700; font-family: "IBM Plex Mono", "JetBrains Mono", monospace; }
+.lg-qa > p { margin-top: 0.4rem; color: var(--text-secondary); }
 .lg-worksheet {
     margin-top: 0.7rem; padding: 0.5rem 0.7rem; font-size: 0.85rem; line-height: 1.6;
-    background: rgba(20,184,166,0.08); border-left: 3px solid var(--accent-teal); border-radius: 8px;
-    color: var(--text-secondary);
+    background: #ffffff; border: 1px solid var(--border-color); border-radius: 0;
+    color: var(--text-primary);
 }
-.lg-worksheet a { color: var(--accent-teal); font-weight: 700; }
+.lg-worksheet a { color: var(--accent-blue); font-weight: 700; text-decoration: underline; }
 
 .lg-curriculum {
-    margin-top: 0.75rem; font-size: 0.82rem; color: var(--text-muted); line-height: 1.7;
-    border-top: 1px dashed var(--border-color); padding-top: 0.6rem;
+    margin-top: 0.75rem; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.7;
+    border-top: 1px solid var(--border-color); padding-top: 0.6rem;
 }
-.lg-curriculum strong { color: var(--text-secondary); }
+.lg-curriculum strong { color: var(--text-primary); }
 @media (max-width: 768px) {
     .learning-guide { padding: 0 1rem; margin-top: 1rem; }
     .lg-panels { grid-template-columns: 1fr; }
+    .lg-card { margin: -1px 0 0 0; }
 }
 @media print { .learning-guide { display: none !important; } }
 
-/* ── Phase 62：名詞小幫手 + 設計取捨導讀 ── */
 .glossary-card {
-    margin-bottom: 1rem; background: rgba(20,184,166,0.07);
-    border: 1px solid rgba(20,184,166,0.3); border-radius: 10px; overflow: hidden;
+    margin-bottom: 1rem; background: #ffffff;
+    border: 1px solid var(--border-color); border-radius: 0; overflow: hidden;
 }
 .glossary-card > summary {
     cursor: pointer; list-style: none; padding: 0.55rem 0.8rem; font-weight: 700;
-    font-size: 0.88rem; color: var(--accent-teal); user-select: none;
+    font-size: 0.88rem; color: var(--text-primary); user-select: none;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    border-bottom: 1px solid transparent;
 }
 .glossary-card > summary::-webkit-details-marker { display: none; }
-.glossary-card > summary::after { content: '＋'; float: right; color: var(--accent-teal); }
-.glossary-card[open] > summary::after { content: '－'; }
+.glossary-card > summary::after { content: '+'; float: right; color: var(--text-primary); font-family: monospace; }
+.glossary-card[open] > summary { border-bottom-color: var(--border-color); }
+.glossary-card[open] > summary::after { content: '-'; }
 .glossary-list { padding: 0.2rem 0.9rem 0.8rem; margin: 0; font-size: 0.84rem; line-height: 1.6; }
-.glossary-list dt { color: var(--text-primary); font-weight: 700; margin-top: 0.55rem; }
+.glossary-list dt { color: var(--text-primary); font-weight: 700; margin-top: 0.55rem; font-family: "IBM Plex Mono", "JetBrains Mono", monospace; }
 .glossary-list dd { color: var(--text-secondary); margin: 0.1rem 0 0; padding-left: 0.2rem; }
 .design-compare-lead {
     color: var(--text-secondary); font-size: 0.88rem; line-height: 1.7;
-    background: rgba(245,158,11,0.08); border-left: 3px solid var(--accent-amber);
-    border-radius: 8px; padding: 0.6rem 0.8rem; margin: 0.3rem 0 0.6rem;
+    background: #ffffff; border: 1px solid var(--border-color);
+    border-radius: 0; padding: 0.6rem 0.8rem; margin: 0.3rem 0 0.6rem;
 }
-.design-compare-lead strong { color: var(--accent-amber); }
+.design-compare-lead strong { color: var(--text-primary); }
 
-/* ── Phase 63：白話即時解讀 ── */
 .metric-interpret {
     width: 100%; margin-top: 0.5rem; padding: 0.5rem 0.7rem;
-    font-size: 0.86rem; line-height: 1.6; border-radius: 8px;
-    border-left: 3px solid var(--text-muted); background: rgba(148,163,184,0.08);
-    color: var(--text-secondary); transition: background 0.2s, border-color 0.2s;
+    font-size: 0.86rem; line-height: 1.6; border-radius: 0;
+    border: 1px solid var(--border-color); background: #ffffff;
+    color: var(--text-primary);
 }
 .metric-interpret:empty { display: none; }
-.metric-interpret.mi-ok   { border-left-color: var(--accent-teal);  background: rgba(20,184,166,0.1); }
-.metric-interpret.mi-warn { border-left-color: var(--accent-amber); background: rgba(245,158,11,0.1); }
-.metric-interpret.mi-bad  { border-left-color: var(--accent-red);   background: rgba(239,68,68,0.1); }
+.metric-interpret.mi-ok   { border-left: 4px solid var(--text-primary); }
+.metric-interpret.mi-warn { border-left: 4px solid var(--text-secondary); }
+.metric-interpret.mi-bad  { border-left: 4px solid var(--accent-blue); }
 
-/* ── Phase 66：2D 剖面限制說明 + SW 更新提示條 ── */
 .iec-2d-note {
     width: 100%; margin-top: 0.4rem;
-    font-size: 0.78rem; line-height: 1.6; color: var(--text-muted);
+    font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary);
 }
-.iec-2d-note strong { color: var(--text-secondary); }
+.iec-2d-note strong { color: var(--text-primary); }
 .sw-update-toast {
     position: fixed; left: 50%; transform: translateX(-50%);
     bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
     z-index: 1200; display: flex; align-items: center; gap: 0.75rem;
-    padding: 0.6rem 1rem; border-radius: 12px;
-    background: rgba(15, 23, 42, 0.95); border: 1px solid var(--border-highlight);
-    box-shadow: var(--shadow-soft); color: var(--text-primary); font-size: 0.9rem;
+    padding: 0.6rem 1rem; border-radius: 0;
+    background: #ffffff; border: 1px solid var(--border-color);
+    color: var(--text-primary); font-size: 0.9rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     animation: toast-in 0.25s ease-out;
 }
 .sw-update-toast button {
-    padding: 0.35rem 0.8rem; border: none; border-radius: 8px;
-    background: var(--accent-blue); color: #fff; font-weight: 700; font-size: 0.85rem;
+    padding: 0.35rem 0.8rem; border: 1px solid var(--border-color); border-radius: 0;
+    background: var(--text-primary); color: #fff; font-weight: 700; font-size: 0.85rem;
     cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
-.sw-update-toast button:hover { background: var(--accent-blue-hover); }
+.sw-update-toast button:hover { background: var(--accent-blue); border-color: var(--accent-blue); }
 @keyframes toast-in { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .sw-update-toast { animation: none; } }
 @media print { .iec-2d-note, .sw-update-toast { display: none !important; } }
@@ -566,17 +565,18 @@ input[type="range"]::-moz-range-thumb:active {
 }
 
 .info-card {
-    background: rgba(20, 184, 166, 0.05);
-    border-left: 3px solid var(--accent-teal);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
     padding: 1rem;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0;
     margin-top: 0.5rem;
 }
 
 .info-card h3 {
     font-size: 0.85rem;
-    color: var(--accent-teal);
+    color: var(--text-primary);
     margin-bottom: 0.4rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 
 .info-card p {
@@ -588,39 +588,35 @@ input[type="range"]::-moz-range-thumb:active {
     color: var(--text-primary);
 }
 
-/* 光源設計模式分析卡片（依模式即時更新優劣） */
 .mode-analysis-card {
-    background: rgba(245, 158, 11, 0.06);
-    border-left-color: var(--accent-amber);
+    border-left: 4px solid var(--text-primary);
 }
-.mode-analysis-card h3 { color: var(--accent-amber); }
+.mode-analysis-card h3 { color: var(--text-primary); }
 .mode-analysis-card p { margin-bottom: 0.5rem; line-height: 1.5; }
 .mode-analysis-card p:last-child { margin-bottom: 0; }
 .mode-analysis-note {
     font-size: 0.76rem !important;
-    color: var(--text-muted) !important;
-    border-top: 1px dashed rgba(255,255,255,0.12);
+    color: var(--text-secondary) !important;
+    border-top: 1px solid var(--border-color);
     padding-top: 0.5rem;
 }
 
-/* 兩種設計哲學對照表 */
-/* sticky 首欄用不透明底色（卡片 rgba(30,41,59,.6) 疊在 #0b1120 上的等效色），
-   避免水平捲動時被捲動的儲存格從首欄底下透出 */
 .design-compare-card {
     margin-top: 1rem;
-    --cmp-sticky-bg: #16202f;        /* 內文首欄 */
-    --cmp-sticky-head-bg: #202a3b;   /* 表頭左上角格 */
+    --cmp-sticky-bg: #ffffff;
+    --cmp-sticky-head-bg: #f6f4ee;
 }
 .design-compare-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border-color);
 }
-/* 手機版捲動提示：表格在窄螢幕需水平捲動，提示使用者左右滑動 */
 .design-compare-hint {
     display: none;
     font-size: 0.72rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin-bottom: 0.4rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 .design-compare-table {
     width: 100%;
@@ -632,20 +628,19 @@ input[type="range"]::-moz-range-thumb:active {
 .design-compare-table td {
     padding: 0.55rem 0.7rem;
     text-align: left;
-    border-bottom: 1px solid var(--border-color);
+    border: 1px solid var(--border-color);
     vertical-align: top;
 }
 .design-compare-table thead th {
     color: var(--text-primary);
-    font-weight: 600;
-    border-bottom: 2px solid var(--border-color);
-    background: rgba(148, 163, 184, 0.08);
+    font-weight: 700;
+    background: var(--cmp-sticky-head-bg);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 .design-compare-table thead th small {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-weight: 400;
 }
-/* sticky 首欄：捲動時行標籤恆可見 */
 .design-compare-table th:first-child,
 .design-compare-table td:first-child {
     position: sticky;
@@ -653,25 +648,23 @@ input[type="range"]::-moz-range-thumb:active {
     z-index: 1;
 }
 .design-compare-table tbody td:first-child {
-    color: var(--text-secondary);
-    font-weight: 600;
+    color: var(--text-primary);
+    font-weight: 700;
     white-space: nowrap;
     background: var(--cmp-sticky-bg);
-    box-shadow: 1px 0 0 var(--border-color); /* 首欄右側分隔線（取代被 sticky 遮住的 border）*/
 }
 .design-compare-table thead th:first-child {
-    z-index: 2; /* 左上角格需蓋在內文 sticky 格之上 */
+    z-index: 2;
     background: var(--cmp-sticky-head-bg);
-    box-shadow: 1px 0 0 var(--border-color);
 }
-.design-compare-table tbody td { color: var(--text-secondary); }
-.design-compare-table .cmp-good { color: var(--accent-teal); }
-.design-compare-table .cmp-warn { color: var(--accent-amber); }
-.design-compare-table .cmp-bad  { color: #ef4444; }
+.design-compare-table tbody td { color: var(--text-primary); }
+.design-compare-table .cmp-good { color: var(--text-primary); font-weight: 700; }
+.design-compare-table .cmp-warn { color: var(--text-secondary); }
+.design-compare-table .cmp-bad  { color: var(--accent-blue); font-weight: 700; }
 .design-compare-table .cmp-same {
     text-align: center;
-    color: var(--accent-sky, #0ea5e9);
-    font-weight: 600;
+    color: var(--text-primary);
+    font-weight: 700;
 }
 .design-compare-foot {
     font-size: 0.8rem;
@@ -681,52 +674,54 @@ input[type="range"]::-moz-range-thumb:active {
 }
 .design-compare-foot strong { color: var(--text-primary); }
 
-/* Visualization Area */
 .visualization-area {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    /* Phase 50：CSS 包含（layout + style），隔離模擬區的佈局重算，
-       讓 canvas 動畫不觸發文件其他區塊的 reflow */
     contain: layout style;
+    padding: 1.5rem;
+    border-right: 1px solid var(--border-color);
 }
 
 .view-tabs {
     display: flex;
-    gap: 1rem;
+    gap: 0;
     margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    background: #ffffff;
 }
 
 .tab-btn {
-    background: rgba(30, 41, 59, 0.6);
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-primary);
+    border: none;
+    border-right: 1px solid var(--border-color);
     padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+    border-radius: 0;
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     cursor: pointer;
-    transition: all 0.2s;
     outline: none;
+    flex: 1;
+}
+.tab-btn:last-child {
+    border-right: none;
 }
 
 .tab-btn:hover {
-    background: rgba(51, 65, 85, 0.8);
-    color: var(--text-primary);
+    background: var(--bg-main);
 }
 
 .tab-btn.active {
-    background: var(--accent-blue);
-    color: white;
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 12px rgba(14, 165, 233, 0.4);
+    background: var(--text-primary);
+    color: #ffffff;
 }
 
 .view-content {
     display: none;
     flex-direction: column;
     gap: 1.5rem;
-    animation: fadeIn 0.3s ease-in-out;
 }
 
 .view-content.active {
@@ -734,17 +729,15 @@ input[type="range"]::-moz-range-thumb:active {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(5px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .view-card {
     background: var(--bg-card);
-    backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
+    border-radius: 0;
     padding: 1.25rem;
-    box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
 }
@@ -754,19 +747,23 @@ input[type="range"]::-moz-range-thumb:active {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
 }
 
 .card-header h3 {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 
 .legend {
     display: flex;
     gap: 1rem;
     font-size: 0.8rem;
-    color: var(--text-secondary);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    color: var(--text-primary);
 }
 
 .legend-item {
@@ -778,31 +775,32 @@ input[type="range"]::-moz-range-thumb:active {
 .dot {
     width: 10px;
     height: 10px;
-    border-radius: 50%;
+    border-radius: 0;
+    border: 1px solid var(--border-color);
 }
 
-.dot.led { background: #fbbf24; box-shadow: 0 0 5px #fbbf24; }
-.dot.ray-valid { background: var(--accent-blue); opacity: 0.6; }
-.dot.ray-blocked { background: var(--accent-red); opacity: 0.6; }
+.dot.led { background: #ffffff; border: 2px solid var(--text-primary); }
+.dot.ray-valid { background: var(--text-primary); }
+.dot.ray-blocked { background: var(--accent-blue); }
 
-/* Canvas Styling */
 .canvas-container {
     flex: 3;
     min-height: 400px;
     position: relative;
     overflow: hidden;
+    border: 1px solid var(--border-color);
 }
 
 #rayCanvas {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    background: radial-gradient(circle at 50% 0%, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 1));
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.05);
+    background: transparent;
+    border-radius: 0;
+    border: none;
+    display: block;
 }
 
-/* 3D Container Styling */
 .3d-container {
     flex: 1;
     min-height: 600px;
@@ -812,16 +810,14 @@ input[type="range"]::-moz-range-thumb:active {
 .canvas-3d {
     width: 100%;
     height: 600px;
-    background: #0f172a;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.05);
+    background: transparent;
+    border-radius: 0;
+    border: 1px solid var(--border-color);
     overflow: hidden;
-    position: relative;  /* anchor for .canvas-loading overlay */
-    /* prevent iOS scroll hijack during pinch-zoom on canvas */
+    position: relative;
     touch-action: none;
 }
 
-/* 3D Canvas Loading Overlay */
 .canvas-loading {
     position: absolute;
     inset: 0;
@@ -830,62 +826,58 @@ input[type="range"]::-moz-range-thumb:active {
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    background: #0f172a;
-    border-radius: 8px;
+    background: #ffffff;
+    border-radius: 0;
     z-index: 10;
-    transition: opacity 0.4s ease;
     pointer-events: none;
 }
 .canvas-loading.hidden {
     opacity: 0;
 }
 .canvas-loading p {
-    color: var(--text-muted);
+    color: var(--text-primary);
     font-size: 0.85rem;
-    letter-spacing: 0.03em;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    font-weight: 700;
 }
 .loading-ring {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(14, 165, 233, 0.15);
-    border-top-color: var(--accent-blue);
-    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    border-top-color: transparent;
+    border-radius: 0;
     animation: spin 0.9s linear infinite;
 }
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
 
-/* Heatmap Legend */
 .heatmap-legend-wrapper {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 0.85rem;
-    background: rgba(15, 23, 42, 0.6);
+    background: #ffffff;
     padding: 0.25rem 0.75rem;
-    border-radius: 20px;
+    border-radius: 0;
     border: 1px solid var(--border-color);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 
 .heatmap-bar {
     width: 80px;
-    height: 8px;
-    border-radius: 4px;
-    background: linear-gradient(to right,
-        hsl(240, 100%, 50%),
-        hsl(180, 100%, 50%),
-        hsl(120, 100%, 50%),
-        hsl(60, 100%, 50%),
-        hsl(0, 100%, 50%)
-    );
+    height: 10px;
+    border-radius: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='10' preserveAspectRatio='none'%3E%3Crect x='0' y='0' width='20' height='10' fill='%23e0e0e0'/%3E%3Crect x='20' y='0' width='20' height='10' fill='%23b0b0b0'/%3E%3Crect x='40' y='0' width='20' height='10' fill='%23808080'/%3E%3Crect x='60' y='0' width='20' height='10' fill='%23505050'/%3E%3Crect x='80' y='0' width='20' height='10' fill='%23e8412c'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    border: 1px solid var(--border-color);
 }
 
 .heatmap-label {
-    color: var(--text-muted);
+    color: var(--text-primary);
+    font-weight: 700;
 }
 
-/* Chart Container */
 .chart-container {
     flex: 2;
     min-height: 250px;
@@ -895,121 +887,112 @@ input[type="range"]::-moz-range-thumb:active {
     position: relative;
     height: 220px;
     width: 100%;
-    transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .chart-wrapper.expanded {
     height: 380px;
 }
 
-/* 圖表放大按鈕（右下角）*/
 .chart-expand-btn {
     position: absolute;
     bottom: 0.4rem;
     right: 0.4rem;
     width: 24px;
     height: 24px;
-    background: rgba(15, 23, 42, 0.75);
+    background: #ffffff;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
-    color: var(--text-muted);
+    border-radius: 0;
+    color: var(--text-primary);
     font-size: 0.85rem;
-    line-height: 1;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s, color 0.2s;
     z-index: 5;
 }
-.chart-expand-btn:hover { background: rgba(51,65,85,0.9); color: var(--text-primary); }
+.chart-expand-btn:hover { background: var(--text-primary); color: #ffffff; }
 
 .metric-highlight {
-    background: rgba(14, 165, 233, 0.1);
-    border: 1px solid var(--border-highlight);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
     padding: 0.4rem 1rem;
-    border-radius: 8px;
+    border-radius: 0;
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 
 .metric-highlight span {
     font-size: 1.1rem;
     font-weight: 700;
-    color: var(--accent-teal);
-    font-family: monospace;
+    color: var(--accent-blue);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 
-/* Paper Reference Section */
 .paper-reference-container {
     margin: 1.5rem;
     background: var(--bg-card);
-    backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
-    border-radius: 16px;
-    box-shadow: var(--shadow-soft);
+    border-radius: 0;
     overflow: hidden;
 }
 
 .paper-header {
     padding: 1.25rem 1.5rem;
-    background: rgba(15, 23, 42, 0.9);
+    background: var(--bg-main);
+    border-bottom: 1px solid var(--border-color);
     cursor: pointer;
-    transition: background 0.2s;
     user-select: none;
-    /* Phase 48：黏性定位，捲動時始終露出標題列，方便從文件任意位置收合區塊 */
     position: sticky;
     top: var(--header-height, 60px);
     z-index: 10;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
 .paper-header:hover {
-    background: rgba(30, 41, 59, 0.9);
+    background: #ffffff;
 }
 
 .paper-header h2 {
     font-size: 1.1rem;
-    color: var(--accent-teal);
+    color: var(--text-primary);
     margin: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    font-family: "Noto Sans TC", sans-serif;
+    font-weight: 700;
 }
 
 .paper-header h2 span {
     font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 400;
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 
 .paper-content {
     padding: 0 1.5rem;
-    /* max-height is managed by JS (scrollHeight) for accurate animation */
     max-height: none;
-    transition: max-height 0.42s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.35s ease;
-    opacity: 1;
     overflow: hidden;
-    color: var(--text-secondary);
+    color: var(--text-primary);
 }
 
 .paper-content.collapsed {
     max-height: 0 !important;
     padding: 0 1.5rem;
-    opacity: 0;
 }
 
 .paper-content h2 {
     color: var(--text-primary);
     font-size: 1.4rem;
+    font-weight: 700;
     margin: 1.5rem 0 1rem;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.5rem;
 }
 
 .paper-content h3 {
-    color: var(--accent-blue);
+    color: var(--text-primary);
     font-size: 1.1rem;
     margin: 1.5rem 0 0.5rem;
 }
@@ -1031,151 +1014,136 @@ input[type="range"]::-moz-range-thumb:active {
 
 .paper-content li strong {
     color: var(--text-primary);
+    font-weight: 700;
 }
 
 .literature-list a {
-    color: var(--accent-blue);
-    text-decoration: none;
-    transition: color 0.2s, text-decoration 0.2s;
+    color: var(--text-primary);
+    text-decoration: underline;
 }
 
 .literature-list a:hover {
-    color: var(--accent-blue-hover);
-    text-decoration: underline;
+    color: var(--accent-blue);
 }
 
 .download-section {
     margin: 2.5rem 0 1.5rem;
     padding: 1.5rem;
-    background: rgba(14, 165, 233, 0.05);
-    border: 1px dashed var(--border-highlight);
-    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
     text-align: center;
 }
 
 .download-btn {
     display: inline-block;
-    background: var(--accent-blue);
-    color: white;
+    background: var(--text-primary);
+    color: #ffffff;
     padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 600;
+    border-radius: 0;
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     text-decoration: none;
-    transition: background 0.2s, transform 0.2s;
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    border: 1px solid var(--text-primary);
 }
 
 .download-btn:hover {
-    background: var(--accent-blue-hover);
-    transform: translateY(-2px);
+    background: #ffffff;
+    color: var(--text-primary);
 }
 
 .download-note {
     margin-top: 0.75rem;
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--text-secondary);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
 }
 
-/* ── 3D-Only 控制項標籤與淡化提示 ── */
 .tag-3d {
     display: inline-block;
     font-size: 0.65rem;
     font-weight: 700;
     padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    background: rgba(20, 184, 166, 0.15);
-    border: 1px solid rgba(20, 184, 166, 0.4);
-    color: var(--accent-teal);
-    letter-spacing: 0.03em;
+    border-radius: 0;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     vertical-align: middle;
     margin-left: 0.3rem;
 }
-/* 2D 模式下淡化 3D-only 控制項 */
 .controls-panel:not(.panel-3d-active) .control-3d-only {
-    opacity: 0.45;
+    opacity: 0.3;
     pointer-events: none;
-    /* 允許視覺上清楚這些控制項在 2D 模式不適用 */
-    transition: opacity 0.3s ease;
 }
 .controls-panel.panel-3d-active .control-3d-only {
     opacity: 1;
     pointer-events: auto;
-    transition: opacity 0.3s ease;
 }
 
-/* ── Skip to content link（鍵盤 / 螢幕閱讀器）── */
 .skip-link {
     position: absolute;
     top: -100%;
     left: 0;
-    background: var(--accent-blue);
+    background: var(--text-primary);
     color: #fff;
     padding: 0.6rem 1.2rem;
     font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-size: 0.9rem;
-    border-radius: 0 0 8px 0;
+    border-radius: 0;
     text-decoration: none;
     z-index: 9999;
-    transition: top 0.2s;
 }
 .skip-link:focus {
     top: 0;
 }
 
-/* ── 鍵盤焦點環（keyboard :focus-visible）── */
-/* 覆蓋瀏覽器預設，確保在深色背景上清晰可見 */
 :focus-visible {
     outline: 2px solid var(--accent-blue) !important;
-    outline-offset: 3px !important;
-    border-radius: 4px !important;
+    outline-offset: 2px !important;
+    border-radius: 0 !important;
 }
-/* 滑桿的焦點環改為更大 */
 input[type="range"]:focus-visible {
-    outline: 3px solid var(--accent-blue) !important;
-    outline-offset: 4px !important;
+    outline: 2px solid var(--accent-blue) !important;
+    outline-offset: 2px !important;
 }
 
-/* ── iOS Safe Area（iPhone notch / 底部 Home indicator）── */
-.paper-reference-container {
-    /* 確保最底層內容不被 iPhone Home Indicator 遮擋 */
-    padding-bottom: env(safe-area-inset-bottom, 0);
-}
-/* sticky header 需要 safe-area-inset-top 以免被 Dynamic Island 蓋住 */
 .app-header {
     padding-top: max(1rem, calc(0.75rem + env(safe-area-inset-top, 0px)));
 }
+.paper-reference-container {
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
 
-/* ── 捲動提示箭頭（2D canvas 底部）── */
 .scroll-hint {
-    display: none; /* 桌機隱藏 */
+    display: none;
     position: absolute;
     bottom: 0.5rem;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(14, 165, 233, 0.18);
-    border: 1px solid var(--border-highlight);
-    color: var(--accent-blue);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     padding: 0.25rem 0.75rem;
-    border-radius: 20px;
+    border-radius: 0;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.4s ease;
     white-space: nowrap;
     z-index: 5;
 }
 .scroll-hint.visible { opacity: 1; }
 
-/* ── 手機版控制面板背景遮罩（點擊關閉面板）── */
 .panel-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.32);
-    z-index: 88; /* 低於 controls-panel(89) 和 panel-toggle(90)，高於 visualization area(auto) */
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 88;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.28s ease;
     -webkit-tap-highlight-color: transparent;
 }
 .panel-backdrop.active {
@@ -1183,27 +1151,23 @@ input[type="range"]:focus-visible {
     pointer-events: auto;
 }
 
-/* ── 首次訪問 / 快捷鍵提示 Toast ── */
 .onboard-toast {
     position: fixed;
     bottom: 1.25rem;
     left: 50%;
     transform: translateX(-50%) translateY(1rem);
-    background: rgba(15, 23, 42, 0.96);
-    border: 1px solid var(--border-highlight);
-    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
     padding: 0.9rem 1.2rem;
     max-width: 340px;
     width: calc(100vw - 2rem);
     font-size: 0.88rem;
-    color: var(--text-secondary);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    color: var(--text-primary);
     z-index: 200;
     opacity: 0;
-    transition: opacity 0.35s ease, transform 0.35s ease;
     line-height: 1.5;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     pointer-events: none;
 }
 .onboard-toast.visible {
@@ -1211,19 +1175,15 @@ input[type="range"]:focus-visible {
     transform: translateX(-50%) translateY(0);
 }
 
-/* ── Phase 49：PWA 安裝提示條 ── */
 .pwa-install-bar {
-    display: none; /* 預設隱藏；beforeinstallprompt 觸發後加 .visible */
+    display: none;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 100;
-    background: rgba(15, 23, 42, 0.96);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(14, 165, 233, 0.35);
-    /* Phase 50：安全區域內縮，避免被 iPhone Home Indicator 遮擋 */
+    background: #ffffff;
+    border-top: 1px solid var(--border-color);
     padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
     padding-left: max(1rem, env(safe-area-inset-left, 0px));
     padding-right: max(1rem, env(safe-area-inset-right, 0px));
@@ -1236,82 +1196,78 @@ input[type="range"]:focus-visible {
 .pwa-install-bar p {
     flex: 1;
     font-size: 0.88rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     color: var(--text-primary);
     min-width: 180px;
+    font-weight: 700;
 }
 .pwa-btn {
     padding: 0.45rem 1rem;
-    border-radius: 6px;
-    border: none;
+    border-radius: 0;
+    border: 1px solid var(--border-color);
     cursor: pointer;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    font-weight: 700;
     touch-action: manipulation;
     white-space: nowrap;
-    transition: background 0.2s, transform 0.1s;
 }
-.pwa-btn:active { transform: scale(0.95); }
+.pwa-btn:active { background: var(--border-color); color: #fff; }
 .pwa-btn-install {
-    background: var(--accent-blue);
-    color: #fff;
+    background: var(--text-primary);
+    color: #ffffff;
 }
-.pwa-btn-install:hover { background: var(--accent-blue-hover); }
+.pwa-btn-install:hover { background: #ffffff; color: var(--text-primary); }
 .pwa-btn-dismiss {
-    background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
+    background: #ffffff;
+    color: var(--text-primary);
 }
-.pwa-btn-dismiss:hover { color: var(--text-primary); }
-
+.pwa-btn-dismiss:hover { background: var(--bg-main); }
 @keyframes pwa-slide-up {
-    from { transform: translateY(100%); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
 }
 
-/* ── 截圖下載按鈕 ── */
 .screenshot-btn {
-    background: rgba(20, 184, 166, 0.1);
-    border: 1px solid rgba(20, 184, 166, 0.3);
-    color: var(--accent-teal);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     width: 30px;
     height: 30px;
-    border-radius: 6px;
+    border-radius: 0;
     cursor: pointer;
     font-size: 1rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s, transform 0.1s;
     flex-shrink: 0;
 }
-.screenshot-btn:hover  { background: rgba(20, 184, 166, 0.2); }
-.screenshot-btn:active { transform: scale(0.9); }
+.screenshot-btn:hover  { background: var(--text-primary); color: #ffffff; }
+.screenshot-btn:active { background: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); }
 
-/* ── IEC 合規徽章 ── */
 .iec-badge {
     display: inline-block;
     margin-left: 0.5rem;
     padding: 0.1rem 0.5rem;
-    border-radius: 6px;
+    border-radius: 0;
     font-size: 0.72rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-weight: 700;
-    letter-spacing: 0.02em;
     vertical-align: middle;
-    transition: background 0.3s, color 0.3s;
 }
 .iec-pass {
-    background: rgba(20, 184, 166, 0.18);
-    color: var(--accent-teal);
-    border: 1px solid rgba(20, 184, 166, 0.4);
+    background: #ffffff;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 .iec-fail {
-    background: rgba(239, 68, 68, 0.18);
-    color: var(--accent-red);
-    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: #ffffff;
+    color: var(--accent-blue);
+    border: 1px solid var(--accent-blue);
 }
 
-/* ── 自動掃描演示按鈕 ── */
 .demo-row {
     display: flex;
     align-items: center;
@@ -1320,29 +1276,27 @@ input[type="range"]:focus-visible {
 .demo-btn {
     flex: 1;
     padding: 0.55rem 1rem;
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid rgba(245, 158, 11, 0.35);
-    border-radius: 8px;
-    color: var(--accent-amber);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    color: var(--text-primary);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    letter-spacing: 0.02em;
 }
-.demo-btn:hover  { background: rgba(245, 158, 11, 0.18); }
-.demo-btn:active { transform: scale(0.97); }
+.demo-btn:hover  { background: var(--text-primary); color: #ffffff; }
+.demo-btn:active { background: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); }
 .demo-btn.active {
-    background: rgba(245, 158, 11, 0.22);
-    border-color: var(--accent-amber);
+    background: var(--text-primary);
+    color: #ffffff;
     animation: demo-glow 1.2s ease-in-out infinite;
 }
 @keyframes demo-glow {
-    0%,100% { box-shadow: 0 0 4px rgba(245,158,11,0.3); }
-    50%      { box-shadow: 0 0 14px rgba(245,158,11,0.65); }
+    0%,100% { background: var(--text-primary); }
+    50%     { background: var(--accent-blue); border-color: var(--accent-blue); }
 }
 
-/* ── 快速預設場景 ── */
 .preset-row {
     display: flex;
     flex-wrap: wrap;
@@ -1351,7 +1305,9 @@ input[type="range"]:focus-visible {
 }
 .preset-label {
     font-size: 0.78rem;
-    color: var(--text-muted);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    color: var(--text-primary);
+    font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -1359,83 +1315,75 @@ input[type="range"]:focus-visible {
     flex: 1;
     min-width: 0;
     padding: 0.45rem 0.5rem;
-    background: rgba(30, 41, 59, 0.7);
+    background: #ffffff;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-secondary);
+    border-radius: 0;
+    color: var(--text-primary);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     cursor: pointer;
-    transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.1s;
     white-space: nowrap;
     text-align: center;
 }
 .preset-btn:hover {
-    background: rgba(51, 65, 85, 0.9);
-    color: var(--text-primary);
-    border-color: var(--accent-blue);
+    background: var(--bg-main);
 }
 .preset-btn:active,
 .preset-btn.preset-active {
-    background: rgba(14, 165, 233, 0.18);
-    border-color: var(--accent-blue);
-    color: var(--accent-blue);
-    transform: scale(0.97);
+    background: var(--text-primary);
+    color: #ffffff;
 }
 
-/* ── 3D 自動旋轉按鈕 ── */
 .autorotate-btn {
-    background: rgba(20, 184, 166, 0.1);
-    border: 1px solid rgba(20, 184, 166, 0.3);
-    color: var(--accent-teal);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     width: 30px;
     height: 30px;
-    border-radius: 6px;
+    border-radius: 0;
     cursor: pointer;
     font-size: 0.75rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s, transform 0.1s;
     flex-shrink: 0;
 }
-.autorotate-btn:hover   { background: rgba(20, 184, 166, 0.2); }
-.autorotate-btn:active  { transform: scale(0.9); }
+.autorotate-btn:hover   { background: var(--text-primary); color: #ffffff; }
+.autorotate-btn:active  { background: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); }
 .autorotate-btn.active  {
-    background: rgba(20, 184, 166, 0.25);
-    border-color: var(--accent-teal);
-    box-shadow: 0 0 8px rgba(20, 184, 166, 0.4);
+    background: var(--text-primary);
+    color: #ffffff;
     animation: rotate-pulse 2s linear infinite;
 }
 @keyframes rotate-pulse {
-    0%   { box-shadow: 0 0 6px rgba(20, 184, 166, 0.4); }
-    50%  { box-shadow: 0 0 14px rgba(20, 184, 166, 0.7); }
-    100% { box-shadow: 0 0 6px rgba(20, 184, 166, 0.4); }
+    0%   { background: var(--text-primary); }
+    50%  { background: var(--accent-blue); border-color: var(--accent-blue); }
+    100% { background: var(--text-primary); }
 }
 
-/* ── 3D 全螢幕按鈕 ── */
 .fullscreen-btn {
-    background: rgba(14, 165, 233, 0.1);
-    border: 1px solid var(--border-highlight);
-    color: var(--accent-blue);
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
     width: 30px;
     height: 30px;
-    border-radius: 6px;
+    border-radius: 0;
     cursor: pointer;
     font-size: 1rem;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     line-height: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s, transform 0.1s;
     flex-shrink: 0;
     margin-left: auto;
 }
-.fullscreen-btn:hover  { background: rgba(14, 165, 233, 0.22); }
-.fullscreen-btn:active { transform: scale(0.9); }
+.fullscreen-btn:hover  { background: var(--text-primary); color: #ffffff; }
+.fullscreen-btn:active { background: var(--accent-blue); color: #ffffff; border-color: var(--accent-blue); }
 
-/* Full-screen overlay: 3D canvas fills the viewport */
 #canvas3d:fullscreen,
 #canvas3d:-webkit-full-screen,
 #canvas3d:-moz-full-screen,
@@ -1444,56 +1392,48 @@ input[type="range"]:focus-visible {
     height: 100vh !important;
     max-height: none !important;
     border-radius: 0;
-    background: #0f172a;
+    background: #ffffff;
 }
 
-/* ── 手機版浮動指標條 ── */
 .mobile-metric-bar {
-    display: none; /* 桌機不顯示，mobile breakpoint 改為 flex */
+    display: none;
     align-items: center;
     gap: 0.45rem;
     padding: 0.45rem 0.85rem;
-    background: rgba(15, 23, 42, 0.88);
+    background: #ffffff;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 0;
     font-size: 0.8rem;
     margin-bottom: 0.5rem;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     flex-wrap: wrap;
 }
 .mmb-label {
-    color: var(--text-muted);
+    color: var(--text-primary);
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
+    font-weight: 700;
     font-size: 0.78rem;
     white-space: nowrap;
 }
 .mmb-val {
-    font-family: monospace;
+    font-family: "IBM Plex Mono", "JetBrains Mono", monospace;
     font-weight: 700;
     font-size: 1rem;
-    color: var(--accent-teal);
-    transition: color 0.3s;
+    color: var(--text-primary);
 }
 .mmb-hint {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-size: 0.7rem;
     margin-left: auto;
     white-space: nowrap;
-    letter-spacing: 0.01em;
 }
 
-/* ── 減少動畫（無障礙：前庭功能敏感使用者）── */
 @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
-    html { scroll-behavior: auto; } /* Phase 49：取消平滑捲動，使用即時跳轉 */
-    .loading-ring { animation: none; border-top-color: var(--accent-blue); }
+    html { scroll-behavior: auto; }
+    .loading-ring { animation: none; border-top-color: var(--text-primary); }
     .val-pulse { animation: none; }
+    .sw-update-toast { animation: none; }
 }
-
-/* ═══════════════════════════════════════
-   響應式斷點 — 必須放在所有基礎樣式之後
-   (CSS 層疊：後定義的同優先級規則勝出)
-   ═══════════════════════════════════════ */
 
 @media (max-width: 1024px) {
     .app-container {
@@ -1501,16 +1441,12 @@ input[type="range"]:focus-visible {
     }
 }
 
-/* ── 手機（768px 以下）全面優化 ── */
 @media (max-width: 768px) {
-
-    /* 設計對照表：窄螢幕需水平捲動，顯示提示 + 縮小字型 */
     .design-compare-hint { display: block; }
     .design-compare-table { font-size: 0.78rem; }
     .design-compare-table th,
     .design-compare-table td { padding: 0.45rem 0.55rem; }
 
-    /* Header：隱藏英文副標題，縮短標題 */
     .app-header {
         padding: 0.75rem 1rem;
         flex-wrap: wrap;
@@ -1524,95 +1460,79 @@ input[type="range"]:focus-visible {
     }
     .header-badges {
         gap: 0.4rem;
+        margin-left: 0;
     }
     .badge {
         font-size: 0.65rem;
         padding: 0.15rem 0.5rem;
     }
 
-    /* 主容器縮小 padding */
     .app-container {
-        padding: 0.75rem;
-        gap: 0.75rem;
+        padding: 0;
+        gap: 0;
     }
 
-    /* 手機版面板：隱藏 h2 標題和說明文字（toggle 按鈕已說明用途，節省約 65px 垂直空間）*/
     .controls-panel h2,
     .panel-desc {
         display: none;
     }
 
-    /* 控制面板：預設收合，展開按鈕顯示，sticky 懸浮於 header 下方 */
     .panel-toggle {
         display: block;
         position: sticky;
         top: var(--header-height);
         z-index: 90;
-        /* 加深背景以免內容透出 */
-        background: rgba(11, 17, 32, 0.92);
-        border-color: var(--border-highlight);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
-        border-radius: 0 0 10px 10px;
+        background: #ffffff;
+        border-bottom: 1px solid var(--border-color);
+        border-radius: 0;
         margin-top: 0;
-        margin-bottom: 0.5rem;
-    }
-    .panel-toggle:not(.collapsed) {
-        border-radius: 10px 10px 0 0;
+        margin-bottom: 0;
     }
     .controls-panel {
-        position: relative; /* stacking context: z-index 89, above backdrop(88) */
+        position: relative;
         z-index: 89;
         padding: 0 1rem;
         gap: 0;
         overflow: hidden;
         max-height: 0;
-        /* max-height 由 JS scrollHeight 動態設定，transition 負責動畫 */
-        transition: max-height 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-                    padding 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-        border-radius: 12px;
-        /* Phase 50：防止捲動鏈結（panel 捲到底時不傳遞到頁面）*/
+        border-radius: 0;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        background: #ffffff;
         overscroll-behavior: contain;
     }
     .controls-panel.open {
-        /* max-height 由 JS 設定為實際 scrollHeight，不再用 9999px */
         padding: 1rem;
         gap: 1rem;
     }
 
-    /* 滑桿觸控點放大 */
     input[type="range"] {
-        height: 8px;
+        height: 2px;
     }
     input[type="range"]::-webkit-slider-thumb {
-        width: 28px;
-        height: 28px;
-        border-width: 3px;
+        width: 16px;
+        height: 32px;
+        border-width: 1px;
     }
     input[type="range"]::-moz-range-thumb {
-        width: 28px;
-        height: 28px;
-        border-width: 3px;
-        border-radius: 50%;
-        background: var(--accent-blue);
-        cursor: pointer;
+        width: 16px;
+        height: 32px;
+        border-width: 1px;
+        border-radius: 0;
     }
-    /* Phase 59：手機版放大 ± 微調按鈕觸控目標（WCAG 2.5.5 ≥44px） */
     .slider-step-btn {
         width: 44px;
         height: 44px;
         font-size: 1.5rem;
     }
     .slider-row { gap: 0.6rem; }
-    /* Phase 60：手機版加大數值徽章與輸入框觸控目標 */
     .val-editable { padding: 2px 6px; }
     .val-edit-input { width: 4em; padding: 4px 6px; font-size: 1.05em; }
 
-    /* Tab 按鈕：全寬、更高觸控目標 */
     .view-tabs {
-        gap: 0.5rem;
-        margin-bottom: 0.75rem;
+        gap: 0;
+        margin-bottom: 0;
+        border-bottom: 1px solid var(--border-color);
     }
     .tab-btn {
         flex: 1;
@@ -1621,28 +1541,23 @@ input[type="range"]:focus-visible {
         text-align: center;
     }
 
-    /* 3D Canvas：高度改為視窗高度比例 */
     .canvas-3d {
         height: 55vw;
         min-height: 280px;
         max-height: 480px;
     }
 
-    /* 2D Canvas：用 aspect-ratio 取代 min-height，消除 object-fit:contain 的上下留白 */
-    /* rayCanvas 的 buffer 是 1600×800（2:1），容器也設 2:1 → canvas 精確填充，無 letterbox */
     .canvas-container {
         min-height: 0;
         aspect-ratio: 2 / 1;
     }
 
-    /* 圖表放大按鈕：加大觸控目標（WCAG 2.5.5）*/
     .chart-expand-btn {
         width: 32px;
         height: 32px;
         font-size: 0.9rem;
     }
 
-    /* Card header：允許換行 */
     .card-header {
         flex-wrap: wrap;
         gap: 0.5rem;
@@ -1652,7 +1567,6 @@ input[type="range"]:focus-visible {
         flex: 1 1 100%;
     }
 
-    /* 圖例：手機上縮小字型、允許換行 */
     .legend {
         flex-wrap: wrap;
         gap: 0.4rem;
@@ -1662,33 +1576,29 @@ input[type="range"]:focus-visible {
         width: 50px;
     }
 
-    /* 視圖卡片 padding 縮小 */
     .view-card {
         padding: 0.9rem;
+        border-top: none;
+        border-left: none;
+        border-right: none;
     }
 
-    /* Paper 區塊 margin 縮小 */
     .paper-reference-container {
-        margin: 0.75rem;
+        margin: 0;
+        border-left: none;
+        border-right: none;
     }
     .paper-header h2 {
         font-size: 0.95rem;
     }
 
-    /* 捲動提示：手機版才顯示 */
     .scroll-hint { display: block; }
+    .mobile-metric-bar { display: flex; border-left: none; border-right: none; }
 
-    /* 浮動指標條：手機版才顯示 */
-    .mobile-metric-bar { display: flex; }
-
-    /* ── 滑桿標尺中間標籤（手機上太擠，隱藏節省空間）── */
     .range-labels span:nth-child(2) {
         display: none;
     }
 
-    /* ── 控制面板內捲動（手機版高度上限 57vh，不讓面板把視覺化區推太遠）── */
-    /* max-height 和 overflow-y 由 JS 動態設定（openPanel / applyMode），
-       此處的 scrollbar 樣式為補充 */
     .controls-panel.open::-webkit-scrollbar {
         width: 4px;
     }
@@ -1697,11 +1607,9 @@ input[type="range"]:focus-visible {
     }
     .controls-panel.open::-webkit-scrollbar-thumb {
         background: var(--border-color);
-        border-radius: 2px;
+        border-radius: 0;
     }
 
-    /* ── WCAG 2.5.5：最小觸控目標 44×44px ── */
-    /* preset-btn、demo-btn、share-btn 手機版加高至 44px */
     .preset-btn {
         padding: 0.65rem 0.5rem;
         min-height: 44px;
@@ -1715,32 +1623,27 @@ input[type="range"]:focus-visible {
         padding: 0.75rem 1rem;
     }
     .panel-toggle {
-        min-height: 48px; /* 已夠大，確認不被重設 */
+        min-height: 48px;
     }
-
-    /* ── 控制面板捲動隔離（防止過捲動傳導至頁面）── */
     .controls-panel.open {
         overscroll-behavior-y: contain;
     }
 }
 
-/* ── 超小螢幕（iPhone SE 等 390px 以下）── */
 @media (max-width: 390px) {
     .app-header h1 { font-size: 0.9rem; }
     .header-badges { display: none; }
-    /* header-badges 隱藏後，逆行演示／操作手冊連結獨立保留並改用精簡標籤 */
     .header-demo-link,
     .header-guide-link { margin-left: 0.4rem; padding: 0.3rem 0.6rem; font-size: 0.72rem; }
     .header-demo-link .demo-link-full,
     .header-guide-link .demo-link-full { display: none; }
     .header-demo-link .demo-link-short,
     .header-guide-link .demo-link-short { display: inline; }
-    .logo-icon { display: none; } /* 節省橫向空間 */
+    .logo-icon { display: none; }
     .tab-btn { font-size: 0.75rem; padding: 0.75rem 0.25rem; }
     .canvas-3d { height: 60vw; min-height: 240px; }
 }
 
-/* ── 手機橫向（landscape）── */
 @media (max-width: 768px) and (orientation: landscape) {
     .canvas-3d {
         height: 70vw;
@@ -1751,10 +1654,6 @@ input[type="range"]:focus-visible {
     }
 }
 
-/* ═══════════════════════════════════════
-   列印樣式（教師教材）
-   隱藏互動元件，顯示 2D 光路圖 + 圖表
-   ═══════════════════════════════════════ */
 @media print {
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
@@ -1764,13 +1663,10 @@ input[type="range"]:focus-visible {
         font-size: 11pt;
     }
 
-    /* Header：簡化 */
     .app-header {
         position: static !important;
         background: #fff !important;
         border-bottom: 2px solid #333 !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
     }
     .app-header h1 { color: #111 !important; font-size: 14pt; }
     .app-header h1 span { display: inline !important; color: #555 !important; }
@@ -1778,7 +1674,6 @@ input[type="range"]:focus-visible {
     .header-demo-link,
     .header-guide-link { display: none !important; }
 
-    /* 隱藏互動 UI */
     .panel-toggle      { display: none !important; }
     .controls-panel    { display: none !important; }
     .view-tabs         { display: none !important; }
@@ -1787,61 +1682,51 @@ input[type="range"]:focus-visible {
     .fullscreen-btn    { display: none !important; }
     .paper-header span { display: none !important; }
 
-    /* 主容器 → 單欄 */
     .app-container {
         display: block !important;
         padding: 0.5rem !important;
     }
 
-    /* 2D 視圖：強制顯示 */
     #view-2d { display: flex !important; }
     #view-3d { display: none !important; }
 
-    /* 卡片 */
     .view-card {
-        background: #f9fafb !important;
-        border: 1px solid #ccc !important;
-        box-shadow: none !important;
-        backdrop-filter: none !important;
+        background: #fff !important;
+        border: 1px solid #111 !important;
         break-inside: avoid;
     }
     .card-header h3 { color: #111 !important; font-size: 11pt; }
-    .legend { color: #444 !important; }
-    .dot.led         { background: #d97706 !important; }
-    .dot.ray-valid   { background: #0369a1 !important; }
-    .dot.ray-blocked { background: #b91c1c !important; }
+    .legend { color: #111 !important; }
+    .dot.led         { background: #fff !important; border: 2px solid #111 !important; }
+    .dot.ray-valid   { background: #111 !important; }
+    .dot.ray-blocked { background: #666 !important; }
 
-    /* 照度指標 */
     .metric-highlight {
-        background: #f0f9ff !important;
-        border: 1px solid #93c5fd !important;
+        background: #fff !important;
+        border: 1px solid #111 !important;
         color: #111 !important;
     }
 
-    /* Paper 區塊：展開 */
     .paper-reference-container {
         margin: 0.5rem 0 !important;
         background: #fff !important;
-        border: 1px solid #ccc !important;
-        box-shadow: none !important;
+        border: 1px solid #111 !important;
     }
     .paper-content {
         max-height: none !important;
         opacity: 1 !important;
         overflow: visible !important;
-        color: #222 !important;
+        color: #111 !important;
     }
     .paper-content.collapsed {
         max-height: none !important;
         opacity: 1 !important;
     }
     .paper-content h2, .paper-content h3 { color: #111 !important; }
-    .paper-content p, .paper-content li   { color: #333 !important; }
+    .paper-content p, .paper-content li   { color: #111 !important; }
 
-    /* 下載按鈕、skip link：隱藏 */
     .download-section { display: none !important; }
     .skip-link { display: none !important; }
 
-    /* 頁面分隔 */
     .paper-reference-container { page-break-before: always; }
 }
