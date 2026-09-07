@@ -35,9 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Constants
     const LAMP_SPAN_WIDTH = 35.0;
-    const RAYS_PER_LED = 15;
+    // 每盞燈都瞄準原點，射線數為奇數時正中間那條會精確落在 x = 0。
+    // 分箱數若是偶數，x = 0 正好是兩箱的交界，那條射線進哪一箱由浮點誤差決定，
+    // 中央箱只收得到一部分射線 —— 中央照度因此跳成 37.5% / 50% / 100% 這種 1/8 階梯，
+    // 遮擋物稍微移開就報「100% 無影」，與本頁自己的教學說明相反。
+    // 分箱改奇數讓 x = 0 落在中央箱正中；射線加密讓每箱的統計夠穩。
+    const RAYS_PER_LED = 201;
     const TARGET_WIDTH = 20.0;
-    const NUM_BINS = 80;
+    const NUM_BINS = 81;
 
     // Helper math
     const toRadians = deg => deg * Math.PI / 180;
