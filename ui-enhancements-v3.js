@@ -1,6 +1,6 @@
-// ui-enhancements-v2.js — 介面增強集（自 index.html 內嵌 script 整併，Phase 68）
+// ui-enhancements-v3.js — 介面增強集（自 index.html 內嵌 script 整併，Phase 68）
 // 版本以檔名承載（Phase 65 教訓：GitHub Pages CDN 對 query 不可靠）。
-// 內容變更時改檔名後綴（v1→v2）並同步 index.html／sw.js／deploy.yml 三處。
+// 內容變更時改檔名後綴（v2→v3）並同步 index.html／sw.js／deploy.yml 三處。
 
 // ── Phase 59：滑桿 ± 微調按鈕（手機精準調整、長按連續調整）──
     // 觸控拖曳滑桿難以對準精確值（如 0cm／100cm）。為每個滑桿兩側加上 −／＋ 按鈕，
@@ -171,7 +171,8 @@
 
 // ── Phase 63：白話即時解讀 — 觀察中心照度數值，翻譯成「這代表什麼」 ──
     // 以 MutationObserver 監看既有的 #center-illuminance-val（不改 simulation.js），
-    // 解讀文字依 50% 教學參考線分級（IEC 60601-2-41 未訂殘餘照度下限），幫學生把數字連結到意義。
+    // Phase 72：IEC 60601-2-41 未訂殘餘照度下限，解讀改為和「市售手術燈單遮罩數值」的常見區間對照
+    // （區間由 simulation-v8.js 的 window.SLS_MARKET_BAND 計算，這裡只讀取）。
     (function() {
         var valEl = document.getElementById('center-illuminance-val');
         var outEl = document.getElementById('metric-interpret');
@@ -179,18 +180,18 @@
 
         function interpret() {
             var n = parseFloat((valEl.textContent || '').replace('%', ''));
-            if (isNaN(n)) { outEl.textContent = ''; outEl.className = 'metric-interpret'; return; }
+            var band = window.SLS_MARKET_BAND;
+            if (isNaN(n) || !band) { outEl.textContent = ''; outEl.className = 'metric-interpret'; return; }
+            var range = band.lo + '–' + band.hi + '%';
             var msg, level;
             if (n >= 99.5) {
                 level = 'ok';   msg = '目前沒有有效遮擋，術野照度幾乎滿值——還沒形成需要稀釋的陰影。試著移動遮擋物或加大半徑。';
-            } else if (n >= 80) {
-                level = 'ok';   msg = '很亮（≥80%）：遮擋幾乎沒影響，多角度補光成功把本影稀釋掉了，術野依然明亮。';
-            } else if (n >= 50) {
-                level = 'warn'; msg = '仍達標（≥50%）：照度有下降，但仍在 50% 參考線以上，醫師的眼睛還不會覺得暗。';
-            } else if (n >= 20) {
-                level = 'bad';  msg = '未達標（<50%）：低於 50% 參考線，術野中心會出現明顯陰影、影響判斷。試試增加燈數或加大發散角來補光。';
+            } else if (n > band.hi) {
+                level = 'ok';   msg = '高於市售常見區間（' + range + '）：比多數市售手術燈在說明書標示的單遮罩數值還亮，多角度補光把本影稀釋得很乾淨。';
+            } else if (n >= band.lo) {
+                level = 'warn'; msg = '落在市售常見區間（' + range + '）：和多數市售手術燈的單遮罩標示值相當——照度有下降，但本影已被明顯稀釋。';
             } else {
-                level = 'bad';  msg = '嚴重不足（<20%）：本影幾乎沒被稀釋，接近「單一光源被擋住」的情況。';
+                level = 'bad';  msg = '低於市售常見區間（' + range + '）：比多數市售手術燈的單遮罩標示值還暗，術野中心會出現明顯陰影。試試增加燈數或加大發散角來補光。';
             }
             outEl.textContent = '💬 ' + msg;
             outEl.className = 'metric-interpret mi-' + level;

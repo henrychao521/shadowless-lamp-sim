@@ -13,7 +13,7 @@
 ## 功能總覽
 
 ### 主模擬器（`index.html`）
-- **2D 幾何剖面分析**（`simulation.js`）：Canvas 即時光線追跡 + Chart.js 相對照度分佈曲線（%），含 IEC 50% 基準線與 PASS/FAIL 徽章
+- **2D 幾何剖面分析**（`simulation.js`）：Canvas 即時光線追跡 + Chart.js 相對照度分佈曲線（%），含「市售常見區間」色帶（市售手術燈單遮罩殘餘照度的中間一半，29–70%）與區間對照徽章（低於／落在／高於）
 - **3D 空間模擬與熱圖**（`simulation3d.js`，懶載入）：Three.js 多光錐疊加、Realistic Mode（Bloom/SSAO）、Smart Compensation 補光演示
 - **雙設計哲學對照**：LED 陣列式（Trumpf iLED 型）↔ 多面反射式（DomeLux 型），含工程取捨導讀
 - **7 條參數滑桿**：燈高、遮擋物 X/Y/Z/半徑、LED 數量、發散角——支援 ± 微調按鈕（長按連續）與點擊數值直接輸入
@@ -23,7 +23,7 @@
 - 🔬 **試試看**：5 個「先猜再看」引導探究任務，一鍵套用對應預設場景
 - ✅ **自我檢核**：4 題點開看解答
 - 📖 **名詞小幫手**：本影／半影／相對照度／發散角等國中語言詞彙卡
-- 💬 **白話即時解讀**：中心照度數字即時翻譯成意義（三色分級對應 IEC 門檻）
+- 💬 **白話即時解讀**：中心照度數字即時翻譯成意義（三色分級對應市售常見區間；IEC 60601-2-41 只要求標示殘餘照度，未訂合格下限）
 
 ### 延伸頁面
 - 🔭 **光路逆行互動演示**（`optics-reciprocity.html`）：同一塊拋物面凹鏡，反過來用就從望遠鏡變成探照燈／無影燈；含障礙物孔徑遮擋演示（擋住部分光路，交會處仍不留影）
@@ -62,7 +62,7 @@ push 到 `main` → GitHub Actions（`.github/workflows/deploy.yml`）自動部�
 shadowless-lamp-sim/
 ├── index.html               # 主 UI + 教學鷹架 + 理論報告（collapsible）
 ├── index.css
-├── simulation-v7.js         # 2D 光線追跡 + Chart.js 照度曲線（版本以檔名承載）
+├── simulation-v8.js         # 2D 光線追跡 + Chart.js 照度曲線（版本以檔名承載）
 ├── simulation3d.js          # 3D Three.js 光錐疊加 + 後處理（懶載入）
 ├── optics-reciprocity.html  # 光路逆行互動演示（獨立頁）
 ├── sw.js                    # Service Worker（PWA 離線）

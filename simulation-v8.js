@@ -1,5 +1,43 @@
 // simulation.js
 
+// ── 市售手術燈「單遮罩殘餘照度」對照區間（2026-09-29 蒐集）──
+// IEC 60601-2-41 只要求廠商在說明書「標示」單遮罩、雙遮罩、深腔管的殘餘照度百分比，沒有訂合格下限，
+// 所以本站不判 PASS／FAIL，改拿學生的結果和「市售產品公開的單遮罩數值」對照。
+// 只收口徑一致的一組：單一遮罩置中、未開主動補償。數值抄自原廠規格書／型錄，
+// 型號、數值、網址見 index.html 理論報告的「市售手術燈殘餘照度公開數值」表。
+// 不納入色帶：Trumpf iLED 7（只公布開啟 Shadow Management 主動補償後的數值）、
+//             Getinge Volista（單遮罩為側向偏置 lateral mask，量法不同）。
+// 區間取第 1～第 3 四分位數（上下半組中位數，n 為奇數時不含中位數）＝「中間一半的產品」。
+window.SLS_MARKET_BAND = (function () {
+    var samples = [
+        ['Medical Illumination MI-1000', 27.2],
+        ['Medical Illumination MI-750', 0.003],
+        ['Mindray HyLED 760', 75],
+        ['Mindray HyLED 730', 70],
+        ['Mindray HyLED X9（未開 AICS）', 65],
+        ['Mindray HyLED X5', 60],
+        ['Trumpf／Hillrom TruLight 53x0 窄光斑', 29],
+        ['Trumpf／Hillrom TruLight 53x0 寬光斑', 58],
+        ['Trumpf／Hillrom TruLight 55x0 窄光斑', 59],
+        ['Trumpf／Hillrom TruLight 55x0 寬光斑', 76],
+        ['Trumpf／Hillrom TruLight 33x0', 58],
+        ['Trumpf／Hillrom TruLight 35x0', 68],
+        ['Getinge Maquet H LED 700', 77],
+        ['Getinge Maquet H LED 500', 56],
+        ['Getinge Maquet H LED 300', 28]
+    ];
+    var v = samples.map(function (s) { return s[1]; }).sort(function (a, b) { return a - b; });
+    function median(a) { var m = a.length >> 1; return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2; }
+    var half = v.length >> 1;
+    var lo = median(v.slice(0, half));
+    var hi = median(v.slice(v.length - half));
+    return {
+        lo: lo, hi: hi, median: median(v), n: v.length, makers: 4, samples: samples,
+        // 'below' 低於區間／'in' 落在區間／'above' 高於區間
+        classify: function (x) { return x < lo ? 'below' : (x > hi ? 'above' : 'in'); }
+    };
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
     // Canvas setup
     const canvas = document.getElementById('rayCanvas');
@@ -8,7 +46,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Chart setup
     const chartCtx = document.getElementById('illuminanceChart').getContext('2d');
     let illuminanceChart = null;
-    let prevIECPass = null; // IEC 閾值穿越追蹤（觸覺反饋用）
+    let prevBandClass = null; // 市售區間分級穿越追蹤（觸覺反饋用）
+    const BAND = window.SLS_MARKET_BAND;
+    const fmtPct = x => String(Math.round(x * 10) / 10);
 
     // UI Elements
     const inputs = {
@@ -93,14 +133,27 @@ document.addEventListener("DOMContentLoaded", () => {
                         fill: false
                     },
                     {
-                        // 教學參考線 50%：IEC 60601-2-41 只要求標示殘餘照度（單遮罩等），未訂合格下限
-                        label: mobile ? '參考線 50%' : '50% 教學參考線',
-                        data: Array(NUM_BINS).fill(50),
-                        borderColor: '#ef4444',
-                        borderDash: [3, 6],
-                        borderWidth: mobile ? 1 : 1.5,
+                        // 市售常見區間下緣（圖例隱藏；上緣資料集以 fill:'-1' 填滿兩線之間成色帶）
+                        label: '市售區間下緣',
+                        data: Array(NUM_BINS).fill(BAND.lo),
+                        borderColor: 'rgba(245, 158, 11, 0.7)',
+                        borderDash: [3, 4],
+                        borderWidth: 1,
                         pointRadius: 0,
                         fill: false
+                    },
+                    {
+                        // IEC 60601-2-41 未訂殘餘照度下限 → 改畫市售產品單遮罩數值的中間一半（四分位距）
+                        label: mobile
+                            ? '市售區間 ' + fmtPct(BAND.lo) + '–' + fmtPct(BAND.hi) + '%'
+                            : '市售常見區間 ' + fmtPct(BAND.lo) + '–' + fmtPct(BAND.hi) + '%（單遮罩，' + BAND.n + ' 筆）',
+                        data: Array(NUM_BINS).fill(BAND.hi),
+                        borderColor: 'rgba(245, 158, 11, 0.7)',
+                        backgroundColor: 'rgba(245, 158, 11, 0.16)',
+                        borderDash: [3, 4],
+                        borderWidth: 1,
+                        pointRadius: 0,
+                        fill: '-1'
                     }
                 ]
             },
@@ -143,7 +196,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 plugins: {
                     legend: {
                         labels: {
-                            color: '#f8fafc',
+                            // 色帶下緣只是填色用的輔助線，不進圖例
+                            filter: function (item) { return item.datasetIndex !== 2; },
+                            // 原本 #f8fafc 是深色主題留下的，淺色圖紙主題下圖例看不見；色帶說明要讀得到
+                            color: '#475569',
                             font: { size: mobile ? 10 : 12 },
                             boxWidth: mobile ? 12 : 16,
                             padding: mobile ? 8 : 12
@@ -490,26 +546,25 @@ document.addEventListener("DOMContentLoaded", () => {
         const centerValElem = displays.centerIlluminance;
         centerValElem.textContent = centerDilution.toFixed(1) + '%';
 
-        // Change color based on threshold (e.g., < 50 is bad)
-        if (centerDilution < 50) {
-            centerValElem.style.color = '#ef4444'; // red
-        } else if (centerDilution < 80) {
-            centerValElem.style.color = '#fbbf24'; // yellow
-        } else {
-            centerValElem.style.color = '#14b8a6'; // teal
-        }
+        // 與市售常見區間對照（IEC 60601-2-41 未訂殘餘照度下限，不判 PASS／FAIL）
+        const bandClass = BAND.classify(centerDilution);
+        const bandColor = bandClass === 'below' ? '#ef4444'   // 低於區間：紅
+                        : bandClass === 'in'    ? '#fbbf24'   // 落在區間：黃
+                        : '#14b8a6';                          // 高於區間：青
+        const bandRange = fmtPct(BAND.lo) + '–' + fmtPct(BAND.hi) + '%';
+        const bandText = {
+            below: { full: '▼ 低於市售區間', short: '▼ 低於區間', mark: '▼' },
+            in:    { full: '● 落在市售區間', short: '● 區間內',   mark: '●' },
+            above: { full: '▲ 高於市售區間', short: '▲ 高於區間', mark: '▲' }
+        }[bandClass];
+        const bandBadgeClass = 'iec-badge ' + (bandClass === 'below' ? 'iec-fail' : 'iec-pass');
+        centerValElem.style.color = bandColor;
 
-        // 50% 教學參考線 Pass/Fail 徽章（IEC 60601-2-41 未訂殘餘照度下限，這是本模擬器自訂的判讀線）
-        const iecPass = centerDilution >= 50;
         const iecBadge = document.getElementById('iec-compliance-badge');
         if (iecBadge) {
-            if (iecPass) {
-                iecBadge.textContent = '✅ PASS（≥50% 參考線）';
-                iecBadge.className = 'iec-badge iec-pass';
-            } else {
-                iecBadge.textContent = '❌ FAIL（<50% 參考線）';
-                iecBadge.className = 'iec-badge iec-fail';
-            }
+            iecBadge.textContent = bandText.full;
+            iecBadge.title = '市售常見區間：' + bandRange + '（市售手術燈單遮罩殘餘照度的中間一半，' + BAND.n + ' 筆）';
+            iecBadge.className = bandBadgeClass;
         }
 
         // ── 手機版浮動指標條同步 ──
@@ -517,30 +572,27 @@ document.addEventListener("DOMContentLoaded", () => {
         const mmbBadge = document.getElementById('mmb-iec-badge');
         if (mmbVal) {
             mmbVal.textContent = centerDilution.toFixed(1) + '%';
-            mmbVal.style.color = centerDilution < 50 ? '#ef4444'
-                               : centerDilution < 80 ? '#fbbf24'
-                               : '#14b8a6';
+            mmbVal.style.color = bandColor;
         }
         if (mmbBadge) {
-            mmbBadge.textContent = iecPass ? '✅ PASS' : '❌ FAIL';
-            mmbBadge.className   = 'iec-badge ' + (iecPass ? 'iec-pass' : 'iec-fail');
+            mmbBadge.textContent = bandText.short;
+            mmbBadge.className   = bandBadgeClass;
         }
 
         // ── 面板折疊按鈕即時照度指示（只在手機版可見）──
         const toggleMetric = document.getElementById('toggle-metric-badge');
         if (toggleMetric) {
-            toggleMetric.textContent = centerDilution.toFixed(0) + '% ' + (iecPass ? '✅' : '❌');
-            toggleMetric.style.color = centerDilution < 50 ? '#ef4444'
-                                     : centerDilution < 80 ? '#fbbf24'
-                                     : '#14b8a6';
+            toggleMetric.textContent = centerDilution.toFixed(0) + '% ' + bandText.mark;
+            toggleMetric.style.color = bandColor;
         }
 
-        // ── IEC 閾值穿越觸覺反饋（Android Chrome 支援 Vibration API）──
-        if (prevIECPass !== null && iecPass !== prevIECPass && navigator.vibrate) {
-            // PASS 達標（≥50% 參考線）：輕快雙振；FAIL 跌破：重-短-重
-            navigator.vibrate(iecPass ? [25, 20, 50] : [70, 25, 35]);
+        // ── 跨越市售區間邊界時的觸覺反饋（Android Chrome 支援 Vibration API）──
+        if (prevBandClass !== null && bandClass !== prevBandClass && navigator.vibrate) {
+            // 往上跨（低於→區間內→高於）：輕快雙振；往下跨：重-短-重
+            const rank = { below: 0, in: 1, above: 2 };
+            navigator.vibrate(rank[bandClass] > rank[prevBandClass] ? [25, 20, 50] : [70, 25, 35]);
         }
-        prevIECPass = iecPass;
+        prevBandClass = bandClass;
     }
 
     // ── URL Hash State (shareable simulation configurations) ──
