@@ -31,11 +31,11 @@
     <link rel="preconnect" href="https://unpkg.com">
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="index.css?v=16">
+    <link rel="stylesheet" href="index.css?v=17">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
-    <!-- 版本改以「檔名」承載（simulation-v9.js）：GitHub Pages CDN 對部分資產不把
+    <!-- 版本改以「檔名」承載（simulation-v10.js）：GitHub Pages CDN 對部分資產不把
          query 納入快取鍵，?v=N 破壞快取在邊緣節點無效（Phase 65 教訓）-->
-    <link rel="preload" as="script" href="simulation-v9.js">
+    <link rel="preload" as="script" href="simulation-v10.js">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Three.js ESM Import Map — jsDelivr has better CDN coverage in Asia/Taiwan -->
     <script type="importmap">
@@ -94,7 +94,7 @@
                     <p class="lg-tip">每個任務都<strong>先預測、再操作驗證</strong>——這才是科學探究。下方藍色按鈕會直接幫你套用對應場景。</p>
                     <ol class="lg-tasks">
                         <li><strong>燈愈多就愈無影嗎？（公平比較）</strong>先套用 <button type="button" class="lg-preset" data-preset="preset-sparse">🔦 少燈對比</button>（5 顆），記下中心照度 ____%；<em>先猜</em>換成 <button type="button" class="lg-preset" data-preset="preset-dense">💡 多燈對比</button>（61 顆，其他條件完全相同）會升還是降，再驗證。接著保持 61 顆，只把「遮擋物水平位置」從 0 移到 12cm，比比看哪一個改變影響大。</li>
-                        <li><strong>遮擋物移到正中央最暗嗎？</strong>把「遮擋物水平位置」從 0 慢慢拖到 +30cm，觀察陰影曲線的最低點怎麼移動，想想為什麼偏移時某一側反而更暗。</li>
+                        <li><strong>遮擋物往旁邊移，中心會怎麼變？</strong>先套用 <button type="button" class="lg-preset" data-preset="preset-iec">📋 IEC標準</button>，<em>先猜</em>把「遮擋物水平位置」從 0 移到 +30cm，中心照度會一路變亮，還是先幾乎不變、之後才變亮？再每隔 6cm 記一次驗證。也看看遮擋物偏到一側時，光斑內哪一邊比較暗（光斑外沒有光，畫成灰色虛線）。</li>
                         <li><strong>燈拉低，影子變深還是變淡？</strong>先套用 <button type="button" class="lg-preset" data-preset="preset-iec">📋 IEC標準</button>，<em>先猜</em>燈高從 150 降到 70cm 中心照度會升還是降，再<strong>只改燈高</strong>驗證（不要低於 70cm：再低遮擋物就伸進燈頭碗口，畫面會跳出提示）；接著燈高固定 100cm，把 LED 從 9 顆改成 61 顆，看看差多少。最後用「從術野中心往上看，燈頭張開多大角度、遮擋物擋掉多大角度」來解釋，並和橘色「市售常見區間」色帶比一比。</li>
                         <li><strong>發散角的兩難。</strong>把「發散角」從 1° 調到 15°：光斑變大還是變小？<em>先猜</em>中心照度的百分比會怎麼變，再看圖驗證。百分比如果沒變，發散角變大換到了什麼、<em>代價</em>又是什麼？</li>
                         <li><strong>延伸任務（光路逆行）。</strong>開啟 <a href="optics-reciprocity.html">光路逆行演示</a>：先猜障礙物變寬時，交會處會出現「缺口」還是只是「整體變暗」？再拖動寬度滑桿驗證。</li>
@@ -304,16 +304,18 @@
                         </div>
                         <!-- Phase 63：白話即時解讀 — 把中心照度數字翻成「這代表什麼」 -->
                         <p class="metric-interpret" id="metric-interpret" aria-live="polite"></p>
-                        <!-- Phase 75：幾何合理性提示 — 遮擋物碰到／穿過燈頭、或伸進燈頭碗口時提醒（ui-enhancements-v4.js） -->
+                        <!-- Phase 75：幾何合理性提示 — 遮擋物碰到／穿過燈頭、或伸進燈頭碗口時提醒（ui-enhancements-v5.js） -->
                         <p class="metric-interpret" id="geometry-warning" role="status" aria-live="polite" hidden></p>
                         <!-- Phase 66：2D 剖面限制說明 — 預設場景偏暗是剖面幾何的特性，避免誤解（Phase 72：改與市售區間對照） -->
                         <p class="iec-2d-note">ℹ️ 注意：2D 剖面把所有 LED 壓在<strong>同一個切面</strong>上，會<strong>高估遮擋</strong>。真實無影燈是 3D 環形陣列，側向燈光可從遮擋物旁繞過，中心照度通常比 2D 剖面高——切到「<strong>3D 空間模擬與熱圖</strong>」分頁可看到完整配置的效果。</p>
                     </div>
                     <div class="chart-wrapper" id="chart-wrapper">
-                        <canvas id="illuminanceChart" role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），兩條折線分別顯示遮擋場景照度與無遮擋基準，橘色色帶為市售手術燈單遮罩殘餘照度的常見區間 56% 至 70%"></canvas>
+                        <canvas id="illuminanceChart" role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），兩條折線分別顯示遮擋場景照度與無遮擋基準（只畫在光斑內），光斑外沒有光可比，以 0% 處的灰色虛線標示，橘色色帶為市售手術燈單遮罩殘餘照度的常見區間 56% 至 70%"></canvas>
                         <!-- 手機版：點擊放大圖表 -->
                         <button class="chart-expand-btn" id="chart-expand-btn" aria-label="切換圖表大小" title="點擊切換圖表大小">⤢</button>
                     </div>
+                    <!-- Phase 76：光斑說明 — 光斑外不畫曲線（灰色虛線），由 ui-enhancements-v5.js 依 window.SLS_SPOT 更新 -->
+                    <p class="iec-2d-note" id="spot-note" aria-live="polite"></p>
                 </div>
 
                 <!-- 兩種無影燈設計哲學對照表 -->
@@ -630,7 +632,7 @@
         }
     })();
     </script>
-    <script src="simulation-v9.js"></script>
+    <script src="simulation-v10.js"></script>
     <!-- simulation3d.js は 3D tab 首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
     <script>
     // ── ARIA Tablist 鍵盤導航（WAI-ARIA tablist pattern）──
@@ -1389,7 +1391,7 @@
     })();
     </script>
 
-    <script src="ui-enhancements-v4.js"></script>
+    <script src="ui-enhancements-v5.js"></script>
 
             </body>
 </html>

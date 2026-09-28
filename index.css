@@ -880,7 +880,8 @@ input[type="range"]::-moz-range-thumb:active {
 
 .chart-container {
     flex: 2;
-    min-height: 250px;
+    /* Phase 76：原為 min-height:250px，會取消「不小於內容」的自動下限，內容一變長就溢出蓋到下一張卡 */
+    min-height: auto;
 }
 
 .chart-wrapper {
@@ -1730,4 +1731,15 @@ input[type="range"]:focus-visible {
     .skip-link { display: none !important; }
 
     .paper-reference-container { page-break-before: always; }
+}
+
+/* Phase 76：手機版 2D 分頁的圖表卡被壓扁、照度圖溢出蓋到下方設計對照表。
+   根因：.chart-container 設 flex:2（基準 0%）又自訂 min-height:250px，取消了 flex 項目
+   「不小於內容」的自動下限；白話解讀文字一變長，卡片高度（379px）就小於內容（684px），
+   多出來的高度反而被分給光路圖卡（554px，畫布 413px 高、圖只佔 187px，上下留白）。
+   手機版改為兩張卡都依內容排版：光路圖畫布本身維持 2:1（Phase 41 原意：不留白邊），圖表卡不小於內容。 */
+@media (max-width: 768px) {
+    .canvas-container { flex: 0 0 auto; aspect-ratio: auto; min-height: auto; }
+    #rayCanvas { height: auto; aspect-ratio: 2 / 1; }
+    .chart-container { flex: 0 0 auto; }
 }
