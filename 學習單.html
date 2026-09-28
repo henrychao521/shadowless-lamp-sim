@@ -59,6 +59,28 @@
     .teacher ul, .teacher ol { margin-left: 20pt; }
     .note { background: #f2f2f2; border-radius: 4pt; padding: 6pt 9pt; margin-top: 5pt; font-size: 10pt; }
 
+
+    /* 任務 4：控制變因紀錄表與幾何示意圖 */
+    table.rec { border-collapse: collapse; margin: 3pt 0 2pt; font-size: 10pt; }
+    table.rec th, table.rec td { border: 0.8pt solid #777; padding: 1pt 6pt; text-align: center; min-width: 42pt; height: 15pt; }
+    table.rec th { background: #eee; font-weight: 700; }
+    table.rec td.lab { background: #f7f7f7; text-align: left; min-width: 88pt; }
+    .explain { display: flex; gap: 10pt; align-items: flex-start; }
+    .explain .qs { flex: 1 1 auto; }
+    .explain figure { flex: 0 0 auto; text-align: center; font-size: 8.5pt; color: #444; }
+    .warn { font-size: 9pt; border: 0.8pt dashed #777; padding: 1pt 6pt; margin: 2pt 0; line-height: 1.45; }
+    .t4 p.step { font-weight: 700; margin-top: 3pt; }
+    .t4 .predict { margin: 2pt 0; }
+    .t4 .lines div { height: 15pt; }
+    .teacher table.fp { border-collapse: collapse; width: 100%; font-size: 8.7pt; margin-top: 2pt; }
+    .teacher table.fp th, .teacher table.fp td { border: 0.6pt solid #999; padding: 1pt 4pt; vertical-align: top; line-height: 1.35; }
+    .teacher table.fp th { background: #eee; }
+    .teacher.compact p, .teacher.compact li { font-size: 9.3pt; line-height: 1.42; }
+    .teacher.compact header.sheet { margin-bottom: 4pt; }
+    .teacher.compact h2 { font-size: 11.5pt; margin: 5pt 0 2pt; }
+    .teacher.compact .note { margin-top: 3pt; padding: 4pt 8pt; }
+    .teacher.compact footer.sheet { margin-top: 4pt; }
+
     footer.sheet { margin-top: 8pt; font-size: 8.5pt; color: #666; text-align: center; }
 </style>
 </head>
@@ -109,22 +131,90 @@
         </ol>
     </div>
 
-    <footer class="sheet">無影燈光學模擬器探究學習單　第 1 頁／共 3 頁</footer>
+    <footer class="sheet">無影燈光學模擬器探究學習單　第 1 頁／共 4 頁</footer>
 </div>
 
-<!-- ════════ 第 2 頁：任務四～五 + 自我檢核 ════════ -->
+<!-- ════════ 第 2 頁：任務四（預測 → 操作驗證 → 解釋 → 對照市售） ════════ -->
 <div class="page">
-    <div class="task">
-        <h2><span class="no">任務 4</span>把燈拉低，還比得上市售燈嗎？</h2>
+    <div class="task t4">
+        <h2><span class="no">任務 4</span>燈拉低，影子會變深還是變淡？（控制變因實驗）</h2>
+        <p style="font-size:10pt;">這個任務只看<b>中心照度</b>。先按「📋 IEC標準」（遮擋物置中、離術野 50cm、半徑 10.5cm、LED 25 顆、發散角 6°），之後<b>每次只改一個滑桿</b>，其他不動。</p>
+
+        <p class="step">① 先預測（還不要操作）</p>
+        <div class="predict">燈高從 150cm 慢慢降到 70cm，中心照度會
+            <span class="check-opts"><label>□ 變亮</label><label>□ 變暗</label><label>□ 不變</label></span><br>
+            我的理由：<span class="blank w" style="min-width:330pt;"></span></div>
+        <div class="predict">燈高固定 100cm，LED 從 9 顆加到 61 顆，中心照度會
+            <span class="check-opts"><label>□ 明顯變亮</label><label>□ 明顯變暗</label><label>□ 差不多</label></span></div>
+
+        <p class="step">② 操作驗證（一次只改一個變因，把數字填進表格）</p>
+        <table class="rec">
+            <tr><th>燈高（cm）</th><th>150</th><th>120</th><th>100</th><th>80</th><th>70</th></tr>
+            <tr><td class="lab">中心照度（%）</td><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="lab">徽章（▼ 低於／● 落在／▲ 高於）</td><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <table class="rec">
+            <tr><th>LED 數量（燈高 100cm）</th><th>9 顆</th><th>25 顆</th><th>61 顆</th></tr>
+            <tr><td class="lab">中心照度（%）</td><td></td><td></td><td></td></tr>
+        </table>
+        <div class="warn">⚠️ 燈高<b>不要低於 70cm</b>：再低，遮擋物頂端就碰到燈頭外圈，等於頭撞進燈裡，數字沒有意義。用滑桿旁的 −／＋ 鈕或點數值直接輸入，才停得準。</div>
+        <p style="font-size:10.5pt;">我的預測 <label>□ 正確</label>　<label>□ 不正確</label>；和預測最不一樣的是：<span class="blank w" style="min-width:210pt;"></span></p>
+
+        <p class="step">③ 用幾何解釋</p>
+        <div class="explain">
+            <div class="qs">
+                <ol class="steps" style="margin-top:0;">
+                    <li>在右圖從術野中心 O 各畫兩條線，連到「燈高 150cm」燈頭的左右兩端；再從 O 畫兩條和遮擋物<b>相切</b>的線。燈頭張開的角度裡，被遮擋物擋住的有
+                        <span class="check-opts"><label>□ 大部分</label><label>□ 一小部分</label></span>。換成「燈高 70cm」再畫一次，被擋住的比例變
+                        <span class="check-opts"><label>□ 大</label><label>□ 小</label></span>。</li>
+                    <li>用「<b>光源張角</b>」這個詞解釋：為什麼燈拉低，中心反而變亮？
+                        <div class="lines"><div></div><div></div></div></li>
+                    <li>燈高 100cm，把遮擋物半徑從 10.5cm 慢慢加大，中心照度在半徑約 <span class="blank"></span> cm 時變成 0%。這時 O 點落在 <label>□ 本影</label>　<label>□ 半影</label>，因為遮擋物擋住的角度 <span class="blank" style="min-width:110pt;"></span>。</li>
+                    <li>LED 從 9 顆加到 61 顆，中心照度幾乎不變。提示：決定中心剩多少的是「燈的顆數」還是「沒被擋住的角度範圍」？
+                        <div class="lines"><div></div></div></li>
+                </ol>
+            </div>
+            <figure><svg class="geo" viewBox="0 0 114 216" width="114pt" height="216pt" xmlns="http://www.w3.org/2000/svg" font-family="STHeiti, Heiti TC, sans-serif">
+<path d="M11.7,18.4 A195.0,195.0 0 0 1 102.7,18.4" fill="none" stroke="#1a1a1a" stroke-width="2.2"/>
+<circle cx="11.7" cy="18.4" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="26.7" cy="15.4" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="41.9" cy="13.6" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="57.2" cy="13.0" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="72.5" cy="13.6" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="87.7" cy="15.4" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="102.7" cy="18.4" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="57.2" y="9.1" font-size="8" text-anchor="middle">燈高 150cm</text>
+<path d="M11.7,129.2 A91.0,91.0 0 0 1 102.7,129.2" fill="none" stroke="#1a1a1a" stroke-width="2.2"/>
+<circle cx="11.7" cy="129.2" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="26.1" cy="122.5" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="41.4" cy="118.4" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="57.2" cy="117.0" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="73.0" cy="118.4" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="88.3" cy="122.5" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<circle cx="102.7" cy="129.2" r="1.8" fill="#fff" stroke="#1a1a1a" stroke-width="0.8"/>
+<text x="57.2" y="113.1" font-size="8" text-anchor="middle">燈高 70cm</text>
+<circle cx="57.2" cy="143.0" r="13.7" fill="#bbb" stroke="#1a1a1a" stroke-width="1"/>
+<text x="57.2" y="146.0" font-size="7" text-anchor="middle">遮擋物</text>
+<line x1="5.2" y1="208.0" x2="109.2" y2="208.0" stroke="#1a1a1a" stroke-width="1.6"/>
+<circle cx="57.2" cy="208.0" r="2.4" fill="#1a1a1a"/><text x="61.2" y="215.0" font-size="8">O 術野中心</text>
+</svg>
+                <figcaption>剖面示意（按比例）</figcaption>
+            </figure>
+        </div>
+
+        <p class="step">④ 對照市售產品</p>
         <ol class="steps">
-            <li>先按「⚠️ 嚴苛遮擋」，再把「無影燈高度」從 100cm 慢慢降到 60cm。</li>
-            <li class="predict"><b>先猜：</b>中心照度會掉到橘色「市售常見區間」色帶（56–70%）以下嗎？<span class="check-opts"><label>□ 會</label><label>□ 不會</label></span></li>
-            <li>實測結果：燈高 60cm 時中心照度 <span class="blank"></span> %，徽章顯示 <label>□ 低於區間</label>　<label>□ 落在區間</label>　<label>□ 高於區間</label></li>
-            <li>如果你是手術室的工程師，燈不能再升高的情況下，你會調整哪個參數來補救？為什麼？
-                <div class="lines"><div></div><div></div></div></li>
+            <li>表格裡哪幾個燈高落在橘色「市售常見區間」（56–70%）？<span class="blank w"></span></li>
+            <li>燈高 100cm 時中心照度低於市售區間。如果燈不能再拉低（醫師的頭和手需要空間），工程師可以改燈的哪一項<b>設計</b>讓光源張角變大？
+                <div class="lines"><div></div></div></li>
         </ol>
     </div>
 
+    <footer class="sheet">無影燈光學模擬器探究學習單　第 2 頁／共 4 頁</footer>
+</div>
+
+<!-- ════════ 第 3 頁：任務五 + 自我檢核 ════════ -->
+<div class="page">
     <div class="task">
         <h2><span class="no">任務 5</span>延伸挑戰：光路逆行（望遠鏡 ⇌ 無影燈）</h2>
         <ol class="steps">
@@ -153,14 +243,14 @@
         </div>
     </div>
 
-    <footer class="sheet">無影燈光學模擬器探究學習單　第 2 頁／共 3 頁</footer>
+    <footer class="sheet">無影燈光學模擬器探究學習單　第 3 頁／共 4 頁</footer>
 </div>
 
-<!-- ════════ 第 3 頁：教師指引 ════════ -->
-<div class="page teacher">
+<!-- ════════ 第 4 頁：教師指引 ════════ -->
+<div class="page teacher compact">
     <header class="sheet">
         <h1>教師指引（本頁發放前可抽除）</h1>
-        <div class="sub">課綱對應．參考答案要點．常見迷思．評量建議</div>
+        <div class="sub">課綱對應．參考答案要點．常見迷思．失敗路徑．評量建議</div>
     </header>
 
     <h2>課綱對應（108 課綱・生活科技）</h2>
@@ -171,7 +261,7 @@
         <li><b>任務 1</b>：多燈照度上升。關鍵語：「不同<b>角度</b>」——每顆燈從不同方向照向術野，某方向被擋住時其他方向補上，本影被稀釋成淡半影。</li>
         <li><b>任務 2</b>：最低點跟著遮擋物移動（且偏移時遮擋物正下方偏外側更暗——該處能「繞過」遮擋物的燈更少）。</li>
         <li><b>任務 3</b>：大發散角光斑大、補影強，代價是能量分散、中心照度與聚焦深度下降——典型 trade-off。</li>
-        <li><b>任務 4</b>：實測（2D、嚴苛遮擋）燈高 100cm 約 60%、80cm 約 56%、60cm 約 71%——燈拉低後反而升到市售常見區間（56–70%）上緣以上：燈愈低，外圈光束斜射角度愈大，愈容易從偏置的遮擋物旁繞過。很多學生會猜「變暗」，正好討論預測與結果為何不同。若要再提高照度：增加 LED 數量或加大發散角（各有代價，鼓勵說理由，不設標準答案）。</li>
+        <li><b>任務 4</b>（「📋 IEC標準」只改燈高）150／120／100／80／70cm → <b>16／32／40／56／63%</b>：燈愈低愈亮，80、70cm 落在市售區間。LED 9／25／61 顆 → 44／40／43%，<b>差不多</b>（發散角 1°～15° 也都在 38–40%）。<b>解釋</b>：從 O 往上看，寬 70cm 的燈頭半張角在燈高 150／100／70cm 時約 13.5°／20.5°／30°，遮擋物擋住的半張角固定約 12°；中心照度 ≈「燈頭張角裡沒被擋住的比例」。半徑加到約 <b>18cm</b>（遮擋半張角約 21° ＞ 燈頭 20.5°）時全部被擋，O 進入<b>本影</b>。LED 變多只是把同一段角度切得更細，被擋比例不變（9 顆的 44% 是射線計數誤差）。④：加大燈頭直徑或用兩盞燈頭（代價：更大更重）。數據：2026-09-29 以 Playwright 操作模擬器的掃描紀錄 <code>shadowless_task4_scan.json</code>。</li>
         <li><b>任務 5</b>：只會整體變暗、不出現缺口——交會處每一點都由整片鏡面各方向供光（孔徑遮擋原理）。與牛頓式斜鏡擋在主鏡前仍見完整星空為同一原理。</li>
     </ol>
 
@@ -179,20 +269,30 @@
     <ul>
         <li>「無影燈把影子<b>消滅</b>了」→ 應為「<b>稀釋</b>」：只要有遮擋就有影子，多光源把深暗本影打散成幾乎看不見的半影。</li>
         <li>「IEC 規定被擋住後要保有某個百分比的亮度」→ IEC 60601-2-41 只要求廠商<b>標示</b>單遮罩、雙遮罩、深腔等殘餘照度百分比，<b>沒有訂合格下限</b>。站上的色帶是 4 家廠商 14 筆公開單遮罩數值（MI-750 標示 0.003% 異常偏低、未納入）的中間一半（56–70%），是「跟市售產品比」的對照，不是合格線。</li>
-        <li>「模擬器預設場景中心只剩約四成亮度，是不是壞了？」→ 2D 剖面把所有 LED 壓在同一切面、會<b>高估遮擋</b>；真實 3D 環形陣列側向燈可繞過（站上有說明，可引導切到 3D 分頁對照）。</li>
+        <li>「模擬器預設場景中心只剩約四成亮度，是不是壞了？」→ 2D 剖面把所有 LED 壓在同一切面、會<b>高估遮擋</b>；真實 3D 環形陣列側向燈可繞過（可切到 3D 分頁對照）。</li>
+        <li>「燈愈低愈暗」→ 百分比是「被擋後÷沒擋時」，看角度不看距離：燈拉低，燈頭張角變大，更多光從遮擋物旁斜射進來，中心反而變亮。「LED 愈多剩愈多」→ 中心剩多少看沒被擋住的<b>角度範圍</b>；多燈的好處是影子邊緣平順、單顆壞掉影響小。</li>
         <li>「燈愈多一定愈好」→ 引導從成本、散熱、維修（站上「設計哲學對照表」）反思。</li>
     </ul>
+
+    <h2>失敗路徑（任務 4 常見操作錯誤）</h2>
+    <table class="fp">
+        <tr><th style="width:23%">學生的嘗試</th><th style="width:37%">結果</th><th style="width:21%">改用</th><th style="width:19%">學到什麼</th></tr>
+        <tr><td>燈高和 LED 數同時改</td><td>數字變了，說不出是誰造成的</td><td>按「📋 IEC標準」重來，一次只動一個滑桿</td><td>控制變因</td></tr>
+        <tr><td>從「⚠️ 嚴苛遮擋」把燈拉到 60cm</td><td>讀到 71%，以為燈愈低愈好；其實遮擋物頂端（79cm）已高過燈頭外圈</td><td>用「IEC標準」、燈高不低於 70cm</td><td>模擬數字要先檢查幾何合不合理</td></tr>
+        <tr><td>手機拖滑桿停在 115cm</td><td>讀到 27%，比 120cm 的 32% 還低，以為規律錯了</td><td>改測間距大的五個燈高，看整體趨勢</td><td>模擬用有限條光線計數，相鄰數值會跳動幾個百分點</td></tr>
+        <tr><td>想靠加 LED 或加大發散角把 100cm 的 40% 補進市售區間</td><td>幾乎不動</td><td>改動燈高或遮擋物位置</td><td>陰影稀釋是角度問題，不是燈數問題</td></tr>
+    </table>
 
     <h2>評量建議</h2>
     <ul>
         <li>形成性：任務 1–5 的「預測 vs 實測」對照（重視說理，不以猜對為分數）。</li>
         <li>總結性：自我檢核 Q1–Q2 答出「稀釋、不同角度交會補光」核心概念即達標；Q3 反思品質可作加分。</li>
-        <li>延伸：請學生用站上「複製連結」功能保存一組自己設計的「最差場景」與「補救後場景」連結，附在作業中。</li>
+        <li>延伸：用站上「複製連結」保存自己設計的「最差場景」與「補救後場景」，附在作業中。</li>
     </ul>
 
-    <div class="note">💡 課堂操作建議：教師機投影用「🎬 自動掃描演示」鈕吸引注意；學生分組用手機操作（滑桿旁 −／＋ 鈕與點數值直接輸入適合小螢幕精準調整）。全站支援離線（PWA），網路不穩的教室可預先安裝。</div>
+    <div class="note">💡 教師機投影用「🎬 自動掃描演示」吸引注意；學生分組用手機操作（−／＋ 鈕、點數值直接輸入較準）。全站支援離線（PWA），網路不穩的教室可預先安裝。</div>
 
-    <footer class="sheet">無影燈光學模擬器探究學習單　第 3 頁／共 3 頁（教師指引）</footer>
+    <footer class="sheet">無影燈光學模擬器探究學習單　第 4 頁／共 4 頁（教師指引）</footer>
 </div>
 
 </body>

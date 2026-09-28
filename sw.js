@@ -7,7 +7,7 @@
 //   「新標頭＋舊內文」且不把 query 納入快取鍵 → ?v=N 永遠打不掉陳舊副本。
 //   改以「檔名」承載版本（simulation-v6.js），路徑必在 CDN 快取鍵內，保證取新。
 //   另：預快取一律 cache:'no-cache' 強制重新驗證。）
-const CACHE_NAME = 'sls-cache-v23'; // Phase 74：市售區間拿掉 MI-750（0.003% 異常偏低）→ 56–70%，simulation-v8→v9
+const CACHE_NAME = 'sls-cache-v24'; // Phase 74：學習單任務 4 改為控制變因實驗（試試看第 4 項同步改寫）；市售區間 56–70%（拿掉 MI-750）
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 // ⚠️ 帶版本碼的資產必須與 index.html 的引用完全一致（Phase 64 修正）：
