@@ -159,6 +159,7 @@
         <tr><td>IEC 殘餘照度說法更正</td><td><span class="badge badge-green">✅ Phase 71</span></td><td>跨平台審查指出「IEC 60601-2-41 要求殘餘照度 ≥50%」有誤（審查員主張應為 10%）。查標準原文（IEC 60601-2-41:2009/AMD1:2013 201.12.1.102.1.1 d）：只要求在使用說明書標示單遮罩、雙遮罩、深腔管等殘餘照度百分比，<strong>沒有合格下限</strong>，10% 也不成立（MI-750 標示 0.003% 仍宣稱符合本標準）。判分維持 50%，全站改稱「50% 教學參考線」、徽章改 PASS／FAIL（參考線）；另加註 3D 真實模式固定 12 盞代表燈、屏幕→螢幕、反光鏡折射→反射、LED 幾乎不含紅外線。simulation-v6→v7、ui-enhancements-v1→v2、SW v18→v19、deploy.yml 三處同步；學習單／操作介紹 PDF 重出</td></tr>
         <tr><td>市售區間對照＋報告更正＋輻照度兩版</td><td><span class="badge badge-green">✅ Phase 72</span></td><td>使用者決定（R06 選 C）：殘餘照度不再以 50% 判 PASS／FAIL，改和市售手術燈公開的單遮罩數值對照——4 家廠商 15 筆（置中、未開主動補償），取第 1～3 四分位數 29–70%（中位數 59%）畫成橘色色帶，徽章改「低於／落在／高於市售區間」，理論報告新增型號／數值／網址出處表。R07：研究報告 docx 與 surgery_light.txt 的「通常要求…」「顯著高於 IEC 最低臨界百分比」改正（python-docx 只改純文字 run，結構計數不變、LibreOffice 轉 PDF 14 頁不變）。R08：總輻照度改列「2009 年版 1000 W/m²；2021 年第 3 版 700 W/m²」（Getinge ed.3 解說單＋Mindray HyLED Q 產品頁兩個獨立來源）。simulation-v7→v8、ui-enhancements-v2→v3、SW v19→v21、deploy.yml 三處同步；學習單／操作介紹 PDF 重出</td></tr>
         <tr><td>手機控制面板捲動修正</td><td><span class="badge badge-green">✅ Phase 73</span></td><td>手機 375×812 展開「⚙️ 模擬參數」後面板卡在 max-height≈481px、overflow:hidden，只看得到前三四個滑桿，其餘捲不到。根因：<code>.controls-panel</code> 從未宣告 <code>transition: max-height</code>，openPanel() 內綁的 <code>transitionend</code> 監聽器永遠不觸發，原本要在動畫結束後補上的 <code>overflow-y: auto</code> 就一直沒生效。修法：media query 補上 max-height transition，並在 openPanel() 設定 max-height 的同一時機直接同步設 overflow-y:auto（不再只靠 transitionend），桌機版不受影響。Playwright 375×812 實測：面板 scrollHeight 2162px／clientHeight 461px／overflowY=auto，捲到最後一支滑桿並實際拖動、數值確實改變。index.css?v=15→16、SW sls-cache-v21→v22</td></tr>
+        <tr><td>市售區間拿掉 MI-750＋學習單任務 4 重新設計</td><td><span class="badge badge-green">✅ Phase 74</span></td><td>使用者決定：MI-750 單遮罩標示 0.003% 數值異常偏低，不納入色帶；同口徑重算 4 家 14 筆 → <strong>56–70%（中位數 59.5%）</strong>，網站、學習單、操作介紹、docx、surgery_light.txt 同步。任務 4 原題「嚴苛遮擋＋燈拉低會跌破」與模擬結果不符：用 Playwright 操作模擬器掃 6 個滑桿（16 組、156 個點），查出中心照度取決於「燈頭張角中沒被遮擋物擋住的比例」——燈拉低變亮、遮擋物愈大愈靠近術野愈暗、LED 數量與發散角幾乎無關，嚴苛遮擋場景在燈高低於 90cm 時遮擋物已穿進燈頭。任務 4 改為「預測→控制變因→幾何解釋→對照市售」（IEC標準場景只改燈高 150–70cm＋LED 9／25／61 顆），教師指引加迷思與失敗路徑；學習單 3→4 頁。simulation-v8→v9、SW v22→v24、deploy.yml 三處同步</td></tr>
         <tr><td>dev-log 分頁</td><td><span class="badge badge-green">✅ Phase 69</span></td><td>dev-log.html 已漲至 215KB（其中逐字稿區段獨佔 118KB），整段移出為獨立頁 <code>dev-log-transcript.html</code>，主頁瘦身至 97KB 並留醒目連結；新對話往後依時序增補於該頁尾端。deploy.yml 三處補檔；兩檔標籤平衡驗證通過（dev-log 不在 SW 預快取，無需 bump）</td></tr>
         <tr><td>inline JS 整併</td><td><span class="badge badge-green">✅ Phase 68</span></td><td>把 Phase 59（± 微調鈕）、60（數值就地輸入）、61（試試看一鍵套場景）、63（白話即時解讀）四個自包含 IIFE 自 index.html 抽出，整併為單一可快取檔 <code>ui-enhancements-v1.js</code>（10KB，檔名承載版本）。index.html 90.7KB→80.9KB、inline script 23→19 塊；外部檔置於原第一個區塊位置（&lt;/body&gt; 前），執行順序與行為不變。SW 預快取補檔、deploy.yml 三處補檔、SW↔HTML 資產交叉檢查一致；SW v16→v17</td></tr>
         <tr><td>探究學習單 PDF</td><td><span class="badge badge-green">✅ Phase 67</span></td><td>新增可列印探究學習單（A4 三頁，Chrome headless 產 PDF，黑白印表機友善）：第 1–2 頁為學生任務——對應站上「🔬 試試看」五任務的「先猜→操作→記錄」書寫欄（含勾選預測、照度記錄格、開放問答線）+ 自我檢核 3 題；第 3 頁教師指引（108 課綱對應、各任務參考答案要點、常見迷思澄清、評量建議、課堂操作技巧），發放前可抽除。試試看卡尾新增「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔（Phase 56 教訓）；pdftoppm 三頁逐頁目視驗證。index.css ?v=13→v14、SW v15→v16</td></tr>
@@ -172,6 +173,19 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 74 — 市售區間拿掉 MI-750、學習單任務 4 改為控制變因實驗 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-09-29 · simulation-v9.js／index.html／學習單／操作介紹／docx／surgery_light.txt · Playwright 參數掃描</div>
+      <p>兩項使用者決定：① Medical Illumination MI-750 的單遮罩 0.003% 不納入色帶；② 學習單任務 4 的前提（嚴苛遮擋＋燈拉低通常會跌破）和模擬結果相反，要先弄懂模擬器的物理再重新出題。</p>
+      <ul>
+        <li><strong>區間重算</strong>：同口徑（單遮罩、置中、未開主動補償、上下半組中位數）14 筆：27.2、28、29、56、58、58、59｜60、65、68、70、75、76、77 → <strong>56–70%</strong>，中位數 59.5%（原 15 筆 29–70%、59%）。MI-750 保留在出處表，「列入色帶」改為「否：數值異常偏低」。白話解讀、手機指標條、圖例由 <code>SLS_MARKET_BAND</code> 自動算；寫死的一句話原理（三到七成→56–70%）、Q3、名詞小幫手、臨床物理意義、理論報告、照度圖 aria-label、學習單、操作介紹、README、surgery_light.txt 手動改。docx 只改兩個純文字 run：段落 111／run 587／圖片 98 前後相同，LibreOffice 轉 PDF 14 頁、每頁行數不變；報告裡「維持在 63% 以上、落在區間之內」仍成立。備份 .bak-2026-09-29b.docx 不進 git。</li>
+        <li><strong>物理模型</strong>：燈頭是以術野中心 O 為圓心、半徑＝燈高的圓弧，水平半寬固定 35cm，LED 在 ±asin(35/燈高) 內等角分布、全部瞄準 O；遮擋物是 2D 圓，射線線段和圓的距離小於半徑就算被擋。中心照度＝中央分箱內沒被擋的射線比例，約等於「燈頭張角裡沒被遮擋物擋住的比例」（各 LED 權重 ∝ cos θ）。</li>
+        <li><strong>掃描結果</strong>（Playwright 設定滑桿、讀 <code>#center-illuminance-val</code>）：IEC標準只改燈高 150／120／100／80／70cm → 16／32／40／56／63%；遮擋物高度 30→70cm → 4→56%；半徑 2→18cm → 88→0%（約 18cm 時遮擋半張角超過燈頭 20.5°，O 進入本影）；LED 5～61 顆 → 40～57% 隨機跳動、多燈時約 40–45%；發散角 1°～15° → 38–40%；遮擋物往側邊移 0→30cm → 40→100%。嚴苛遮擋場景（頭頂 79cm）在燈高低於 90cm 時已高過燈頭外圈，舊題 60cm 的 71% 來自不合理的幾何。數據與腳本存於 mesh-review-2026-09-28/fixes/shadowless_task4_scan.json／.py。</li>
+        <li><strong>任務 4 新題</strong>：① 預測燈從 150 降到 70cm、LED 9→61 顆的變化；② IEC標準場景一次只改一個變因填表（提醒燈高不低於 70cm）；③ 在按比例畫的剖面圖上從 O 畫燈頭端線與遮擋物切線，用「光源張角」解釋，並找出中心變 0%（本影）的遮擋物半徑、說明 LED 數為何無關；④ 對照市售區間，討論燈不能再低時該怎麼改設計（加大燈頭、雙燈頭）。教師指引附實測值、「燈愈低愈暗」「LED 愈多剩愈多」兩條迷思與四列失敗路徑表。網站「試試看」第 4 項同步改寫。學習單 3→4 頁（任務 4 獨立一頁）。</li>
+        <li><strong>三件套</strong>：simulation-v8→v9（index.html、sw.js、deploy.yml 三處同步），CACHE_NAME v22→v24；學習單.pdf／操作介紹.pdf 無頭 Chrome 重出（4／4 頁）。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 73 — 手機控制面板展開後捲不到後段滑桿 <span class="badge badge-green">完成</span></h3>
