@@ -157,6 +157,7 @@
         <tr><td>白話即時解讀</td><td><span class="badge badge-green">✅ Phase 63</span></td><td>把「中心殘餘照度」數字即時翻成白話意義：≥80% 很亮、≥50% 仍合格、&lt;50% 不合格會留影、&lt;20% 嚴重不足、≈100% 尚無有效遮擋；依 IEC 50% 門檻三色（青/琥珀/紅）對應。以 MutationObserver 監看既有 #center-illuminance-val（完全不改 simulation.js），數值一變即更新並用 aria-live 播報。DOM shim 7 級門檻測試全過、50% 邊界與 PASS 徽章一致。index.css ?v=11→v12、SW v10→v11</td></tr>
         <tr><td>視覺改版：淺色工程圖紙</td><td><span class="badge badge-green">✅ Phase 70</span></td><td>研習回饋「所有站台像 AI 模板」，全站改版分三套承重系統；本站分到 A「工程圖紙」：index.css 整份重寫為紙白方格底、1px 黑線分格、零圓角、無陰影、等寬字標註、唯一強調色雷射紅；:root 變數名全部保留只改值、color-scheme 改 light。由 Antigravity 依規格產出，機器探針驗收（原檔 365 條規則的每個 class/id 選擇器都在、零漸層、零圓角）。HTML 只拿掉 JS 不依賴的 13 種 emoji；index.css?v=14→15、SW sls-cache-v17→v18、SW↔HTML 交叉檢查通過</td></tr>
         <tr><td>IEC 殘餘照度說法更正</td><td><span class="badge badge-green">✅ Phase 71</span></td><td>跨平台審查指出「IEC 60601-2-41 要求殘餘照度 ≥50%」有誤（審查員主張應為 10%）。查標準原文（IEC 60601-2-41:2009/AMD1:2013 201.12.1.102.1.1 d）：只要求在使用說明書標示單遮罩、雙遮罩、深腔管等殘餘照度百分比，<strong>沒有合格下限</strong>，10% 也不成立（MI-750 標示 0.003% 仍宣稱符合本標準）。判分維持 50%，全站改稱「50% 教學參考線」、徽章改 PASS／FAIL（參考線）；另加註 3D 真實模式固定 12 盞代表燈、屏幕→螢幕、反光鏡折射→反射、LED 幾乎不含紅外線。simulation-v6→v7、ui-enhancements-v1→v2、SW v18→v19、deploy.yml 三處同步；學習單／操作介紹 PDF 重出</td></tr>
+        <tr><td>市售區間對照＋報告更正＋輻照度兩版</td><td><span class="badge badge-green">✅ Phase 72</span></td><td>使用者決定（R06 選 C）：殘餘照度不再以 50% 判 PASS／FAIL，改和市售手術燈公開的單遮罩數值對照——4 家廠商 15 筆（置中、未開主動補償），取第 1～3 四分位數 29–70%（中位數 59%）畫成橘色色帶，徽章改「低於／落在／高於市售區間」，理論報告新增型號／數值／網址出處表。R07：研究報告 docx 與 surgery_light.txt 的「通常要求…」「顯著高於 IEC 最低臨界百分比」改正（python-docx 只改純文字 run，結構計數不變、LibreOffice 轉 PDF 14 頁不變）。R08：總輻照度改列「2009 年版 1000 W/m²；2021 年第 3 版 700 W/m²」（Getinge ed.3 解說單＋Mindray HyLED Q 產品頁兩個獨立來源）。simulation-v7→v8、ui-enhancements-v2→v3、SW v19→v21、deploy.yml 三處同步；學習單／操作介紹 PDF 重出</td></tr>
         <tr><td>dev-log 分頁</td><td><span class="badge badge-green">✅ Phase 69</span></td><td>dev-log.html 已漲至 215KB（其中逐字稿區段獨佔 118KB），整段移出為獨立頁 <code>dev-log-transcript.html</code>，主頁瘦身至 97KB 並留醒目連結；新對話往後依時序增補於該頁尾端。deploy.yml 三處補檔；兩檔標籤平衡驗證通過（dev-log 不在 SW 預快取，無需 bump）</td></tr>
         <tr><td>inline JS 整併</td><td><span class="badge badge-green">✅ Phase 68</span></td><td>把 Phase 59（± 微調鈕）、60（數值就地輸入）、61（試試看一鍵套場景）、63（白話即時解讀）四個自包含 IIFE 自 index.html 抽出，整併為單一可快取檔 <code>ui-enhancements-v1.js</code>（10KB，檔名承載版本）。index.html 90.7KB→80.9KB、inline script 23→19 塊；外部檔置於原第一個區塊位置（&lt;/body&gt; 前），執行順序與行為不變。SW 預快取補檔、deploy.yml 三處補檔、SW↔HTML 資產交叉檢查一致；SW v16→v17</td></tr>
         <tr><td>探究學習單 PDF</td><td><span class="badge badge-green">✅ Phase 67</span></td><td>新增可列印探究學習單（A4 三頁，Chrome headless 產 PDF，黑白印表機友善）：第 1–2 頁為學生任務——對應站上「🔬 試試看」五任務的「先猜→操作→記錄」書寫欄（含勾選預測、照度記錄格、開放問答線）+ 自我檢核 3 題；第 3 頁教師指引（108 課綱對應、各任務參考答案要點、常見迷思澄清、評量建議、課堂操作技巧），發放前可抽除。試試看卡尾新增「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔（Phase 56 教訓）；pdftoppm 三頁逐頁目視驗證。index.css ?v=13→v14、SW v15→v16</td></tr>
@@ -170,6 +171,21 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 72 — 殘餘照度改與市售區間對照、研究報告更正、輻照度兩版並列 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-09-29 · simulation-v8.js／ui-enhancements-v3.js／index.html／學習單／操作介紹／docx／surgery_light.txt · 原廠規格書蒐集</div>
+      <p>Phase 71 查到 IEC 60601-2-41 對殘餘照度只要求標示、沒有下限，但判分仍保留 50%。使用者決定（R06 選 C）改拿市售產品的公開數值當對照，並一併處理研究報告（R07）與輻照度上限（R08）。</p>
+      <ul>
+        <li><strong>蒐集</strong>：原廠規格書／型錄／使用手冊中公開的殘餘照度——Medical Illumination MI-1000／MI-750、Mindray HyLED 760／730／X9／X5、Trumpf／Hillrom TruLight 5000／3000、Getinge Maquet H LED 700／500／300、Trumpf iLED 7、Getinge Volista。</li>
+        <li><strong>口徑</strong>：模擬器只有一個置中遮擋物，所以色帶只用「單遮罩、置中、未開主動補償」那組（4 家 15 筆）；iLED 7 只公布 Shadow Management 開啟的值、Volista 用側向遮罩，列在出處表但不進色帶。區間取上下半組中位數（29–70%），計算寫在 <code>window.SLS_MARKET_BAND</code>，資料改了區間會自動更新。</li>
+        <li><strong>改法</strong>：圖表 50% 紅線→橘色色帶；徽章→▼低於／●落在／▲高於市售區間；白話解讀、手機指標條、折疊鈕、觸覺回饋、一句話原理、任務 4、Q3、名詞小幫手、臨床物理意義、理論報告、學習單、操作介紹全部改寫。圖例字色原本是深色主題的 #f8fafc，在淺色主題下看不見，順手改深。</li>
+        <li><strong>順帶更正</strong>：學習單答案要點原寫「嚴苛遮擋＋低燈高通常跌破」，實測嚴苛遮擋 100cm 約 60%、80cm 約 56%、60cm 約 71%，燈拉低反而變亮；改寫為實測值並當作預測與結果不符的討論素材。</li>
+        <li><strong>R07</strong>：docx 的公式其實是 Google Docs 匯出的內嵌 PNG（m:oMath 0 個），只改 w:t 純文字 run；改前改後 w:p 155、w:r 613、w:drawing 98 相同，LibreOffice 轉 PDF 皆 14 頁、內嵌圖 196 張；備份 .bak-2026-09-29.docx 不進 git。</li>
+        <li><strong>R08</strong>：Getinge ed.3 解說單寫單一燈具 700 W/m²，Mindray HyLED Q 產品頁寫「irradiance limit has been decreased to 700 W/m²」，兩個獨立來源一致 → 改為兩版並列；2009 年版 1000 W/m² 以 PNNL 2011 佐證。IEC 第 3 版官方試閱本只到前言，變更清單未列此數字。</li>
+        <li><strong>三件套</strong>：simulation-v7→v8、ui-enhancements-v2→v3（index.html、sw.js、deploy.yml 三處同步），CACHE_NAME v19→v21；學習單.pdf／操作介紹.pdf 無頭 Chrome 重出（3／4 頁不變）。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 71 — IEC 殘餘照度說法更正（跨平台網狀審查） <span class="badge badge-green">完成</span></h3>

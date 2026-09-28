@@ -1330,6 +1330,18 @@
         </div>
       </div>
 
+      <div class="msg user">
+        <div class="role">👤 使用者（Phase 72）</div>
+        <div class="content">R06 選 C：改用「市售產品區間」當對照，蒐集至少 5 款主流手術燈原廠公開的殘餘照度，做出處清單，圖表與判定改顯示市售常見區間色帶，取代 PASS／FAIL，所有提到 50% 參考線的地方同步改寫、PDF 重出；口徑不一就只用一致的那組並註明來源數量，不要自己編數字。R07：研究報告 docx 與 surgery_light.txt 的錯誤說法改正，只改純文字 run、不動方程式。R08：700 W/m² 找第二個獨立來源，找到就兩版並列，找不到只加註。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Phase 72 — 市售區間對照＋報告更正＋輻照度兩版）</div>
+        <div class="content">
+          從原廠文件蒐集到 Medical Illumination、Mindray、Trumpf／Hillrom、Getinge 的殘餘照度；口徑一致的「單遮罩置中、未開補償」共 15 筆，中間一半 29–70%（中位數 59%）做成色帶與區間徽章，iLED 7（只有補償開啟值）與 Volista（側向遮罩）只列出處表。學習單任務 4 答案原本與實測相反，一併改為實測值。docx 公式其實是內嵌 PNG，只改文字 run，結構計數與 PDF 頁數不變。700 W/m² 另有 Mindray 產品頁獨立佐證，改為兩版並列。v8／v3、SW v21、deploy.yml 同步。
+        </div>
+      </div>
+
     </div>
   </section>
 
