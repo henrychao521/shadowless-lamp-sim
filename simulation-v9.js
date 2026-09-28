@@ -6,12 +6,12 @@
 // 只收口徑一致的一組：單一遮罩置中、未開主動補償。數值抄自原廠規格書／型錄，
 // 型號、數值、網址見 index.html 理論報告的「市售手術燈殘餘照度公開數值」表。
 // 不納入色帶：Trumpf iLED 7（只公布開啟 Shadow Management 主動補償後的數值）、
-//             Getinge Volista（單遮罩為側向偏置 lateral mask，量法不同）。
+//             Getinge Volista（單遮罩為側向偏置 lateral mask，量法不同）、
+//             Medical Illumination MI-750（單遮罩標示 0.003%，數值異常偏低，2026-09-29 使用者決定不納入）。
 // 區間取第 1～第 3 四分位數（上下半組中位數，n 為奇數時不含中位數）＝「中間一半的產品」。
 window.SLS_MARKET_BAND = (function () {
     var samples = [
         ['Medical Illumination MI-1000', 27.2],
-        ['Medical Illumination MI-750', 0.003],
         ['Mindray HyLED 760', 75],
         ['Mindray HyLED 730', 70],
         ['Mindray HyLED X9（未開 AICS）', 65],

@@ -33,9 +33,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css?v=16">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
-    <!-- 版本改以「檔名」承載（simulation-v8.js）：GitHub Pages CDN 對部分資產不把
+    <!-- 版本改以「檔名」承載（simulation-v9.js）：GitHub Pages CDN 對部分資產不把
          query 納入快取鍵，?v=N 破壞快取在邊緣節點無效（Phase 65 教訓）-->
-    <link rel="preload" as="script" href="simulation-v8.js">
+    <link rel="preload" as="script" href="simulation-v9.js">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Three.js ESM Import Map — jsDelivr has better CDN coverage in Asia/Taiwan -->
     <script type="importmap">
@@ -74,7 +74,7 @@
     <section class="learning-guide" aria-label="學習指引">
         <div class="lg-hook">
             <span class="lg-hook-icon" aria-hidden="true">💡</span>
-            <p><strong>一句話原理：</strong>只要有東西擋光，就一定有影子。無影燈靠「<strong>很多顆燈從不同角度同時補光</strong>」，把醫生頭、手造成的深暗<strong>本影</strong>打散成幾乎看不見的淡<strong>半影</strong>——市售手術燈被一個遮罩擋住時，中間一半的產品術野中心仍保有約三到七成的亮度。它<em>稀釋</em>陰影，而不是<em>消滅</em>陰影。</p>
+            <p><strong>一句話原理：</strong>只要有東西擋光，就一定有影子。無影燈靠「<strong>很多顆燈從不同角度同時補光</strong>」，把醫生頭、手造成的深暗<strong>本影</strong>打散成幾乎看不見的淡<strong>半影</strong>——市售手術燈被一個遮罩擋住時，中間一半的產品術野中心仍保有約 56–70%（五成多到七成）的亮度。它<em>稀釋</em>陰影，而不是<em>消滅</em>陰影。</p>
         </div>
         <div class="lg-panels">
             <details class="lg-card" open>
@@ -107,7 +107,7 @@
                 <div class="lg-body">
                     <details class="lg-qa"><summary>Q1　無影燈能完全消除陰影嗎？</summary><p>不能。只要有遮擋就有影子；它是把最暗的本影「稀釋」成很淡的半影，不是消滅陰影。</p></details>
                     <details class="lg-qa"><summary>Q2　為什麼 LED 要排在半球形的凹弧上，而不是排成平面？</summary><p>讓所有光束都指向同一個術野焦點，從四面八方交會；當某個方向被擋住，其他方向的光仍能補進來。</p></details>
-                    <details class="lg-qa"><summary>Q3　圖上的橘色「市售常見區間」色帶是合格線嗎？</summary><p>不是。IEC 60601-2-41 只要求廠商在說明書標示遮擋後的「殘餘照度」（單遮罩、雙遮罩、深腔管等，以無遮擋時中心照度的百分比表示），並沒有訂合格下限，所以本站不判「合格／不合格」。色帶是我們蒐集 4 家廠商、15 筆公開的<strong>單遮罩</strong>數值後，中間一半產品所在的 <strong>29–70%</strong>（中位數 59%；最低的一款標示 0.003%，最高 77%）。你的結果可以拿來比：低於、落在或高於市售區間。型號與出處見頁尾理論報告。</p></details>
+                    <details class="lg-qa"><summary>Q3　圖上的橘色「市售常見區間」色帶是合格線嗎？</summary><p>不是。IEC 60601-2-41 只要求廠商在說明書標示遮擋後的「殘餘照度」（單遮罩、雙遮罩、深腔管等，以無遮擋時中心照度的百分比表示），並沒有訂合格下限，所以本站不判「合格／不合格」。色帶是我們蒐集 4 家廠商、14 筆公開的<strong>單遮罩</strong>數值後，中間一半產品所在的 <strong>56–70%</strong>（中位數 59.5%；最低 27.2%，最高 77%；另有一款標示 0.003%，數值異常偏低，未納入色帶計算）。你的結果可以拿來比：低於、落在或高於市售區間。型號與出處見頁尾理論報告。</p></details>
                     <details class="lg-qa"><summary>Q4　增大發散角能加強補影，缺點是什麼？</summary><p>光斑變大、能量被分散，中心照度與聚焦深度會下降——這正是工程設計裡的「取捨」。</p></details>
                 </div>
             </details>
@@ -140,7 +140,7 @@
                     <dt>發散角 / 準直</dt><dd>光束張開的角度。角度小＝細而集中的光柱（準直）；角度大＝散開的泛光。</dd>
                     <dt>遮擋物</dt><dd>代表擋在燈與術野之間的東西，例如醫師的頭或手。</dd>
                     <dt>IEC 60601-2-41</dt><dd>醫療電氣設備國際標準的手術燈專篇，規定中心照度、光斑、顯色等性能與量測方法；遮擋後的殘餘照度要求廠商標示，未訂合格下限。</dd>
-                    <dt>市售常見區間</dt><dd>市售手術燈在說明書標示的「單遮罩殘餘照度」，中間一半的產品落在 29–70%。本站拿你的結果跟它比（低於／落在／高於），不是合格線。</dd>
+                    <dt>市售常見區間</dt><dd>市售手術燈在說明書標示的「單遮罩殘餘照度」，中間一半的產品落在 56–70%。本站拿你的結果跟它比（低於／落在／高於），不是合格線。</dd>
                 </dl>
             </details>
 
@@ -241,7 +241,7 @@
 
             <div class="info-card">
                 <h3>臨床物理意義</h3>
-                <p>當遮擋物（醫生頭部）介入光路時，邊緣以大張角投射的光束能繞過障礙物，將焦點處的本影稀釋。中心殘餘照度可以和市售手術燈在說明書標示的單遮罩數值對照：中間一半的產品落在 <strong>29–70%</strong>（IEC 只要求標示，沒有訂合格下限）。</p>
+                <p>當遮擋物（醫生頭部）介入光路時，邊緣以大張角投射的光束能繞過障礙物，將焦點處的本影稀釋。中心殘餘照度可以和市售手術燈在說明書標示的單遮罩數值對照：中間一半的產品落在 <strong>56–70%</strong>（IEC 只要求標示，沒有訂合格下限）。</p>
             </div>
 
             <!-- 光源設計模式分析卡片：依模式即時更新優劣比較 -->
@@ -308,7 +308,7 @@
                         <p class="iec-2d-note">ℹ️ 注意：2D 剖面把所有 LED 壓在<strong>同一個切面</strong>上，會<strong>高估遮擋</strong>。真實無影燈是 3D 環形陣列，側向燈光可從遮擋物旁繞過，中心照度通常比 2D 剖面高——切到「<strong>3D 空間模擬與熱圖</strong>」分頁可看到完整配置的效果。</p>
                     </div>
                     <div class="chart-wrapper" id="chart-wrapper">
-                        <canvas id="illuminanceChart" role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），兩條折線分別顯示遮擋場景照度與無遮擋基準，橘色色帶為市售手術燈單遮罩殘餘照度的常見區間 29% 至 70%"></canvas>
+                        <canvas id="illuminanceChart" role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），兩條折線分別顯示遮擋場景照度與無遮擋基準，橘色色帶為市售手術燈單遮罩殘餘照度的常見區間 56% 至 70%"></canvas>
                         <!-- 手機版：點擊放大圖表 -->
                         <button class="chart-expand-btn" id="chart-expand-btn" aria-label="切換圖表大小" title="點擊切換圖表大小">⤢</button>
                     </div>
@@ -410,7 +410,7 @@
                 <h3 style="margin-top: 0; color: var(--accent-teal);">💡 核心觀念探討：無影燈真的完全無影嗎？弧形設計的意義為何？</h3>
                 
                 <p><strong>無影燈其實無法「完全消滅」陰影，而是極度「稀釋」了陰影。</strong></p>
-                <p>從幾何光學來說，只要有物體擋住光線，就一定會有陰影。無影燈的真正原理是透過大量分散的光源從不同角度照射。當部分光線被醫生的頭部擋住產生深暗的「本影（Umbra）」時，其他角度的光會剛好填補進這個暗區，將本影打散成人類視覺幾乎難以察覺的微弱「半影（Penumbra）」。殘餘的相對照度愈高，陰影就稀釋得愈好。IEC 國際標準只要求廠商標示這個數值、沒有訂合格下限；在我們的模擬器中，可以拿它和市售手術燈公開的單遮罩數值比較（中間一半的產品落在 29–70%）。</p>
+                <p>從幾何光學來說，只要有物體擋住光線，就一定會有陰影。無影燈的真正原理是透過大量分散的光源從不同角度照射。當部分光線被醫生的頭部擋住產生深暗的「本影（Umbra）」時，其他角度的光會剛好填補進這個暗區，將本影打散成人類視覺幾乎難以察覺的微弱「半影（Penumbra）」。殘餘的相對照度愈高，陰影就稀釋得愈好。IEC 國際標準只要求廠商標示這個數值、沒有訂合格下限；在我們的模擬器中，可以拿它和市售手術燈公開的單遮罩數值比較（中間一半的產品落在 56–70%）。</p>
                 
                 <p style="margin-top: 1rem;"><strong>具備光學基礎的「弧形」設計，是減輕明暗差異的絕對關鍵：</strong></p>
                 <ul style="margin-bottom: 0;">
@@ -435,13 +435,13 @@
             </ul>
 
             <h3>市售手術燈殘餘照度公開數值（2026-09-29 蒐集）</h3>
-            <p>以下數值抄自原廠規格書、型錄或使用手冊，百分比＝遮擋後中心照度÷無遮擋中心照度。模擬器的遮擋物只有一個、放在中央，所以色帶只用<strong>口徑一致的單遮罩（置中、未開主動補償）</strong>那一組：4 家廠商、15 筆數值，取中間一半（第 1～第 3 四分位數）＝ <strong>29–70%</strong>，中位數 59%。</p>
+            <p>以下數值抄自原廠規格書、型錄或使用手冊，百分比＝遮擋後中心照度÷無遮擋中心照度。模擬器的遮擋物只有一個、放在中央，所以色帶只用<strong>口徑一致的單遮罩（置中、未開主動補償）</strong>那一組：4 家廠商、14 筆數值，取中間一半（第 1～第 3 四分位數）＝ <strong>56–70%</strong>，中位數 59.5%。Medical Illumination MI-750 標示的 0.003% 數值異常偏低，保留在表中但未納入色帶計算。</p>
             <div class="design-compare-scroll">
             <table class="design-compare-table" style="min-width:820px;">
                 <thead><tr><th>廠商／型號</th><th>單遮罩</th><th>雙遮罩</th><th>深腔管＋單遮罩</th><th>列入色帶</th><th>出處</th></tr></thead>
                 <tbody>
                     <tr><td>Medical Illumination MI-1000</td><td>27.2%</td><td>37.2%</td><td>24.3%</td><td>是</td><td><a href="https://www.medillum.com/wp-content/uploads/2025/10/1003362-Rev.-N-MI-LINE-Manual.pdf" target="_blank" rel="noopener">MI-Line 安裝維修手冊 Rev. N</a></td></tr>
-                    <tr><td>Medical Illumination MI-750</td><td>0.003%<br><small>（原文「.003%」）</small></td><td>34.5%</td><td>0.003%</td><td>是</td><td>同上</td></tr>
+                    <tr><td>Medical Illumination MI-750</td><td>0.003%<br><small>（原文「.003%」）</small></td><td>34.5%</td><td>0.003%</td><td>否：數值異常偏低、未納入色帶計算</td><td>同上</td></tr>
                     <tr><td>Mindray HyLED 760</td><td>75%</td><td>55%</td><td>70%</td><td>是</td><td><a href="https://www.mindray.com/content/dam/xpace/ru/resources/brochure/hyled-7-product-brochure-ru.pdf" target="_blank" rel="noopener">Mindray HyLED 7 型錄（俄文版）</a></td></tr>
                     <tr><td>Mindray HyLED 730</td><td>70%</td><td>55%</td><td>65%</td><td>是</td><td>同上</td></tr>
                     <tr><td>Mindray HyLED X9</td><td>65%<br><small>（開 AICS Plus 補償：100%）</small></td><td>55%</td><td>65%</td><td>是（未開補償值）</td><td><a href="https://tn.healthcare.airliquide.com/sites/alh_tn/files/2022-10/eclairage-operatoire.pdf" target="_blank" rel="noopener">HyLED X 系列型錄（Air Liquide 突尼西亞轉載）</a></td></tr>
@@ -628,7 +628,7 @@
         }
     })();
     </script>
-    <script src="simulation-v8.js"></script>
+    <script src="simulation-v9.js"></script>
     <!-- simulation3d.js は 3D tab 首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
     <script>
     // ── ARIA Tablist 鍵盤導航（WAI-ARIA tablist pattern）──
