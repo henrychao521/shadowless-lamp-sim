@@ -160,6 +160,7 @@
         <tr><td>市售區間對照＋報告更正＋輻照度兩版</td><td><span class="badge badge-green">✅ Phase 72</span></td><td>使用者決定（R06 選 C）：殘餘照度不再以 50% 判 PASS／FAIL，改和市售手術燈公開的單遮罩數值對照——4 家廠商 15 筆（置中、未開主動補償），取第 1～3 四分位數 29–70%（中位數 59%）畫成橘色色帶，徽章改「低於／落在／高於市售區間」，理論報告新增型號／數值／網址出處表。R07：研究報告 docx 與 surgery_light.txt 的「通常要求…」「顯著高於 IEC 最低臨界百分比」改正（python-docx 只改純文字 run，結構計數不變、LibreOffice 轉 PDF 14 頁不變）。R08：總輻照度改列「2009 年版 1000 W/m²；2021 年第 3 版 700 W/m²」（Getinge ed.3 解說單＋Mindray HyLED Q 產品頁兩個獨立來源）。simulation-v7→v8、ui-enhancements-v2→v3、SW v19→v21、deploy.yml 三處同步；學習單／操作介紹 PDF 重出</td></tr>
         <tr><td>手機控制面板捲動修正</td><td><span class="badge badge-green">✅ Phase 73</span></td><td>手機 375×812 展開「⚙️ 模擬參數」後面板卡在 max-height≈481px、overflow:hidden，只看得到前三四個滑桿，其餘捲不到。根因：<code>.controls-panel</code> 從未宣告 <code>transition: max-height</code>，openPanel() 內綁的 <code>transitionend</code> 監聽器永遠不觸發，原本要在動畫結束後補上的 <code>overflow-y: auto</code> 就一直沒生效。修法：media query 補上 max-height transition，並在 openPanel() 設定 max-height 的同一時機直接同步設 overflow-y:auto（不再只靠 transitionend），桌機版不受影響。Playwright 375×812 實測：面板 scrollHeight 2162px／clientHeight 461px／overflowY=auto，捲到最後一支滑桿並實際拖動、數值確實改變。index.css?v=15→16、SW sls-cache-v21→v22</td></tr>
         <tr><td>市售區間拿掉 MI-750＋學習單任務 4 重新設計</td><td><span class="badge badge-green">✅ Phase 74</span></td><td>使用者決定：MI-750 單遮罩標示 0.003% 數值異常偏低，不納入色帶；同口徑重算 4 家 14 筆 → <strong>56–70%（中位數 59.5%）</strong>，網站、學習單、操作介紹、docx、surgery_light.txt 同步。任務 4 原題「嚴苛遮擋＋燈拉低會跌破」與模擬結果不符：用 Playwright 操作模擬器掃 6 個滑桿（16 組、156 個點），查出中心照度取決於「燈頭張角中沒被遮擋物擋住的比例」——燈拉低變亮、遮擋物愈大愈靠近術野愈暗、LED 數量與發散角幾乎無關，嚴苛遮擋場景在燈高低於 90cm 時遮擋物已穿進燈頭。任務 4 改為「預測→控制變因→幾何解釋→對照市售」（IEC標準場景只改燈高 150–70cm＋LED 9／25／61 顆），教師指引加迷思與失敗路徑；學習單 3→4 頁。simulation-v8→v9、SW v22→v24、deploy.yml 三處同步</td></tr>
+        <tr><td>說法與模擬實測一致＋幾何合理性提示</td><td><span class="badge badge-green">✅ Phase 75</span></td><td>Phase 74 掃描發現四處說法和模擬器不符，逐一以 Playwright 前後實測修正：① 白話解讀「增加燈數或加大發散角來補光」→ 改為拉低燈（燈頭張角變大）、遮擋物遠離術野或移到側邊；② 「高效多燈」同時把遮擋物移到 x12（40.0% vs 54.5% 的差距來自位置）→ 少燈／多燈只差燈數（40.0% vs 42.6%），另設「只移遮擋物」對照（54.1%）；③ 發散角 1°／15° 中心 39.1%／40.0% 不變，參考答案改說明分子分母同比例縮小（中心光線 1385→75 條）、代價是實際亮度約剩 1/18；④ 嚴苛遮擋 h80／y65／r14 頂端 79cm 穿進燈頭 → h100／x6／y45／r14（24.4%），並新增 #geometry-warning 兩級提示。學習單任務 3／4 對調（燈高實驗成為任務 3），仍 4 頁。ui-enhancements-v3→v4、SW v24→v25、deploy.yml 三處同步</td></tr>
         <tr><td>dev-log 分頁</td><td><span class="badge badge-green">✅ Phase 69</span></td><td>dev-log.html 已漲至 215KB（其中逐字稿區段獨佔 118KB），整段移出為獨立頁 <code>dev-log-transcript.html</code>，主頁瘦身至 97KB 並留醒目連結；新對話往後依時序增補於該頁尾端。deploy.yml 三處補檔；兩檔標籤平衡驗證通過（dev-log 不在 SW 預快取，無需 bump）</td></tr>
         <tr><td>inline JS 整併</td><td><span class="badge badge-green">✅ Phase 68</span></td><td>把 Phase 59（± 微調鈕）、60（數值就地輸入）、61（試試看一鍵套場景）、63（白話即時解讀）四個自包含 IIFE 自 index.html 抽出，整併為單一可快取檔 <code>ui-enhancements-v1.js</code>（10KB，檔名承載版本）。index.html 90.7KB→80.9KB、inline script 23→19 塊；外部檔置於原第一個區塊位置（&lt;/body&gt; 前），執行順序與行為不變。SW 預快取補檔、deploy.yml 三處補檔、SW↔HTML 資產交叉檢查一致；SW v16→v17</td></tr>
         <tr><td>探究學習單 PDF</td><td><span class="badge badge-green">✅ Phase 67</span></td><td>新增可列印探究學習單（A4 三頁，Chrome headless 產 PDF，黑白印表機友善）：第 1–2 頁為學生任務——對應站上「🔬 試試看」五任務的「先猜→操作→記錄」書寫欄（含勾選預測、照度記錄格、開放問答線）+ 自我檢核 3 題；第 3 頁教師指引（108 課綱對應、各任務參考答案要點、常見迷思澄清、評量建議、課堂操作技巧），發放前可抽除。試試看卡尾新增「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔（Phase 56 教訓）；pdftoppm 三頁逐頁目視驗證。index.css ?v=13→v14、SW v15→v16</td></tr>
@@ -173,6 +174,21 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 75 — 說法與模擬實測一致（燈數、發散角、嚴苛遮擋）＋幾何合理性提示 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-09-29 · ui-enhancements-v4.js／index.html／學習單／操作介紹 · Playwright 前後實測</div>
+      <p>Phase 74 的參數掃描顯示：模擬器的中心照度只取決於「燈頭張角中沒被遮擋物擋住的比例」，燈數與發散角幾乎無關。站上與學習單有四處說法和這個結果不符，逐一改正，每處都留前後實測值。</p>
+      <ul>
+        <li><strong>① 白話解讀建議</strong>：低於區間時原本建議「增加燈數或加大發散角來補光」，實測 IEC 標準下 LED 5／61 顆 40.0／42.6%、發散角 1°／15° 39.1／40.0%，兩招都無效。改為「把燈拉低讓燈頭張角變大（實際產品是把燈頭做大）、讓遮擋物離術野遠一點或移到側邊」，並明說燈數、發散角幾乎不會改變百分比。</li>
+        <li><strong>② 任務 1 公平比較</strong>：原「高效多燈」預設同時改了燈數（61）、遮擋物位置（x12、y55）與發散角（4°），和「少燈對比」（5 顆、15°）比是 40.0% → 54.5%，差距其實來自遮擋物。兩個預設改成只差燈數（其餘同 IEC 標準）：5 顆 40.0%、61 顆 42.6%；另設對照「61 顆只把遮擋物移到 12cm」→ 54.1%。按鈕「高效多燈」改名「多燈對比」。參考答案補上 7 顆 57.1%、9 顆 44.4%（燈少時看哪顆剛好在陰影角邊緣）與多燈真正的好處（中心光線 5 顆 45 條 → 61 顆 549 條、單顆故障影響小）。</li>
+        <li><strong>③ 發散角任務</strong>：原答案「中心照度下降」「泛光補影強」，實測百分比 39.1% → 40.0% 不變。依算法說明：百分比＝中心格沒被擋的光線數÷無遮擋時中心格光線數，射進中心的光會不會被擋只看來自哪顆燈；發散角變大，每顆燈射進中心的光線同比例變少（1°：1385 條剩 542；15°：75 條剩 30），分子分母一起縮小。真正的代價是中心實際亮度約剩 1/18、要加大功率；另註明曲線在光斑外顯示 100% 是「沒有光可比」。網站 Q4 同步改寫。</li>
+        <li><strong>④ 嚴苛遮擋幾何</strong>：原設定燈高 80、遮擋物 x18／y65／r14，頂端 79cm 高過燈頭外圈（約 72cm），且遮擋物圓已和燈頭圓弧相交（56.0%）。從 36 組候選挑出 h100／x6／y45／r14：頂端 59cm、離燈頭外圈 94cm 仍有 35cm，中心 24.4%（低於市售區間，保留嚴苛效果）。四個預設全部檢查過，遮擋物都完全在燈頭下方。滑桿不設限制，改加 <code>#geometry-warning</code>：遮擋物碰到或穿過燈頭（圓心到燈頭圓弧距離＜半徑，或圓心超過燈高）→ ⚠️ 警告「沒有物理意義」；只伸進燈頭碗口（頂端高過外圈）→ ℹ️ 提示；網址 hash 還原場景後也會檢查。實測 IEC 燈高 60 出現警告、65 出現提示、70 不提示。</li>
+        <li><strong>版面</strong>：任務 1 變長，原任務 3（發散角）移到第 3 頁並改為任務 4，燈高控制變因實驗改為任務 3（網站試試看順序同步）；教師指引精簡失敗路徑表，學習單仍 4 頁、操作介紹 4 頁。</li>
+        <li><strong>驗證</strong>：前後值與曲線資料存於 mesh-review-2026-09-28/fixes/shadowless_sim_consistency_scan.json；node --check 四支 JS；index／學習單／操作介紹桌機＋手機無新 console 錯誤（sw.js 註冊與學習單 favicon 的本機 404 為已知）；motion_qc（MQC_CONC=2）四個網址無裁切、重疊、溢出。</li>
+        <li><strong>三件套</strong>：ui-enhancements-v3→v4（index.html、sw.js、deploy.yml 三處同步），CACHE_NAME v24→v25。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 74 — 市售區間拿掉 MI-750、學習單任務 4 改為控制變因實驗 <span class="badge badge-green">完成</span></h3>
