@@ -161,6 +161,7 @@
         <tr><td>手機控制面板捲動修正</td><td><span class="badge badge-green">✅ Phase 73</span></td><td>手機 375×812 展開「⚙️ 模擬參數」後面板卡在 max-height≈481px、overflow:hidden，只看得到前三四個滑桿，其餘捲不到。根因：<code>.controls-panel</code> 從未宣告 <code>transition: max-height</code>，openPanel() 內綁的 <code>transitionend</code> 監聽器永遠不觸發，原本要在動畫結束後補上的 <code>overflow-y: auto</code> 就一直沒生效。修法：media query 補上 max-height transition，並在 openPanel() 設定 max-height 的同一時機直接同步設 overflow-y:auto（不再只靠 transitionend），桌機版不受影響。Playwright 375×812 實測：面板 scrollHeight 2162px／clientHeight 461px／overflowY=auto，捲到最後一支滑桿並實際拖動、數值確實改變。index.css?v=15→16、SW sls-cache-v21→v22</td></tr>
         <tr><td>市售區間拿掉 MI-750＋學習單任務 4 重新設計</td><td><span class="badge badge-green">✅ Phase 74</span></td><td>使用者決定：MI-750 單遮罩標示 0.003% 數值異常偏低，不納入色帶；同口徑重算 4 家 14 筆 → <strong>56–70%（中位數 59.5%）</strong>，網站、學習單、操作介紹、docx、surgery_light.txt 同步。任務 4 原題「嚴苛遮擋＋燈拉低會跌破」與模擬結果不符：用 Playwright 操作模擬器掃 6 個滑桿（16 組、156 個點），查出中心照度取決於「燈頭張角中沒被遮擋物擋住的比例」——燈拉低變亮、遮擋物愈大愈靠近術野愈暗、LED 數量與發散角幾乎無關，嚴苛遮擋場景在燈高低於 90cm 時遮擋物已穿進燈頭。任務 4 改為「預測→控制變因→幾何解釋→對照市售」（IEC標準場景只改燈高 150–70cm＋LED 9／25／61 顆），教師指引加迷思與失敗路徑；學習單 3→4 頁。simulation-v8→v9、SW v22→v24、deploy.yml 三處同步</td></tr>
         <tr><td>說法與模擬實測一致＋幾何合理性提示</td><td><span class="badge badge-green">✅ Phase 75</span></td><td>Phase 74 掃描發現四處說法和模擬器不符，逐一以 Playwright 前後實測修正：① 白話解讀「增加燈數或加大發散角來補光」→ 改為拉低燈（燈頭張角變大）、遮擋物遠離術野或移到側邊；② 「高效多燈」同時把遮擋物移到 x12（40.0% vs 54.5% 的差距來自位置）→ 少燈／多燈只差燈數（40.0% vs 42.6%），另設「只移遮擋物」對照（54.1%）；③ 發散角 1°／15° 中心 39.1%／40.0% 不變，參考答案改說明分子分母同比例縮小（中心光線 1385→75 條）、代價是實際亮度約剩 1/18；④ 嚴苛遮擋 h80／y65／r14 頂端 79cm 穿進燈頭 → h100／x6／y45／r14（24.4%），並新增 #geometry-warning 兩級提示。學習單任務 3／4 對調（燈高實驗成為任務 3），仍 4 頁。ui-enhancements-v3→v4、SW v24→v25、deploy.yml 三處同步</td></tr>
+        <tr><td>光斑外不畫 100%＋任務 2 重新設計</td><td><span class="badge badge-green">✅ Phase 76</span></td><td>照度圖原把光斑外（無遮擋時 0 條光線）畫成 100%、光斑邊緣 1 條光線的格子在 0%／100% 亂跳：IEC 標準 81 格中 57～76 格是假 100%。改為無遮擋光線數低於光斑內最多一格 70% 就不畫曲線，另以 0% 處灰色虛線標示「光斑外：沒有光，無從比較」，圖下加光斑說明（±Xcm）；修改後假 100%／假 0% 皆為 0。任務 2 原答案「最低點跟著遮擋物移動」不成立（光斑只有約 ±5cm），改為遮擋物側移 0→30cm 的控制變因實驗（40／41／54／68／84／100%，先不變後變亮）。順帶修正手機圖表卡溢出蓋住設計對照表（min-height:250px 取消自動下限）。simulation-v9→v10、ui-enhancements-v4→v5、index.css?v=16→17、SW v25→v26、deploy.yml 三處同步</td></tr>
         <tr><td>dev-log 分頁</td><td><span class="badge badge-green">✅ Phase 69</span></td><td>dev-log.html 已漲至 215KB（其中逐字稿區段獨佔 118KB），整段移出為獨立頁 <code>dev-log-transcript.html</code>，主頁瘦身至 97KB 並留醒目連結；新對話往後依時序增補於該頁尾端。deploy.yml 三處補檔；兩檔標籤平衡驗證通過（dev-log 不在 SW 預快取，無需 bump）</td></tr>
         <tr><td>inline JS 整併</td><td><span class="badge badge-green">✅ Phase 68</span></td><td>把 Phase 59（± 微調鈕）、60（數值就地輸入）、61（試試看一鍵套場景）、63（白話即時解讀）四個自包含 IIFE 自 index.html 抽出，整併為單一可快取檔 <code>ui-enhancements-v1.js</code>（10KB，檔名承載版本）。index.html 90.7KB→80.9KB、inline script 23→19 塊；外部檔置於原第一個區塊位置（&lt;/body&gt; 前），執行順序與行為不變。SW 預快取補檔、deploy.yml 三處補檔、SW↔HTML 資產交叉檢查一致；SW v16→v17</td></tr>
         <tr><td>探究學習單 PDF</td><td><span class="badge badge-green">✅ Phase 67</span></td><td>新增可列印探究學習單（A4 三頁，Chrome headless 產 PDF，黑白印表機友善）：第 1–2 頁為學生任務——對應站上「🔬 試試看」五任務的「先猜→操作→記錄」書寫欄（含勾選預測、照度記錄格、開放問答線）+ 自我檢核 3 題；第 3 頁教師指引（108 課綱對應、各任務參考答案要點、常見迷思澄清、評量建議、課堂操作技巧），發放前可抽除。試試看卡尾新增「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔（Phase 56 教訓）；pdftoppm 三頁逐頁目視驗證。index.css ?v=13→v14、SW v15→v16</td></tr>
@@ -174,6 +175,21 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 76 — 照度圖光斑外不再畫成 100%、任務 2 照實測重新設計 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-09-29 · simulation-v10.js／ui-enhancements-v5.js／index.css／index.html／學習單／操作介紹 · Playwright 前後實測</div>
+      <p>Phase 75 回報的兩件「畫面／答案和實測不符」：照度圖光斑外顯示 100%，以及任務 2 參考答案「最低點跟著遮擋物移動」。</p>
+      <ul>
+        <li><strong>光斑模型</strong>：所有 LED 都瞄準術野中心，每顆燈的光落在工作面上是一段等寬的光斑，疊起來是「平頂」的——光斑內每格光線數差不多（發散角 6° 時約 ±5cm、每格約 230 條），邊緣一兩格只剩外圈燈的光（中心格的 1%～57%），再往外 0 條。原程式在 0 條時直接給 100%，所以光斑外一大片被畫成「跟沒擋一樣亮」；邊緣只有 1 條光線的格子被擋就是 0%、沒擋就是 100%。</li>
+        <li><strong>修法</strong>：無遮擋光線數低於「光斑內最多一格」的 70% 就視為光斑外，主曲線與 100% 基準都不畫（中心格永遠保留），另加 0% 處的灰色虛線資料集「光斑外：沒有光，無從比較（不畫曲線）」。模擬器每次重算寫出 <code>window.SLS_SPOT</code>，照度圖下方的說明段落顯示「曲線只畫在光斑內（約 ±Xcm）」。說明原本接在白話解讀後面，motion_qc 抓到自動掃描演示時版面位移 CLS 0.104（解讀文字長短不同把圖表推上推下），改放圖表下方後 CLS 0.011。</li>
+        <li><strong>前後實測</strong>（IEC 標準，Chart.getChart 讀曲線）：修改前每種設定都畫滿 81 格，其中假 100% 57～76 格、遮擋物偏移時邊緣假 0% 1～2 格；修改後只畫光斑內（6°：21 格 ±4.9cm；15°：53 格 ±12.8cm；1°：3 格），假 100%／假 0% 皆為 0。遮擋物移到 30cm 時的 100% 是真的沒被擋。</li>
+        <li><strong>任務 2</strong>：燈都瞄準中心、光斑只有約 ±5cm，影子不會離開光斑「跟著走」，舊答案不成立。實測只移遮擋物 0／6／12／18／24／30cm → 40.0／41.3／54.2／68.0／84.0／100.0%：遮擋半張角約 12°、燈頭 20.5°，擋住的範圍還整個在燈頭張角裡時（約 7cm 內）被擋的燈一樣多，超出後才變亮，約 30cm 整個移出。+12cm 時光斑內左緣 61%、右緣 47%（靠遮擋物那側較暗）。改為「先猜趨勢 → 每 6cm 填表 → 看哪側暗 → 用遮擋角是否超出燈頭張角解釋」；網站試試看同步。任務 4 答案的光斑寬度改照新圖（1° 約 1.5cm、15° 約 26cm）。</li>
+        <li><strong>順帶修正（手機圖表卡溢出）</strong>：375px 寬時照度圖卡高度 379px、內容 684px，照度圖溢出蓋住下方設計對照表（main 上即存在，Phase 75 解讀文字變長後更明顯）。根因是 <code>.chart-container</code> 的 <code>min-height:250px</code> 取消了 flex 項目「不小於內容」的自動下限；多出的高度反被分給光路圖卡（554px，畫布 413px 高、圖只佔 187px）。改 <code>min-height:auto</code>，手機版兩張卡依內容排版、光路圖畫布本身維持 2:1（Phase 41 原意）。修改後 375px：光路圖卡 276px（畫布 297×149）、圖表卡 834px 不溢出；桌機 1400px 畫布 989×495 不留白邊。</li>
+        <li><strong>驗證</strong>：前後值存於 mesh-review-2026-09-28/fixes/shadowless_spot_edge_scan.json；node --check 四支 JS；三頁桌機＋手機無新 console 錯誤；motion_qc 四個網址 clipped／textOverlap／offRight 皆 0。學習單、操作介紹 PDF 重出（4／4 頁）。</li>
+        <li><strong>三件套</strong>：simulation-v9→v10、ui-enhancements-v4→v5、index.css?v=16→17（index.html、sw.js、deploy.yml 同步），CACHE_NAME v25→v26。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 75 — 說法與模擬實測一致（燈數、發散角、嚴苛遮擋）＋幾何合理性提示 <span class="badge badge-green">完成</span></h3>

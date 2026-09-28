@@ -1366,6 +1366,18 @@
         </div>
       </div>
 
+      <div class="msg user">
+        <div class="role">👤 使用者（Phase 76）</div>
+        <div class="content">從 main 開 fix/spot-edge：① 任務 2 參考答案「最低點跟著遮擋物移動」用 Playwright 實測改寫，模型下無意義就重新設計（預測→實測→解釋）；② 光斑外顯示 100% 改成留空或灰色虛線標示「光斑外，無光可比」，圖例與白話解讀同步說明。附前後實測數據。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Phase 76 — 光斑外不畫 100%＋任務 2 重新設計）</div>
+        <div class="content">
+          光斑外（無遮擋光線數低於光斑內最多一格 70%）不畫曲線，改以 0% 灰色虛線標示並在圖下說明光斑範圍；假 100% 從 57～76 格降到 0。任務 2 在這個模型下影子不會跟著走，改為遮擋物側移 0→30cm 實驗（40→100%，先不變後變亮），用遮擋角是否超出燈頭張角解釋。順帶修正手機圖表卡溢出蓋住下一張卡。simulation-v10、ui-enhancements-v5、index.css v17、SW v26。
+        </div>
+      </div>
+
     </div>
   </section>
 
