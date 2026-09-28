@@ -158,6 +158,7 @@
         <tr><td>視覺改版：淺色工程圖紙</td><td><span class="badge badge-green">✅ Phase 70</span></td><td>研習回饋「所有站台像 AI 模板」，全站改版分三套承重系統；本站分到 A「工程圖紙」：index.css 整份重寫為紙白方格底、1px 黑線分格、零圓角、無陰影、等寬字標註、唯一強調色雷射紅；:root 變數名全部保留只改值、color-scheme 改 light。由 Antigravity 依規格產出，機器探針驗收（原檔 365 條規則的每個 class/id 選擇器都在、零漸層、零圓角）。HTML 只拿掉 JS 不依賴的 13 種 emoji；index.css?v=14→15、SW sls-cache-v17→v18、SW↔HTML 交叉檢查通過</td></tr>
         <tr><td>IEC 殘餘照度說法更正</td><td><span class="badge badge-green">✅ Phase 71</span></td><td>跨平台審查指出「IEC 60601-2-41 要求殘餘照度 ≥50%」有誤（審查員主張應為 10%）。查標準原文（IEC 60601-2-41:2009/AMD1:2013 201.12.1.102.1.1 d）：只要求在使用說明書標示單遮罩、雙遮罩、深腔管等殘餘照度百分比，<strong>沒有合格下限</strong>，10% 也不成立（MI-750 標示 0.003% 仍宣稱符合本標準）。判分維持 50%，全站改稱「50% 教學參考線」、徽章改 PASS／FAIL（參考線）；另加註 3D 真實模式固定 12 盞代表燈、屏幕→螢幕、反光鏡折射→反射、LED 幾乎不含紅外線。simulation-v6→v7、ui-enhancements-v1→v2、SW v18→v19、deploy.yml 三處同步；學習單／操作介紹 PDF 重出</td></tr>
         <tr><td>市售區間對照＋報告更正＋輻照度兩版</td><td><span class="badge badge-green">✅ Phase 72</span></td><td>使用者決定（R06 選 C）：殘餘照度不再以 50% 判 PASS／FAIL，改和市售手術燈公開的單遮罩數值對照——4 家廠商 15 筆（置中、未開主動補償），取第 1～3 四分位數 29–70%（中位數 59%）畫成橘色色帶，徽章改「低於／落在／高於市售區間」，理論報告新增型號／數值／網址出處表。R07：研究報告 docx 與 surgery_light.txt 的「通常要求…」「顯著高於 IEC 最低臨界百分比」改正（python-docx 只改純文字 run，結構計數不變、LibreOffice 轉 PDF 14 頁不變）。R08：總輻照度改列「2009 年版 1000 W/m²；2021 年第 3 版 700 W/m²」（Getinge ed.3 解說單＋Mindray HyLED Q 產品頁兩個獨立來源）。simulation-v7→v8、ui-enhancements-v2→v3、SW v19→v21、deploy.yml 三處同步；學習單／操作介紹 PDF 重出</td></tr>
+        <tr><td>手機控制面板捲動修正</td><td><span class="badge badge-green">✅ Phase 73</span></td><td>手機 375×812 展開「⚙️ 模擬參數」後面板卡在 max-height≈481px、overflow:hidden，只看得到前三四個滑桿，其餘捲不到。根因：<code>.controls-panel</code> 從未宣告 <code>transition: max-height</code>，openPanel() 內綁的 <code>transitionend</code> 監聽器永遠不觸發，原本要在動畫結束後補上的 <code>overflow-y: auto</code> 就一直沒生效。修法：media query 補上 max-height transition，並在 openPanel() 設定 max-height 的同一時機直接同步設 overflow-y:auto（不再只靠 transitionend），桌機版不受影響。Playwright 375×812 實測：面板 scrollHeight 2162px／clientHeight 461px／overflowY=auto，捲到最後一支滑桿並實際拖動、數值確實改變。index.css?v=15→16、SW sls-cache-v21→v22</td></tr>
         <tr><td>dev-log 分頁</td><td><span class="badge badge-green">✅ Phase 69</span></td><td>dev-log.html 已漲至 215KB（其中逐字稿區段獨佔 118KB），整段移出為獨立頁 <code>dev-log-transcript.html</code>，主頁瘦身至 97KB 並留醒目連結；新對話往後依時序增補於該頁尾端。deploy.yml 三處補檔；兩檔標籤平衡驗證通過（dev-log 不在 SW 預快取，無需 bump）</td></tr>
         <tr><td>inline JS 整併</td><td><span class="badge badge-green">✅ Phase 68</span></td><td>把 Phase 59（± 微調鈕）、60（數值就地輸入）、61（試試看一鍵套場景）、63（白話即時解讀）四個自包含 IIFE 自 index.html 抽出，整併為單一可快取檔 <code>ui-enhancements-v1.js</code>（10KB，檔名承載版本）。index.html 90.7KB→80.9KB、inline script 23→19 塊；外部檔置於原第一個區塊位置（&lt;/body&gt; 前），執行順序與行為不變。SW 預快取補檔、deploy.yml 三處補檔、SW↔HTML 資產交叉檢查一致；SW v16→v17</td></tr>
         <tr><td>探究學習單 PDF</td><td><span class="badge badge-green">✅ Phase 67</span></td><td>新增可列印探究學習單（A4 三頁，Chrome headless 產 PDF，黑白印表機友善）：第 1–2 頁為學生任務——對應站上「🔬 試試看」五任務的「先猜→操作→記錄」書寫欄（含勾選預測、照度記錄格、開放問答線）+ 自我檢核 3 題；第 3 頁教師指引（108 課綱對應、各任務參考答案要點、常見迷思澄清、評量建議、課堂操作技巧），發放前可抽除。試試看卡尾新增「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔（Phase 56 教訓）；pdftoppm 三頁逐頁目視驗證。index.css ?v=13→v14、SW v15→v16</td></tr>
@@ -171,6 +172,18 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 73 — 手機控制面板展開後捲不到後段滑桿 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-09-29 · index.css／index.html · Playwright 手機尺寸實測</div>
+      <p>使用者回報：手機寬度（375×812）點「⚙️ 模擬參數」展開後，<code>#controls-panel-body</code> 內容約 2120px 高但只看得到前三、四個滑桿，其餘捲不到、也拖不到。</p>
+      <ul>
+        <li><strong>根因</strong>：openPanel() 設好 <code>max-height</code> 後，靠監聽同一元素的 <code>transitionend</code> 事件才在動畫結束時把 <code>overflow-y</code> 從 CSS 預設的 <code>hidden</code> 改成 <code>auto</code>。但手機 media query 裡的 <code>.controls-panel</code> 從未宣告 <code>transition: max-height</code>，瀏覽器不會發出這個 transitionend——事件永遠不觸發，<code>overflow-y</code> 就永遠停在 <code>hidden</code>，面板被硬性限高（<code>mobileCap()</code>≈57% 視窗高）又捲不動，後段控制項全部看不到也摸不到。</li>
+        <li><strong>修法</strong>：① 在 <code>.controls-panel</code>（手機 media query）補上 <code>transition: max-height 0.25s ease</code>，讓展開／收合動畫如原本設計跑起來、transitionend 正常觸發；② 在 openPanel() 設定 <code>max-height</code> 的同一行程序直接同步設 <code>overflowY = 'auto'</code>（手機版），不再只依賴 transitionend 這條容易被漏接的路徑，兩邊互為備援。<code>applyMode()</code>／<code>closePanel()</code> 既有邏輯不動。桌機版（<code>applyMode()</code> 非手機分支）本就 <code>max-height:none</code>，不受影響。</li>
+        <li><strong>驗證</strong>：Playwright（channel="chrome"）375×812 開面板 → <code>scrollHeight=2162px</code>／<code>clientHeight=461px</code>／<code>overflowY=auto</code>；捲到最後一支滑桿（第 7 支）確認落在面板可視範圍內，並用滑鼠拖曳其滑塊，數值 6→3.5 確實變化。<code>motion_qc.py</code>（MQC_CONC=2）跑手機＋桌機兩種視窗，兩者 <code>clipped</code> 均為空陣列，僅各留一條已知的本機預覽期定 console 404（sw.js 註冊走絕對路徑 <code>/shadowless-lamp-sim/sw.js</code>，README 已註明本機預覽時 SW 本就不會生效，非本次改動所致）。</li>
+        <li><strong>三件套</strong>：index.css?v=15→16（index.html／sw.js 兩處同步），CACHE_NAME v21→v22。本次未新增檔案，deploy.yml 清單不用改。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 72 — 殘餘照度改與市售區間對照、研究報告更正、輻照度兩版並列 <span class="badge badge-green">完成</span></h3>
