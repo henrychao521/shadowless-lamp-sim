@@ -7,7 +7,7 @@
 //   「新標頭＋舊內文」且不把 query 納入快取鍵 → ?v=N 永遠打不掉陳舊副本。
 //   改以「檔名」承載版本（simulation-v6.js），路徑必在 CDN 快取鍵內，保證取新。
 //   另：預快取一律 cache:'no-cache' 強制重新驗證。）
-const CACHE_NAME = 'sls-cache-v25'; // Phase 75：說法與模擬實測一致（白話建議、少燈／多燈公平比較、發散角說明、嚴苛遮擋幾何）＋幾何合理性提示，ui-enhancements-v3→v4
+const CACHE_NAME = 'sls-cache-v26'; // Phase 76：光斑外不再畫成 100%（灰色虛線標示無光可比）＋任務 2 照實測重新設計，simulation-v9→v10、ui-enhancements-v4→v5
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 // ⚠️ 帶版本碼的資產必須與 index.html 的引用完全一致（Phase 64 修正）：
@@ -17,9 +17,9 @@ const CACHE_NAME = 'sls-cache-v25'; // Phase 75：說法與模擬實測一致（
 const LOCAL_ASSETS = [
     '/shadowless-lamp-sim/',
     '/shadowless-lamp-sim/index.html',
-    '/shadowless-lamp-sim/index.css?v=16',
-    '/shadowless-lamp-sim/simulation-v9.js',
-    '/shadowless-lamp-sim/ui-enhancements-v4.js',
+    '/shadowless-lamp-sim/index.css?v=17',
+    '/shadowless-lamp-sim/simulation-v10.js',
+    '/shadowless-lamp-sim/ui-enhancements-v5.js',
     '/shadowless-lamp-sim/simulation3d.js?v=6',
     '/shadowless-lamp-sim/optics-reciprocity.html',
     '/shadowless-lamp-sim/icon.svg',

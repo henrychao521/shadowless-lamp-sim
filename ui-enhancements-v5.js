@@ -1,6 +1,6 @@
-// ui-enhancements-v4.js — 介面增強集（自 index.html 內嵌 script 整併，Phase 68）
+// ui-enhancements-v5.js — 介面增強集（自 index.html 內嵌 script 整併，Phase 68）
 // 版本以檔名承載（Phase 65 教訓：GitHub Pages CDN 對 query 不可靠）。
-// 內容變更時改檔名後綴（v3→v4）並同步 index.html／sw.js／deploy.yml 三處。
+// 內容變更時改檔名後綴（v4→v5）並同步 index.html／sw.js／deploy.yml 三處。
 
 // ── Phase 59：滑桿 ± 微調按鈕（手機精準調整、長按連續調整）──
     // 觸控拖曳滑桿難以對準精確值（如 0cm／100cm）。為每個滑桿兩側加上 −／＋ 按鈕，
@@ -172,7 +172,7 @@
 // ── Phase 63：白話即時解讀 — 觀察中心照度數值，翻譯成「這代表什麼」 ──
     // 以 MutationObserver 監看既有的 #center-illuminance-val（不改 simulation.js），
     // Phase 72：IEC 60601-2-41 未訂殘餘照度下限，解讀改為和「市售手術燈單遮罩數值」的常見區間對照
-    // （區間由 simulation-v9.js 的 window.SLS_MARKET_BAND 計算，這裡只讀取）。
+    // （區間由 simulation-v10.js 的 window.SLS_MARKET_BAND 計算，這裡只讀取）。
     // Phase 75：低於區間時的建議依 Playwright 實測改寫——中心照度取決於「燈頭張角中沒被遮擋物擋住的比例」，
     // 增加燈數、加大發散角幾乎不會改變這個百分比（見學習單任務 1、3、4 教師指引）。
     (function() {
@@ -201,6 +201,23 @@
 
         new MutationObserver(interpret).observe(valEl, { childList: true, characterData: true, subtree: true });
         interpret();
+    })();
+
+// ── Phase 76：光斑說明 — 曲線只畫在光斑內，光斑外（灰色虛線）沒有光可比 ──
+    // 讀 simulation-v10.js 每次重算時寫入的 window.SLS_SPOT（光斑範圍，cm）。
+    // 放在照度圖「下方」的獨立段落：文字長短變化不會把圖表推上推下（避免版面位移）。
+    (function() {
+        var valEl = document.getElementById('center-illuminance-val');
+        var outEl = document.getElementById('spot-note');
+        if (!valEl || !outEl) return;
+        function update() {
+            var spot = window.SLS_SPOT;
+            if (!spot || spot.halfWidth === null) { outEl.textContent = ''; return; }
+            var w = Math.round(spot.halfWidth * 2) / 2;
+            outEl.textContent = '💬 曲線只畫在光斑內（約 ±' + w + 'cm，燈光實際照到的範圍）。兩側 0% 處的灰色虛線是光斑外：那裡本來就沒有光，無從比較「剩幾成」——不是 100% 亮，也不是影子。';
+        }
+        new MutationObserver(update).observe(valEl, { childList: true, characterData: true, subtree: true });
+        update();
     })();
 
 // ── Phase 75：幾何合理性提示 — 遮擋物碰到／穿過燈頭，或伸進燈頭碗口時提醒 ──

@@ -83,6 +83,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const RAYS_PER_LED = 201;
     const TARGET_WIDTH = 20.0;
     const NUM_BINS = 81;
+    // Phase 76：光斑判定門檻。所有 LED 都瞄準中心，光斑是「平頂」的：光斑內每格收到的光線數差不多，
+    // 光斑邊緣只剩外圈幾顆燈的光（實測只有中心格的 1%～57%），再往外完全沒有光。
+    // 原本「無遮擋時 0 條光線」的格子被畫成 100%，邊緣只有 1 條光線的格子則在 0% 與 100% 之間亂跳。
+    // 改為：無遮擋時光線數低於「光斑內最多那一格」的 70% 就視為光斑外，不畫曲線（中心格永遠保留）。
+    const SPOT_THRESHOLD = 0.7;
 
     // Helper math
     const toRadians = deg => deg * Math.PI / 180;
@@ -124,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         pointRadius: 0
                     },
                     {
-                        label: mobile ? '基準 (100%)' : '無遮擋基準',
+                        label: mobile ? '基準 (100%)' : '無遮擋基準（光斑內）',
                         data: Array(NUM_BINS).fill(100),
                         borderColor: '#10b981',
                         borderDash: [5, 5],
@@ -154,6 +159,17 @@ document.addEventListener("DOMContentLoaded", () => {
                         borderWidth: 1,
                         pointRadius: 0,
                         fill: '-1'
+                    },
+                    {
+                        // Phase 76：光斑外沒有光可比 → 主曲線留空，這裡在 0% 基線畫灰色虛線標示範圍
+                        label: mobile ? '光斑外（無光）' : '光斑外：沒有光，無從比較（不畫曲線）',
+                        data: Array(NUM_BINS).fill(null),
+                        borderColor: 'rgba(100, 116, 139, 0.75)',
+                        borderDash: [2, 4],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        fill: false,
+                        spanGaps: false
                     }
                 ]
             },
@@ -521,25 +537,40 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const relativeIlluminance = [];
+        const baseline = [];
+        const outOfSpot = [];
         const labels = [];
         let centerDilution = 0;
         const centerIndex = Math.floor(NUM_BINS / 2);
+        const maxCount = Math.max.apply(null, countsUnobstructed);
+        const spotMin = maxCount * SPOT_THRESHOLD;
+        let spotLo = null, spotHi = null;
 
         for (let i = 0; i < NUM_BINS; i++) {
-            const val = countsUnobstructed[i] > 0 ? (countsActual[i] / countsUnobstructed[i]) * 100 : 100;
+            const xNum = -TARGET_WIDTH + (i + 0.5) * ((2 * TARGET_WIDTH) / NUM_BINS);
+            labels.push(xNum.toFixed(1));
+            // 光斑內：無遮擋時光線數夠多才有「剩幾成」可比；中心格永遠保留（所有燈都瞄準這裡）
+            const inSpot = countsUnobstructed[i] > 0 && (countsUnobstructed[i] >= spotMin || i === centerIndex);
+            const val = inSpot ? (countsActual[i] / countsUnobstructed[i]) * 100 : null;
             relativeIlluminance.push(val);
-            
-            const xVal = (-TARGET_WIDTH + (i + 0.5) * ((2 * TARGET_WIDTH) / NUM_BINS)).toFixed(1);
-            labels.push(xVal);
-            
+            baseline.push(inSpot ? 100 : null);
+            outOfSpot.push(inSpot ? null : 0);
+            if (inSpot) {
+                if (spotLo === null) spotLo = xNum;
+                spotHi = xNum;
+            }
             if (i === centerIndex) {
                 centerDilution = val;
             }
         }
+        // 光斑範圍（格中心座標，cm）給白話解讀引用
+        window.SLS_SPOT = { lo: spotLo, hi: spotHi, halfWidth: Math.max(Math.abs(spotLo), Math.abs(spotHi)) };
 
         // Update Chart
         illuminanceChart.data.labels = labels;
         illuminanceChart.data.datasets[0].data = relativeIlluminance;
+        illuminanceChart.data.datasets[1].data = baseline;
+        illuminanceChart.data.datasets[4].data = outOfSpot;
         illuminanceChart.update();
 
         // Update Text Display
