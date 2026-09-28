@@ -75,8 +75,9 @@
     .teacher table.fp { border-collapse: collapse; width: 100%; font-size: 8.7pt; margin-top: 2pt; }
     .teacher table.fp th, .teacher table.fp td { border: 0.6pt solid #999; padding: 1pt 4pt; vertical-align: top; line-height: 1.35; }
     .teacher table.fp th { background: #eee; }
-    .teacher.compact p, .teacher.compact li { font-size: 9.3pt; line-height: 1.42; }
+    .teacher.compact p, .teacher.compact li { font-size: 9pt; line-height: 1.4; }
     .teacher.compact header.sheet { margin-bottom: 4pt; }
+    .teacher li.src { list-style: none; margin-left: -12pt; color: #444; }
     .teacher.compact h2 { font-size: 11.5pt; margin: 5pt 0 2pt; }
     .teacher.compact .note { margin-top: 3pt; padding: 4pt 8pt; }
     .teacher.compact footer.sheet { margin-top: 4pt; }
@@ -86,7 +87,7 @@
 </head>
 <body>
 
-<!-- ════════ 第 1 頁：任務一～三 ════════ -->
+<!-- ════════ 第 1 頁：任務一～二 ════════ -->
 <div class="page">
     <header class="sheet">
         <h1>外科手術無影燈光學模擬器 — 探究學習單</h1>
@@ -99,13 +100,14 @@
     <p style="font-size:10.5pt; margin-bottom:8pt;">📌 <b>使用方法</b>：每個任務都「<b>先寫下你的預測，再動手操作驗證</b>」。預測錯了完全沒關係——發現「跟我想的不一樣」正是科學探究最有價值的時刻！</p>
 
     <div class="task">
-        <h2><span class="no">任務 1</span>燈愈多就愈無影嗎？</h2>
+        <h2><span class="no">任務 1</span>燈愈多就愈無影嗎？（公平比較）</h2>
         <ol class="steps">
-            <li>點開站上「🔬 試試看」卡，按「🔦 少燈對比」，記下中心照度：<span class="blank"></span> %</li>
-            <li class="predict"><b>先猜：</b>改按「💡 高效多燈」後，中心照度會
-                <span class="check-opts"><label>□ 上升</label><label>□ 下降</label><label>□ 不變</label></span></li>
-            <li>按「💡 高效多燈」驗證，記下中心照度：<span class="blank"></span> %　→　我的預測 <label>□ 正確</label><label>□ 不正確</label></li>
-            <li>想一想：為什麼「很多顆燈」能讓陰影變淡？用「角度」這個詞寫出你的解釋：
+            <li>點開站上「🔬 試試看」卡，按「🔦 少燈對比」（5 顆，其餘同 IEC 標準），記下中心照度：<span class="blank"></span> %</li>
+            <li class="predict"><b>先猜：</b>改按「💡 多燈對比」（61 顆，<b>只改燈數</b>）後，中心照度會
+                <span class="check-opts"><label>□ 明顯上升</label><label>□ 明顯下降</label><label>□ 差不多</label></span></li>
+            <li>驗證：61 顆 <span class="blank"></span> %；再用 −／＋ 鈕試 7 顆 <span class="blank"></span> %、9 顆 <span class="blank"></span> %　→　我的預測 <label>□ 正確</label><label>□ 不正確</label></li>
+            <li>對照：保持 61 顆，<b>只把</b>「遮擋物水平位置」從 0 移到 12cm，中心照度：<span class="blank"></span> %</li>
+            <li>想一想：燈數差 12 倍，中心照度卻差不多；遮擋物移開 12cm 卻明顯變亮。用「角度」解釋，並說說多燈真正的好處：
                 <div class="lines"><div></div><div></div></div></li>
         </ol>
     </div>
@@ -121,23 +123,13 @@
         </ol>
     </div>
 
-    <div class="task">
-        <h2><span class="no">任務 3</span>發散角的兩難（工程取捨）</h2>
-        <ol class="steps">
-            <li>把「透鏡準直發散角」調到 <b>1°</b>，記錄：光斑大小感覺 <span class="blank"></span>、中心照度 <span class="blank"></span> %</li>
-            <li>再調到 <b>15°</b>，記錄：光斑大小感覺 <span class="blank"></span>、中心照度 <span class="blank"></span> %</li>
-            <li>大發散角（泛光）補陰影比較強，但它付出的「代價」是什麼？
-                <div class="lines"><div></div><div></div></div></li>
-        </ol>
-    </div>
-
     <footer class="sheet">無影燈光學模擬器探究學習單　第 1 頁／共 4 頁</footer>
 </div>
 
-<!-- ════════ 第 2 頁：任務四（預測 → 操作驗證 → 解釋 → 對照市售） ════════ -->
+<!-- ════════ 第 2 頁：任務三（預測 → 操作驗證 → 解釋 → 對照市售） ════════ -->
 <div class="page">
     <div class="task t4">
-        <h2><span class="no">任務 4</span>燈拉低，影子會變深還是變淡？（控制變因實驗）</h2>
+        <h2><span class="no">任務 3</span>燈拉低，影子會變深還是變淡？（控制變因實驗）</h2>
         <p style="font-size:10pt;">這個任務只看<b>中心照度</b>。先按「📋 IEC標準」（遮擋物置中、離術野 50cm、半徑 10.5cm、LED 25 顆、發散角 6°），之後<b>每次只改一個滑桿</b>，其他不動。</p>
 
         <p class="step">① 先預測（還不要操作）</p>
@@ -157,7 +149,7 @@
             <tr><th>LED 數量（燈高 100cm）</th><th>9 顆</th><th>25 顆</th><th>61 顆</th></tr>
             <tr><td class="lab">中心照度（%）</td><td></td><td></td><td></td></tr>
         </table>
-        <div class="warn">⚠️ 燈高<b>不要低於 70cm</b>：再低，遮擋物頂端就碰到燈頭外圈，等於頭撞進燈裡，數字沒有意義。用滑桿旁的 −／＋ 鈕或點數值直接輸入，才停得準。</div>
+        <div class="warn">⚠️ 燈高<b>不要低於 70cm</b>：再低，遮擋物頂端就高過燈頭外圈、伸進燈頭碗口，到 60cm 會直接碰到燈頭（畫面會跳出提示），數字沒有意義。用滑桿旁的 −／＋ 鈕或點數值直接輸入，才停得準。</div>
         <p style="font-size:10.5pt;">我的預測 <label>□ 正確</label>　<label>□ 不正確</label>；和預測最不一樣的是：<span class="blank w" style="min-width:210pt;"></span></p>
 
         <p class="step">③ 用幾何解釋</p>
@@ -213,8 +205,20 @@
     <footer class="sheet">無影燈光學模擬器探究學習單　第 2 頁／共 4 頁</footer>
 </div>
 
-<!-- ════════ 第 3 頁：任務五 + 自我檢核 ════════ -->
+<!-- ════════ 第 3 頁：任務四～五 + 自我檢核 ════════ -->
 <div class="page">
+    <div class="task">
+        <h2><span class="no">任務 4</span>發散角的兩難（工程取捨）</h2>
+        <ol class="steps">
+            <li class="predict"><b>先猜：</b>按「📋 IEC標準」，發散角從 1° 調到 15°，中心照度的百分比會
+                <span class="check-opts"><label>□ 上升</label><label>□ 下降</label><label>□ 差不多</label></span></li>
+            <li>發散角 <b>1°</b>：光斑（光線落在工作面的寬度）約 <span class="blank"></span> cm、中心照度 <span class="blank"></span> %</li>
+            <li>發散角 <b>15°</b>：光斑約 <span class="blank"></span> cm、中心照度 <span class="blank"></span> %</li>
+            <li>百分比幾乎沒變，那發散角變大換到了什麼？付出的「代價」是什麼？（提示：同樣多的光，要分給多大的面積？）
+                <div class="lines"><div></div><div></div></div></li>
+        </ol>
+    </div>
+
     <div class="task">
         <h2><span class="no">任務 5</span>延伸挑戰：光路逆行（望遠鏡 ⇌ 無影燈）</h2>
         <ol class="steps">
@@ -258,11 +262,12 @@
 
     <h2>各任務參考答案要點</h2>
     <ol>
-        <li><b>任務 1</b>：多燈照度上升。關鍵語：「不同<b>角度</b>」——每顆燈從不同方向照向術野，某方向被擋住時其他方向補上，本影被稀釋成淡半影。</li>
+        <li><b>任務 1</b>（只改燈數）5 顆 40%、61 顆 43%，<b>差不多</b>；7 顆 57%、9 顆 44%——燈少時要看哪一顆剛好在遮擋物陰影角的邊緣，數字忽高忽低。61 顆只把遮擋物移到 12cm → 54%。關鍵語：中心剩多少取決於<b>燈頭張角中沒被擋住的角度範圍</b>，燈數只是把同一段角度切得多細；遮擋物偏開，被擋的角度有一部分跑出燈頭範圍才明顯變亮。多燈的真正好處：總光量大（中心光線 5 顆 45 條 → 61 顆 549 條）、單顆壞掉影響小、結果穩定。</li>
         <li><b>任務 2</b>：最低點跟著遮擋物移動（且偏移時遮擋物正下方偏外側更暗——該處能「繞過」遮擋物的燈更少）。</li>
-        <li><b>任務 3</b>：大發散角光斑大、補影強，代價是能量分散、中心照度與聚焦深度下降——典型 trade-off。</li>
-        <li><b>任務 4</b>（「📋 IEC標準」只改燈高）150／120／100／80／70cm → <b>16／32／40／56／63%</b>：燈愈低愈亮，80、70cm 落在市售區間。LED 9／25／61 顆 → 44／40／43%，<b>差不多</b>（發散角 1°～15° 也都在 38–40%）。<b>解釋</b>：從 O 往上看，寬 70cm 的燈頭半張角在燈高 150／100／70cm 時約 13.5°／20.5°／30°，遮擋物擋住的半張角固定約 12°；中心照度 ≈「燈頭張角裡沒被擋住的比例」。半徑加到約 <b>18cm</b>（遮擋半張角約 21° ＞ 燈頭 20.5°）時全部被擋，O 進入<b>本影</b>。LED 變多只是把同一段角度切得更細，被擋比例不變（9 顆的 44% 是射線計數誤差）。④：加大燈頭直徑或用兩盞燈頭（代價：更大更重）。數據：2026-09-29 以 Playwright 操作模擬器的掃描紀錄 <code>shadowless_task4_scan.json</code>。</li>
+        <li><b>任務 3</b>（「📋 IEC標準」只改燈高）150／120／100／80／70cm → <b>16／32／40／56／63%</b>，燈愈低愈亮，80、70cm 落在市售區間；LED 9／25／61 顆 → 44／40／43%，差不多。<b>解釋</b>：寬 70cm 的燈頭從 O 看的半張角在 150／100／70cm 時約 13.5°／20.5°／30°，遮擋物擋住的半張角固定約 12°；中心照度 ≈ 燈頭張角裡沒被擋住的比例。半徑加到約 <b>18cm</b>（遮擋半張角約 21° ＞ 20.5°）時 O 進入<b>本影</b>。④：加大燈頭直徑或用兩盞燈頭（代價：更大更重）。</li>
+        <li><b>任務 4</b>光斑 1° 約 2cm、15° 約 26cm；中心照度 39% → 40%，<b>差不多</b>。百分比＝中心格沒被擋的光線數 ÷ 沒遮擋時的光線數，會不會被擋只看光從哪顆燈（哪個角度）來；發散角變大，每顆燈射進中心的光線同比例變少（1°：1385 條剩 542；15°：75 條剩 30），分子分母一起縮小。換到大光斑、好對準；代價是中心實際亮度只剩約 1/18，要加大功率（更熱）補回。曲線在光斑外顯示 100% 是因為那裡沒有光可比，不代表亮。</li>
         <li><b>任務 5</b>：只會整體變暗、不出現缺口——交會處每一點都由整片鏡面各方向供光（孔徑遮擋原理）。與牛頓式斜鏡擋在主鏡前仍見完整星空為同一原理。</li>
+        <li class="src">數據：2026-09-29 以 Playwright 操作模擬器的掃描紀錄 <code>shadowless_task4_scan.json</code>、<code>shadowless_sim_consistency_scan.json</code>。</li>
     </ol>
 
     <h2>常見迷思與澄清</h2>
@@ -274,13 +279,13 @@
         <li>「燈愈多一定愈好」→ 引導從成本、散熱、維修（站上「設計哲學對照表」）反思。</li>
     </ul>
 
-    <h2>失敗路徑（任務 4 常見操作錯誤）</h2>
+    <h2>失敗路徑（任務 3 常見操作錯誤）</h2>
     <table class="fp">
-        <tr><th style="width:23%">學生的嘗試</th><th style="width:37%">結果</th><th style="width:21%">改用</th><th style="width:19%">學到什麼</th></tr>
-        <tr><td>燈高和 LED 數同時改</td><td>數字變了，說不出是誰造成的</td><td>按「📋 IEC標準」重來，一次只動一個滑桿</td><td>控制變因</td></tr>
-        <tr><td>從「⚠️ 嚴苛遮擋」把燈拉到 60cm</td><td>讀到 71%，以為燈愈低愈好；其實遮擋物頂端（79cm）已高過燈頭外圈</td><td>用「IEC標準」、燈高不低於 70cm</td><td>模擬數字要先檢查幾何合不合理</td></tr>
-        <tr><td>手機拖滑桿停在 115cm</td><td>讀到 27%，比 120cm 的 32% 還低，以為規律錯了</td><td>改測間距大的五個燈高，看整體趨勢</td><td>模擬用有限條光線計數，相鄰數值會跳動幾個百分點</td></tr>
-        <tr><td>想靠加 LED 或加大發散角把 100cm 的 40% 補進市售區間</td><td>幾乎不動</td><td>改動燈高或遮擋物位置</td><td>陰影稀釋是角度問題，不是燈數問題</td></tr>
+        <tr><th style="width:27%">學生的嘗試</th><th style="width:33%">結果</th><th style="width:21%">改用</th><th style="width:19%">學到什麼</th></tr>
+        <tr><td>燈高和 LED 數同時改</td><td>數字變了，說不出是誰造成的</td><td>按「IEC標準」重來，一次只動一個</td><td>控制變因</td></tr>
+        <tr><td>遮擋物放在 x18、高 65、半徑 14cm 就把燈拉到 60cm</td><td>讀到 71%，以為燈愈低愈好；其實遮擋物已穿進燈頭，畫面跳出警告</td><td>用「IEC標準」、燈高不低於 70cm</td><td>先檢查幾何合不合理</td></tr>
+        <tr><td>手機拖滑桿停在 115cm</td><td>讀到 27%，比 120cm 的 32% 還低</td><td>改測間距大的五個燈高</td><td>光線計數有跳動，看趨勢</td></tr>
+        <tr><td>想靠加 LED 或加大發散角把 40% 補進市售區間</td><td>幾乎不動</td><td>改燈高或遮擋物位置</td><td>陰影稀釋是角度問題</td></tr>
     </table>
 
     <h2>評量建議</h2>
@@ -288,9 +293,9 @@
         <li>形成性：任務 1–5 的「預測 vs 實測」對照（重視說理，不以猜對為分數）。</li>
         <li>總結性：自我檢核 Q1–Q2 答出「稀釋、不同角度交會補光」核心概念即達標；Q3 反思品質可作加分。</li>
         <li>延伸：用站上「複製連結」保存自己設計的「最差場景」與「補救後場景」，附在作業中。</li>
+        <li>課堂：教師機投影用「🎬 自動掃描演示」；學生分組用手機（−／＋ 鈕、點數值輸入較準）。全站可離線（PWA）。</li>
     </ul>
 
-    <div class="note">💡 教師機投影用「🎬 自動掃描演示」吸引注意；學生分組用手機操作（−／＋ 鈕、點數值直接輸入較準）。全站支援離線（PWA），網路不穩的教室可預先安裝。</div>
 
     <footer class="sheet">無影燈光學模擬器探究學習單　第 4 頁／共 4 頁（教師指引）</footer>
 </div>
