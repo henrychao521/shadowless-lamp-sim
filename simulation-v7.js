@@ -93,8 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         fill: false
                     },
                     {
-                        // IEC 60601-2-41: shadow dilution ≥ 50% center illuminance required
-                        label: mobile ? 'IEC ≥50%' : 'IEC 60601 最低標準 (50%)',
+                        // 教學參考線 50%：IEC 60601-2-41 只要求標示殘餘照度（單遮罩等），未訂合格下限
+                        label: mobile ? '參考線 50%' : '50% 教學參考線',
                         data: Array(NUM_BINS).fill(50),
                         borderColor: '#ef4444',
                         borderDash: [3, 6],
@@ -499,15 +499,15 @@ document.addEventListener("DOMContentLoaded", () => {
             centerValElem.style.color = '#14b8a6'; // teal
         }
 
-        // IEC 60601-2-41 Pass/Fail badge
+        // 50% 教學參考線 Pass/Fail 徽章（IEC 60601-2-41 未訂殘餘照度下限，這是本模擬器自訂的判讀線）
         const iecPass = centerDilution >= 50;
         const iecBadge = document.getElementById('iec-compliance-badge');
         if (iecBadge) {
             if (iecPass) {
-                iecBadge.textContent = '✅ IEC PASS';
+                iecBadge.textContent = '✅ PASS（≥50% 參考線）';
                 iecBadge.className = 'iec-badge iec-pass';
             } else {
-                iecBadge.textContent = '❌ IEC FAIL';
+                iecBadge.textContent = '❌ FAIL（<50% 參考線）';
                 iecBadge.className = 'iec-badge iec-fail';
             }
         }
@@ -522,7 +522,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                : '#14b8a6';
         }
         if (mmbBadge) {
-            mmbBadge.textContent = iecPass ? '✅ IEC PASS' : '❌ IEC FAIL';
+            mmbBadge.textContent = iecPass ? '✅ PASS' : '❌ FAIL';
             mmbBadge.className   = 'iec-badge ' + (iecPass ? 'iec-pass' : 'iec-fail');
         }
 
@@ -537,7 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // ── IEC 閾值穿越觸覺反饋（Android Chrome 支援 Vibration API）──
         if (prevIECPass !== null && iecPass !== prevIECPass && navigator.vibrate) {
-            // IEC PASS 達標：輕快雙振；IEC FAIL 跌破：重-短-重
+            // PASS 達標（≥50% 參考線）：輕快雙振；FAIL 跌破：重-短-重
             navigator.vibrate(iecPass ? [25, 20, 50] : [70, 25, 35]);
         }
         prevIECPass = iecPass;

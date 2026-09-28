@@ -1,4 +1,4 @@
-// ui-enhancements-v1.js — 介面增強集（自 index.html 內嵌 script 整併，Phase 68）
+// ui-enhancements-v2.js — 介面增強集（自 index.html 內嵌 script 整併，Phase 68）
 // 版本以檔名承載（Phase 65 教訓：GitHub Pages CDN 對 query 不可靠）。
 // 內容變更時改檔名後綴（v1→v2）並同步 index.html／sw.js／deploy.yml 三處。
 
@@ -171,7 +171,7 @@
 
 // ── Phase 63：白話即時解讀 — 觀察中心照度數值，翻譯成「這代表什麼」 ──
     // 以 MutationObserver 監看既有的 #center-illuminance-val（不改 simulation.js），
-    // 解讀文字依 IEC 50% 門檻分級，幫學生把數字連結到意義。
+    // 解讀文字依 50% 教學參考線分級（IEC 60601-2-41 未訂殘餘照度下限），幫學生把數字連結到意義。
     (function() {
         var valEl = document.getElementById('center-illuminance-val');
         var outEl = document.getElementById('metric-interpret');
@@ -186,9 +186,9 @@
             } else if (n >= 80) {
                 level = 'ok';   msg = '很亮（≥80%）：遮擋幾乎沒影響，多角度補光成功把本影稀釋掉了，術野依然明亮。';
             } else if (n >= 50) {
-                level = 'warn'; msg = '仍合格（≥50%）：照度有下降但仍符合 IEC 60601 標準，醫師的眼睛還不會覺得暗。';
+                level = 'warn'; msg = '仍達標（≥50%）：照度有下降，但仍在 50% 參考線以上，醫師的眼睛還不會覺得暗。';
             } else if (n >= 20) {
-                level = 'bad';  msg = '不合格（<50%）：低於 IEC 50% 下限，術野中心會出現明顯陰影、影響判斷。試試增加燈數或加大發散角來補光。';
+                level = 'bad';  msg = '未達標（<50%）：低於 50% 參考線，術野中心會出現明顯陰影、影響判斷。試試增加燈數或加大發散角來補光。';
             } else {
                 level = 'bad';  msg = '嚴重不足（<20%）：本影幾乎沒被稀釋，接近「單一光源被擋住」的情況。';
             }
