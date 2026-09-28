@@ -33,9 +33,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css?v=15">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
-    <!-- 版本改以「檔名」承載（simulation-v6.js）：GitHub Pages CDN 對部分資產不把
+    <!-- 版本改以「檔名」承載（simulation-v7.js）：GitHub Pages CDN 對部分資產不把
          query 納入快取鍵，?v=N 破壞快取在邊緣節點無效（Phase 65 教訓）-->
-    <link rel="preload" as="script" href="simulation-v6.js">
+    <link rel="preload" as="script" href="simulation-v7.js">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Three.js ESM Import Map — jsDelivr has better CDN coverage in Asia/Taiwan -->
     <script type="importmap">
@@ -107,7 +107,7 @@
                 <div class="lg-body">
                     <details class="lg-qa"><summary>Q1　無影燈能完全消除陰影嗎？</summary><p>不能。只要有遮擋就有影子；它是把最暗的本影「稀釋」成很淡的半影，不是消滅陰影。</p></details>
                     <details class="lg-qa"><summary>Q2　為什麼 LED 要排在半球形的凹弧上，而不是排成平面？</summary><p>讓所有光束都指向同一個術野焦點，從四面八方交會；當某個方向被擋住，其他方向的光仍能補進來。</p></details>
-                    <details class="lg-qa"><summary>Q3　IEC 標準裡「殘餘照度需 ≥ 50%」是什麼意思？</summary><p>被頭部之類的物體遮擋後，術野中心仍要保有「沒有遮擋時」一半以上的亮度，醫師的眼睛才不會覺得變暗、影響判斷。</p></details>
+                    <details class="lg-qa"><summary>Q3　圖上那條「50% 紅色基準線」是 IEC 規定的嗎？</summary><p>不是。IEC 60601-2-41 只要求廠商在說明書標示遮擋後的「殘餘照度」（單遮罩、雙遮罩、深腔管等，以無遮擋時中心照度的百分比表示），並沒有訂合格下限；市售產品的單遮罩數值從不到 1% 到 60% 以上都有。本模擬器把「被擋住後仍保有一半亮度」的 50% 當作教學參考線，方便判斷陰影稀釋得好不好。</p></details>
                     <details class="lg-qa"><summary>Q4　增大發散角能加強補影，缺點是什麼？</summary><p>光斑變大、能量被分散，中心照度與聚焦深度會下降——這正是工程設計裡的「取捨」。</p></details>
                 </div>
             </details>
@@ -139,7 +139,7 @@
                     <dt>相對照度（%）</dt><dd>跟「完全沒有遮擋」時相比，現在這個位置還剩多少亮度。100% = 跟沒擋一樣亮。</dd>
                     <dt>發散角 / 準直</dt><dd>光束張開的角度。角度小＝細而集中的光柱（準直）；角度大＝散開的泛光。</dd>
                     <dt>遮擋物</dt><dd>代表擋在燈與術野之間的東西，例如醫師的頭或手。</dd>
-                    <dt>IEC 60601-2-41</dt><dd>醫療電氣設備的國際安全標準，規定無影燈被遮擋後中心照度仍需 ≥ 50%。</dd>
+                    <dt>IEC 60601-2-41</dt><dd>醫療電氣設備國際標準的手術燈專篇，規定中心照度、光斑、顯色等性能與量測方法；遮擋後的殘餘照度要求廠商標示，未訂合格下限。</dd>
                 </dl>
             </details>
 
@@ -178,7 +178,7 @@
                     <input type="checkbox" id="realistic_mode" style="width: 18px; height: 18px; cursor: pointer;">
                     切換 3D 真實手術環境模式 <span class="tag-3d">3D</span>
                 </label>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">開啟後將顯示 Low-Poly 手術檯、實體模型與真實陰影效果，並隱藏抽象幾何光束。</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">開啟後將顯示 Low-Poly 手術檯、實體模型與真實陰影效果，並隱藏抽象幾何光束。受瀏覽器 WebGL 陰影貼圖數量限制，真實模式固定以 12 盞代表燈呈現光影，「LED 數量」滑桿在此模式只改變整體亮度；燈數對陰影稀釋的影響請看 2D 剖面與 3D 熱圖。</p>
             </div>
 
             <div class="control-group control-3d-only" id="smart_comp_group" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1); display: none;">
@@ -304,7 +304,7 @@
                         <!-- Phase 63：白話即時解讀 — 把中心照度數字翻成「這代表什麼」 -->
                         <p class="metric-interpret" id="metric-interpret" aria-live="polite"></p>
                         <!-- Phase 66：2D 剖面限制說明 — 預設場景顯示 FAIL 是剖面幾何的特性，避免誤解 -->
-                        <p class="iec-2d-note">ℹ️ 注意：2D 剖面把所有 LED 壓在<strong>同一個切面</strong>上，會<strong>高估遮擋</strong>。真實無影燈是 3D 環形陣列，側向燈光可從遮擋物旁繞過，較容易通過 IEC 50%——切到「<strong>3D 空間模擬與熱圖</strong>」分頁可看到完整配置的效果。</p>
+                        <p class="iec-2d-note">ℹ️ 注意：2D 剖面把所有 LED 壓在<strong>同一個切面</strong>上，會<strong>高估遮擋</strong>。真實無影燈是 3D 環形陣列，側向燈光可從遮擋物旁繞過，較容易守住 50% 參考線——切到「<strong>3D 空間模擬與熱圖</strong>」分頁可看到完整配置的效果。</p>
                     </div>
                     <div class="chart-wrapper" id="chart-wrapper">
                         <canvas id="illuminanceChart" role="img" aria-label="手術工作平面相對照度分佈圖：X 軸為與中心的距離（cm），Y 軸為相對照度（%），三條折線分別顯示遮擋場景照度、無遮擋基準，以及 IEC 60601 50% 標準線"></canvas>
@@ -414,7 +414,7 @@
                 <p style="margin-top: 1rem;"><strong>具備光學基礎的「弧形」設計，是減輕明暗差異的絕對關鍵：</strong></p>
                 <ul style="margin-bottom: 0;">
                     <li><strong>巨觀的弧形（立體燈頭排列）：</strong> 如同我們 3D 模擬器中呈現的，LED 不能排列在平面上，必須排列在一個<strong>半球面的凹弧形（Dome）</strong>上。這確保所有光線都能精準指向一個共同的「空間焦點（手術創口）」，讓光束從四面八方交會，極大地強化了繞過障礙物補光的能力。</li>
-                    <li><strong>微觀的弧形（光學透鏡與反射面）：</strong> 一般 LED 光線會四散發散，導致焦距不夠深。工程師會在每顆 LED 前方加上「<strong>非球面弧形透鏡（Aspheric Lens）</strong>」將發散光壓縮成高強度的窄光柱；或採用「<strong>多焦橢圓曲線反射面</strong>」，利用弧形反光鏡將光線折射到目標區。這能大幅減少雜散光，讓明暗分佈變得極度均勻且集中。</li>
+                    <li><strong>微觀的弧形（光學透鏡與反射面）：</strong> 一般 LED 光線會四散發散，導致焦距不夠深。工程師會在每顆 LED 前方加上「<strong>非球面弧形透鏡（Aspheric Lens）</strong>」將發散光壓縮成高強度的窄光柱；或採用「<strong>多焦橢圓曲線反射面</strong>」，利用弧形反光鏡將光線反射到目標區。這能大幅減少雜散光，讓明暗分佈變得極度均勻且集中。</li>
                 </ul>
             </div>
 
@@ -422,7 +422,7 @@
             <ul>
                 <li><strong>顯色指數（CRI）與深紅還原度（R9）：</strong>在手術中，核心視覺物體多由鮮紅血液與組織構成。若 R9 過低會導致紅色發灰，容易引發誤判。因此國際標準要求 R9 > 90。</li>
                 <li><strong>相關色溫（CCT）調諧：</strong>不同的手術類型偏好不同的色溫。為解決混光時可能產生的陰影邊界色分離（條紋），現代透鏡表面刻有微結構（Micro-structured surface）進行波段混頻。</li>
-                <li><strong>熱輻射抑制：</strong>LED 為冷光源，發光光譜不含紅外線。總輻照度（Total Irradiance）受 IEC 規範限制，必須嚴格維持在 1000 W/m² 以下以保護患者組織不被灼傷。</li>
+                <li><strong>熱輻射抑制：</strong>LED 為冷光源，出光光譜幾乎不含紅外線（晶片本身仍會發熱，需靠散熱設計）。總輻照度（Total Irradiance）受 IEC 規範限制，必須嚴格維持在 1000 W/m² 以下以保護患者組織不被灼傷。</li>
             </ul>
 
             <h3>國際標準規範與性能指標 (IEC 60601-2-41)</h3>
@@ -430,7 +430,7 @@
                 <li><strong>中心照度 (Ec)：</strong> 40,000 至 160,000 lx</li>
                 <li><strong>光斑直徑 (D10 / D50)：</strong> D50 至少應達 D10 的 50%</li>
                 <li><strong>一般顯色指數 (Ra)：</strong> 85 至 100</li>
-                <li><strong>單遮罩陰影稀釋：</strong> 模擬單人頭部阻擋時（直徑 21cm），要求殘餘照度至少維持 50% 以上。</li>
+                <li><strong>陰影稀釋（殘餘照度）：</strong> 以直徑 21cm 遮罩模擬頭部（另有雙遮罩、深腔管等測試），量測遮擋後中心照度剩下幾成；標準要求廠商在說明書標示這些百分比，<strong>並未訂合格下限</strong>。本模擬器的 50% 是教學參考線，不是法規門檻。</li>
             </ul>
 
             <h3>智慧自適應補償技術</h3>
@@ -598,7 +598,7 @@
         }
     })();
     </script>
-    <script src="simulation-v6.js"></script>
+    <script src="simulation-v7.js"></script>
     <!-- simulation3d.js は 3D tab 首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
     <script>
     // ── ARIA Tablist 鍵盤導航（WAI-ARIA tablist pattern）──
@@ -1349,7 +1349,7 @@
     })();
     </script>
 
-    <script src="ui-enhancements-v1.js"></script>
+    <script src="ui-enhancements-v2.js"></script>
 
             </body>
 </html>
