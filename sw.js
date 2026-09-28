@@ -7,7 +7,7 @@
 //   「新標頭＋舊內文」且不把 query 納入快取鍵 → ?v=N 永遠打不掉陳舊副本。
 //   改以「檔名」承載版本（simulation-v6.js），路徑必在 CDN 快取鍵內，保證取新。
 //   另：預快取一律 cache:'no-cache' 強制重新驗證。）
-const CACHE_NAME = 'sls-cache-v21'; // Phase 72：市售常見區間對照（simulation-v8／ui-enhancements-v3）＋總輻照度改列 2009／2021 兩版
+const CACHE_NAME = 'sls-cache-v22'; // Phase 73：修手機版控制面板展開後捲不到後段滑桿（缺 max-height transition 導致 transitionend 沒觸發、overflow 卡在 hidden）
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 // ⚠️ 帶版本碼的資產必須與 index.html 的引用完全一致（Phase 64 修正）：
@@ -17,7 +17,7 @@ const CACHE_NAME = 'sls-cache-v21'; // Phase 72：市售常見區間對照（sim
 const LOCAL_ASSETS = [
     '/shadowless-lamp-sim/',
     '/shadowless-lamp-sim/index.html',
-    '/shadowless-lamp-sim/index.css?v=15',
+    '/shadowless-lamp-sim/index.css?v=16',
     '/shadowless-lamp-sim/simulation-v8.js',
     '/shadowless-lamp-sim/ui-enhancements-v3.js',
     '/shadowless-lamp-sim/simulation3d.js?v=6',

@@ -1495,6 +1495,7 @@ input[type="range"]:focus-visible {
         gap: 0;
         overflow: hidden;
         max-height: 0;
+        transition: max-height 0.25s ease;
         border-radius: 0;
         border-right: none;
         border-bottom: 1px solid var(--border-color);
