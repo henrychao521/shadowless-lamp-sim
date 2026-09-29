@@ -20,7 +20,7 @@ const LOCAL_ASSETS = [
     '/shadowless-lamp-sim/index.css?v=17',
     '/shadowless-lamp-sim/simulation-v11.js',
     '/shadowless-lamp-sim/ui-enhancements-v5.js',
-    '/shadowless-lamp-sim/simulation3d.js?v=6',
+    '/shadowless-lamp-sim/simulation3d-v7.js',
     '/shadowless-lamp-sim/optics-reciprocity.html',
     '/shadowless-lamp-sim/icon.svg',
     '/shadowless-lamp-sim/manifest.json',

@@ -14,7 +14,7 @@
 
 ### 主模擬器（`index.html`）
 - **2D 幾何剖面分析**（`simulation.js`）：Canvas 即時光線追跡 + Chart.js 相對照度分佈曲線（%），含「市售常見區間」色帶（市售手術燈單遮罩殘餘照度的中間一半，56–70%）與區間對照徽章（低於／落在／高於）
-- **3D 空間模擬與熱圖**（`simulation3d.js`，懶載入）：Three.js 多光錐疊加、Realistic Mode（Bloom/SSAO）、Smart Compensation 補光演示
+- **3D 空間模擬與熱圖**（`simulation3d-v7.js`，懶載入）：Three.js 多光錐疊加、Realistic Mode（Bloom/SSAO）、Smart Compensation 補光演示
 - **雙設計哲學對照**：LED 陣列式（Trumpf iLED 型）↔ 多面反射式（DomeLux 型），含工程取捨導讀
 - **7 條參數滑桿**：燈高、遮擋物 X/Y/Z/半徑、LED 數量、發散角——支援 ± 微調按鈕（長按連續）與點擊數值直接輸入
 
@@ -63,7 +63,7 @@ shadowless-lamp-sim/
 ├── index.html               # 主 UI + 教學鷹架 + 理論報告（collapsible）
 ├── index.css
 ├── simulation-v8.js         # 2D 光線追跡 + Chart.js 照度曲線（版本以檔名承載）
-├── simulation3d.js          # 3D Three.js 光錐疊加 + 後處理（懶載入）
+├── simulation3d-v7.js       # 3D Three.js 光錐疊加 + 後處理（懶載入）
 ├── optics-reciprocity.html  # 光路逆行互動演示（獨立頁）
 ├── sw.js                    # Service Worker（PWA 離線）
 ├── manifest.json / icon.svg # PWA

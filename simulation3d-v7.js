@@ -357,9 +357,17 @@ const volumetricCones = [];
 const numSpotLights = 12;
 
 // Volumetric Cone Geometry (Tip at origin, extending along +Z)
+// ConeGeometry 頂點在 +Y；translate 後頂點在原點、底面在 −Y。rotateX(−π/2) 把底面轉到 +Z，
+// 配合 animate() 的 lookAt(0,0,0)（非相機物件的 +Z 會朝向目標）光錐才會朝術野展開。
+// （Phase 77 前是 +π/2，底面在 −Z，光錐朝天花板。）
 const coneGeo = new THREE.ConeGeometry(10.5, 120, 16);
 coneGeo.translate(0, -60, 0); 
-coneGeo.rotateX(Math.PI / 2);
+coneGeo.rotateX(-Math.PI / 2);
+
+// 聚光燈瞄準點：術野中心 (0,0,0)。Phase 77 前瞄準地板 (0,−60,0)，外圈燈的光軸在術野平面偏離中心約 8 cm。
+const fieldTarget = new THREE.Object3D();
+fieldTarget.position.set(0, 0, 0);
+realisticGroup.add(fieldTarget);
 
 // Load IES Profile
 const iesLoader = new IESLoader();
@@ -428,7 +436,6 @@ const uiElements3D = {
     lampHeight: document.getElementById('lamp_height'),
     obsX: document.getElementById('obstacle_x'),
     ledCount: document.getElementById('num_leds'),
-    domeAngle: document.getElementById('beam_spread'),
     obsY: document.getElementById('obstacle_y'),
     obsZ: document.getElementById('obstacle_z'),
     obsRad: document.getElementById('obstacle_rad'),
@@ -441,7 +448,6 @@ function getParams3D() {
     return {
         lampHeight: parseFloat(uiElements3D.lampHeight.value),
         ledCount: parseInt(uiElements3D.ledCount.value),
-        maxAngle: parseFloat(uiElements3D.domeAngle.value) * Math.PI / 180,
         obsX: parseFloat(uiElements3D.obsX.value),
         obsY: parseFloat(uiElements3D.obsY.value),
         obsZ: parseFloat(uiElements3D.obsZ.value),
@@ -451,19 +457,26 @@ function getParams3D() {
     };
 }
 
+// Phase 77：抽象模式（光線＋熱圖）的 LED 位置與 2D 剖面同一套幾何——
+// 以術野中心為球心、燈高為半徑的球冠（所有 LED 都瞄準術野），半張角 asin(35 cm / 燈高)，
+// 對應 simulation-v11.js 的 LAMP_SPAN_WIDTH = 35。
+// 先前誤把「發散角」滑桿（1–15°）當成燈罩球冠張角，LED 全擠在燈頭中央半徑 0.4–6 cm 內，
+// IEC 預設場景 3D 熱圖中心 0%（2D 為 40%）；發散角只影響 2D 剖面的光線張開，熱圖把每顆 LED 當點光源。
+const LAMP_SPAN_HALF_WIDTH = 35;
+// 真實模式 12 盞代表燈沿用燈罩外觀（半徑 23 cm、球冠 72°）的內外兩圈
+const HOUSING_CAP_ANGLE = Math.PI / 2.5;
+
 // Generate uniform points on a spherical cap
-function generateLEDs3D(count, radius, maxAngle, lampHeight) {
+function generateLEDs3D(count, lampHeight) {
     const points = [];
+    const maxAngle = Math.asin(Math.min(0.999, LAMP_SPAN_HALF_WIDTH / lampHeight));
     const phi = Math.PI * (3 - Math.sqrt(5)); 
     for (let i = 0; i < count; i++) {
         let y = 1 - (i / (count - 1)) * (1 - Math.cos(maxAngle));
         if (isNaN(y)) y = 1;
         const r = Math.sqrt(1 - y * y);
         const theta = phi * i;
-        const px = Math.cos(theta) * r * radius;
-        const pz = Math.sin(theta) * r * radius;
-        const py = y * radius;
-        points.push(new THREE.Vector3(px, lampHeight - (radius - py), pz));
+        points.push(new THREE.Vector3(Math.cos(theta) * r * lampHeight, y * lampHeight, Math.sin(theta) * r * lampHeight));
     }
     return points;
 }
@@ -500,13 +513,13 @@ function updateSimulation3D(fullHeatmap = true) {
     target3D.obsPos.set(params.obsX, params.obsY, params.obsZ);
 
     // Generate LEDs
-    ledPoints = generateLEDs3D(params.ledCount, domeRadius, params.maxAngle, params.lampHeight);
+    ledPoints = generateLEDs3D(params.ledCount, params.lampHeight);
 
     // If Realistic, update SpotLights positions to match the dome spread
     if (params.isRealistic) {
         // Place spot lights in two concentric rings
-        const outerAngle = params.maxAngle * 0.9;
-        const innerAngle = params.maxAngle * 0.4;
+        const outerAngle = HOUSING_CAP_ANGLE * 0.9;
+        const innerAngle = HOUSING_CAP_ANGLE * 0.4;
         
         let blockedCount = 0;
         const baseIntensity = ((params.ledCount / 50) * 0.6 + 0.2) * 50000; // Scaled for r160 physical lighting
@@ -514,7 +527,7 @@ function updateSimulation3D(fullHeatmap = true) {
 
         // Smart Compensation Raycasting Setup
         const targetPt = new THREE.Vector3(0, 0, 0); // Wound center
-        const sphere = new THREE.Sphere(obstacle.position, params.obsRad);
+        const sphere = new THREE.Sphere(target3D.obsPos, params.obsRad);
         const ray = new THREE.Ray();
         
         for (let i = 0; i < numSpotLights; i++) {
@@ -535,7 +548,7 @@ function updateSimulation3D(fullHeatmap = true) {
             
             const lightPos = new THREE.Vector3(px, params.lampHeight - (domeRadius - py), pz);
             target3D.lights[i].position.copy(lightPos);
-            spotLights[i].target = floor;
+            spotLights[i].target = fieldTarget;
             
             if (params.smartCompEnabled) {
                 const dir = new THREE.Vector3().subVectors(targetPt, lightPos).normalize();
@@ -576,7 +589,7 @@ function updateSimulation3D(fullHeatmap = true) {
         const colorBlocked = new THREE.Color(0xf43f5e); 
 
         const ray = new THREE.Ray();
-        const sphere = new THREE.Sphere(obstacle.position, params.obsRad);
+        const sphere = new THREE.Sphere(target3D.obsPos, params.obsRad);
         const targetCenter = new THREE.Vector3(0, 0, 0);
 
         for (let i = 0; i < ledPoints.length; i++) {
@@ -609,7 +622,12 @@ function updateSimulation3D(fullHeatmap = true) {
         
         if (rayLines.geometry) rayLines.geometry.dispose();
         rayLines.geometry = lineGeo;
-        rayLines.material = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.3 });
+        // 材質只建一次重複使用（先前每次拖曳滑桿都 new 一個且不釋放）
+        if (!rayLines.userData.slsMat) {
+            if (rayLines.material) rayLines.material.dispose();
+            rayLines.userData.slsMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.3 });
+            rayLines.material = rayLines.userData.slsMat;
+        }
 
         // Throttle Heatmap Generation
         if (fullHeatmap) {
@@ -632,7 +650,7 @@ function generateHeatmap(params) {
     const imgData = ctx.createImageData(size, size);
     const data = imgData.data;
 
-    const sphere = new THREE.Sphere(obstacle.position, params.obsRad);
+    const sphere = new THREE.Sphere(target3D.obsPos, params.obsRad);
     const ray = new THREE.Ray();
     const pt = new THREE.Vector3();
     const normal = new THREE.Vector3(0, 1, 0);

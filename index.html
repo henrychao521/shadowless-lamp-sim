@@ -179,7 +179,7 @@
                     <input type="checkbox" id="realistic_mode" style="width: 18px; height: 18px; cursor: pointer;">
                     切換 3D 真實手術環境模式 <span class="tag-3d">3D</span>
                 </label>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">開啟後將顯示 Low-Poly 手術檯、實體模型與真實陰影效果，並隱藏抽象幾何光束。受瀏覽器 WebGL 陰影貼圖數量限制，真實模式固定以 12 盞代表燈呈現光影，「LED 數量」滑桿在此模式只改變整體亮度；燈數對陰影稀釋的影響請看 2D 剖面與 3D 熱圖。</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">開啟後將顯示 Low-Poly 手術檯、實體模型與真實陰影效果，並隱藏抽象幾何光束。受瀏覽器 WebGL 陰影貼圖數量限制，真實模式固定以 12 盞代表燈呈現光影，「LED 數量」滑桿在此模式只改變整體亮度；燈數對陰影稀釋的影響請看 2D 剖面與 3D 熱圖。3D 熱圖把每顆 LED 當成點光源，「發散角」滑桿只作用在 2D 剖面。</p>
             </div>
 
             <div class="control-group control-3d-only" id="smart_comp_group" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1); display: none;">
@@ -519,7 +519,7 @@
             // ── 懶載入 3D 模組（首次切換至 3D tab 才下載 Three.js bundle）──
             if (viewName === '3d' && !window._sls3dLoading) {
                 window._sls3dLoading = true;
-                import('./simulation3d.js?v=6').catch(function(e) {
+                import('./simulation3d-v7.js').catch(function(e) {
                     console.warn('[sls] 3D module load failed:', e);
                     window._sls3dLoading = false; // 允許重試
                 });
@@ -633,7 +633,7 @@
     })();
     </script>
     <script src="simulation-v11.js"></script>
-    <!-- simulation3d.js は 3D tab 首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
+    <!-- simulation3d-v7.js 在 3D 分頁首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
     <script>
     // ── ARIA Tablist 鍵盤導航（WAI-ARIA tablist pattern）──
     (function() {
@@ -1235,7 +1235,7 @@
             var isActive = btn.classList.toggle('active');
             btn.textContent = isActive ? '⏹' : '▶';
             btn.title = isActive ? '停止自動旋轉' : '自動旋轉 Demo 模式（適合課堂投影）';
-            // 呼叫 simulation3d.js 暴露的 API（ES module 無法直接讀取）
+            // 呼叫 simulation3d-v7.js 暴露的 API（ES module 無法直接讀取）
             if (window.sls3d && window.sls3d.setAutoRotate) {
                 window.sls3d.setAutoRotate(isActive);
             }
