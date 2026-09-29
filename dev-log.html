@@ -162,6 +162,7 @@
         <tr><td>市售區間拿掉 MI-750＋學習單任務 4 重新設計</td><td><span class="badge badge-green">✅ Phase 74</span></td><td>使用者決定：MI-750 單遮罩標示 0.003% 數值異常偏低，不納入色帶；同口徑重算 4 家 14 筆 → <strong>56–70%（中位數 59.5%）</strong>，網站、學習單、操作介紹、docx、surgery_light.txt 同步。任務 4 原題「嚴苛遮擋＋燈拉低會跌破」與模擬結果不符：用 Playwright 操作模擬器掃 6 個滑桿（16 組、156 個點），查出中心照度取決於「燈頭張角中沒被遮擋物擋住的比例」——燈拉低變亮、遮擋物愈大愈靠近術野愈暗、LED 數量與發散角幾乎無關，嚴苛遮擋場景在燈高低於 90cm 時遮擋物已穿進燈頭。任務 4 改為「預測→控制變因→幾何解釋→對照市售」（IEC標準場景只改燈高 150–70cm＋LED 9／25／61 顆），教師指引加迷思與失敗路徑；學習單 3→4 頁。simulation-v8→v9、SW v22→v24、deploy.yml 三處同步</td></tr>
         <tr><td>說法與模擬實測一致＋幾何合理性提示</td><td><span class="badge badge-green">✅ Phase 75</span></td><td>Phase 74 掃描發現四處說法和模擬器不符，逐一以 Playwright 前後實測修正：① 白話解讀「增加燈數或加大發散角來補光」→ 改為拉低燈（燈頭張角變大）、遮擋物遠離術野或移到側邊；② 「高效多燈」同時把遮擋物移到 x12（40.0% vs 54.5% 的差距來自位置）→ 少燈／多燈只差燈數（40.0% vs 42.6%），另設「只移遮擋物」對照（54.1%）；③ 發散角 1°／15° 中心 39.1%／40.0% 不變，參考答案改說明分子分母同比例縮小（中心光線 1385→75 條）、代價是實際亮度約剩 1/18；④ 嚴苛遮擋 h80／y65／r14 頂端 79cm 穿進燈頭 → h100／x6／y45／r14（24.4%），並新增 #geometry-warning 兩級提示。學習單任務 3／4 對調（燈高實驗成為任務 3），仍 4 頁。ui-enhancements-v3→v4、SW v24→v25、deploy.yml 三處同步</td></tr>
         <tr><td>光斑外不畫 100%＋任務 2 重新設計</td><td><span class="badge badge-green">✅ Phase 76</span></td><td>照度圖原把光斑外（無遮擋時 0 條光線）畫成 100%、光斑邊緣 1 條光線的格子在 0%／100% 亂跳：IEC 標準 81 格中 57～76 格是假 100%。改為無遮擋光線數低於光斑內最多一格 70% 就不畫曲線，另以 0% 處灰色虛線標示「光斑外：沒有光，無從比較」，圖下加光斑說明（±Xcm）；修改後假 100%／假 0% 皆為 0。任務 2 原答案「最低點跟著遮擋物移動」不成立（光斑只有約 ±5cm），改為遮擋物側移 0→30cm 的控制變因實驗（40／41／54／68／84／100%，先不變後變亮）。順帶修正手機圖表卡溢出蓋住設計對照表（min-height:250px 取消自動下限）。simulation-v9→v10、ui-enhancements-v4→v5、index.css?v=16→17、SW v25→v26、deploy.yml 三處同步</td></tr>
+        <tr><td>Gemini 第二輪審查修正</td><td><span class="badge badge-green">✅ Phase 77</span></td><td>Gemini 3.1 Pro／3.8 Flash 對 9/28 修正前快照的 38 條意見逐條比對現版：已修 11、駁回 7、新修正 19、待決定 1（另列 1 項延伸待決定）。新修正：① 3D 抽象模式把「發散角」滑桿當成燈罩球冠張角，LED 擠在燈頭中央 0.4–6cm，IEC 預設 3D 熱圖中心 0%（2D 40%）→ 改與 2D 同幾何（術野為球心、半寬 35cm 球冠），重算約 63%；遮擋判定改用目標位置而非補間中的位置；體積光錐方向顛倒、聚光燈瞄準地板一併修正。② 2D 被攔截光線畫到遮擋物為止。③ 光路逆行頁：無影燈不是拋物面平行光、遮擋後「變暗」不是「全亮」。④ R9 未有 IEC 下限、LED 燈盤可為平面、中國用語。simulation-v10→v11、simulation3d.js?v=6→simulation3d-v7.js、SW v26→v27、deploy.yml 三處同步</td></tr>
         <tr><td>dev-log 分頁</td><td><span class="badge badge-green">✅ Phase 69</span></td><td>dev-log.html 已漲至 215KB（其中逐字稿區段獨佔 118KB），整段移出為獨立頁 <code>dev-log-transcript.html</code>，主頁瘦身至 97KB 並留醒目連結；新對話往後依時序增補於該頁尾端。deploy.yml 三處補檔；兩檔標籤平衡驗證通過（dev-log 不在 SW 預快取，無需 bump）</td></tr>
         <tr><td>inline JS 整併</td><td><span class="badge badge-green">✅ Phase 68</span></td><td>把 Phase 59（± 微調鈕）、60（數值就地輸入）、61（試試看一鍵套場景）、63（白話即時解讀）四個自包含 IIFE 自 index.html 抽出，整併為單一可快取檔 <code>ui-enhancements-v1.js</code>（10KB，檔名承載版本）。index.html 90.7KB→80.9KB、inline script 23→19 塊；外部檔置於原第一個區塊位置（&lt;/body&gt; 前），執行順序與行為不變。SW 預快取補檔、deploy.yml 三處補檔、SW↔HTML 資產交叉檢查一致；SW v16→v17</td></tr>
         <tr><td>探究學習單 PDF</td><td><span class="badge badge-green">✅ Phase 67</span></td><td>新增可列印探究學習單（A4 三頁，Chrome headless 產 PDF，黑白印表機友善）：第 1–2 頁為學生任務——對應站上「🔬 試試看」五任務的「先猜→操作→記錄」書寫欄（含勾選預測、照度記錄格、開放問答線）+ 自我檢核 3 題；第 3 頁教師指引（108 課綱對應、各任務參考答案要點、常見迷思澄清、評量建議、課堂操作技巧），發放前可抽除。試試看卡尾新增「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔（Phase 56 教訓）；pdftoppm 三頁逐頁目視驗證。index.css ?v=13→v14、SW v15→v16</td></tr>
@@ -175,6 +176,23 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 77 — Gemini 第二輪審查：3D 燈頭幾何、光路圖、光路逆行類比與用語 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-09-29 · simulation-v11.js／simulation3d-v7.js／index.html／optics-reciprocity.html／學習單／操作介紹 · Playwright 截圖＋Python 重算</div>
+      <p>Gemini 3.1 Pro 與 3.8 Flash 對 9/28 修正前的原始碼快照提出 38 條意見。逐條在現版 grep 引文、對照第一輪紀錄與使用者決定：11 條已在 Phase 71–76 修掉、7 條駁回（例如「學習指引按鈕沒綁事件」——綁定在 ui-enhancements，Gemini 那一份沒拿到該檔）、19 條新修正、1 條待決定。</p>
+      <ul>
+        <li><strong>3D 燈頭幾何（最重要）</strong>：抽象模式的 LED 位置由「發散角」滑桿決定球冠張角（1–15°），燈罩半徑 23cm → LED 全擠在中央半徑 0.4–6cm，等於一顆點光源；IEC 預設場景 3D 熱圖中心 0%、整片深藍本影，和 2D 的 40%、頁面「3D 通常比 2D 高」都矛盾。改為與 2D 相同：以術野為球心、燈高為半徑、半寬 35cm（asin(35/燈高)）的球冠。Python 依熱圖公式重算：IEC 63%、多燈 63%、少燈 59%、嚴苛遮擋 36%、燈高 70cm 83%。發散角只作用在 2D，控制面板與手冊加註。</li>
+        <li><strong>3D 其他</strong>：碰撞與熱圖改用 <code>target3D.obsPos</code>（原用 lerp 補間中的位置，熱圖 50ms 後只算一次會停在舊位置）；體積光錐 rotateX(+π/2) 讓底面朝 −Z、lookAt 後朝天花板 → 改 −π/2；聚光燈瞄準地板 (0,−60,0) → 術野中心；光線材質只建一次。</li>
+        <li><strong>2D 光路圖</strong>：紅色「被攔截光線」原本畫穿遮擋物到工作面，改解圓交點截斷（照度計算不變，IEC 仍 40.0%）。</li>
+        <li><strong>光路逆行類比</strong>：探照燈才是「焦點↔平行光」、望遠鏡反過來用；多面反射式無影燈讓許多光束從不同方向會聚到術野。首頁類比卡、演示頁導言／模式按鈕／說明／註腳、操作手冊、學習單任務 5 標題同步；障礙物演示標籤「仍全亮」→「仍受光，只變暗」。</li>
+        <li><strong>理論報告</strong>：IEC 60601-2-41 要求 Ra 85–100、R9 只要求標示未訂下限（原寫「國際標準要求 R9 > 90」）；LED 可排平面燈盤再以傾斜模組導向焦點（原寫「不能排列在平面上」）；計算機模擬→電腦模擬、實時→即時、錄像流→錄影串流、集成→整合、緩存→快取。</li>
+        <li><strong>操作手冊</strong>：障礙物 Z 位置補 −30–30cm／0；「IEC 標準」預設改稱量測情境、不是合格配置。</li>
+        <li><strong>待決定</strong>：學習單「光與照明」單元名稱（需對照課本）；另列延伸：2D／3D 燈頭 70cm 與真實模式燈罩 46cm 外觀尺寸不一。</li>
+        <li><strong>驗證</strong>：node --check；Playwright 截圖對照 main（3D 熱圖從整片本影變成稀釋陰影、真實模式光錐朝下）；motion_qc 兩頁桌機＋手機 clipped／textOverlap／offRight 皆 0，console 只有本機 SW 路徑 404（main 相同）。學習單、操作介紹 PDF 重出（4／4 頁）。</li>
+        <li><strong>三件套</strong>：simulation-v10→v11、simulation3d.js?v=6→simulation3d-v7.js（index.html、sw.js、deploy.yml 同步），CACHE_NAME v26→v27。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 76 — 照度圖光斑外不再畫成 100%、任務 2 照實測重新設計 <span class="badge badge-green">完成</span></h3>
