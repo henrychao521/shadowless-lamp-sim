@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>光路逆行互動演示 — 望遠鏡 ⇌ 探照燈／無影燈</title>
-    <meta name="description" content="以同一塊拋物面凹鏡演示光路可逆性：牛頓式反射望遠鏡（收光成像）與探照燈／手術無影燈（出光投射）互為逆向光學系統。">
+    <title>光路逆行互動演示 — 望遠鏡 ⇌ 探照燈・無影燈的孔徑遮擋</title>
+    <meta name="description" content="以同一塊拋物面凹鏡演示光路可逆性：牛頓式反射望遠鏡（收光成像）與探照燈（出光投射）互為逆向光學系統；並以孔徑遮擋說明手術無影燈為何把光會聚到術野而不留影。">
     <link rel="icon" href="icon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -145,14 +145,14 @@
 </head>
 <body>
     <header class="app-header">
-        <h1>光路逆行互動演示 <span>望遠鏡 ⇌ 探照燈／手術無影燈（光路可逆性）</span></h1>
+        <h1>光路逆行互動演示 <span>望遠鏡 ⇌ 探照燈（光路可逆性）・無影燈（孔徑遮擋）</span></h1>
         <a class="back-link" href="index.html">← 返回無影燈模擬</a>
     </header>
 
     <div class="wrap">
         <div class="lead">
             <h2>🔭 同一塊拋物面凹鏡，反過來用就從望遠鏡變成探照燈</h2>
-            <p>凹拋物面有個關鍵性質：<strong>放在焦點的點光源 → 反射成平行光</strong>；反過來，<strong>平行入射光 → 聚到焦點</strong>。多面反射式手術無影燈與牛頓式反射望遠鏡，正是這條性質的「正、逆」兩個方向。下方可即時切換方向、觀察光的流向反轉。</p>
+            <p>凹拋物面有個關鍵性質：<strong>放在焦點的點光源 → 反射成平行光</strong>；反過來，<strong>平行入射光 → 聚到焦點</strong>。探照燈與牛頓式反射望遠鏡，正是這條性質的「正、逆」兩個方向。手術無影燈的反射碗則不是射出一道平行光，而是讓許多光束從不同方向會聚、重疊到術野（見下方差異③與障礙物演示）。下方可即時切換方向、觀察光的流向反轉。</p>
         </div>
 
         <div class="stage">
@@ -170,7 +170,7 @@
                     </button>
                     <button class="mode-btn" id="btnProject" type="button">
                         出光・投射
-                        <span class="mb-sub">探照燈／無影燈</span>
+                        <span class="mb-sub">探照燈</span>
                     </button>
                 </div>
                 <button class="swap-btn" id="btnSwap" type="button">⇄ 光路逆行（交換光源與接收器）</button>
@@ -211,8 +211,8 @@
             <h3>為什麼可以這樣類比？</h3>
             <p>兩個系統<strong>共用同一塊拋物面凹鏡</strong>與「焦點 ↔ 平行光」的反射性質，差別只在<strong>光走的方向相反</strong>——這正是物理上的<strong>光路可逆（reversibility of light）</strong>。把光源與接收器互換，光線路徑完全不變、只有箭頭反向。</p>
             <ul class="key-points">
-                <li><span class="hl-sky">平行光那一端</span>：望遠鏡是「遠方星光入射」，探照燈／無影燈是「平行光束射出照向目標」。</li>
-                <li><span class="hl-amber">焦點那一端</span>：望遠鏡放「感光元件／目鏡」成像，無影燈放「燈泡」當光源。</li>
+                <li><span class="hl-sky">平行光那一端</span>：望遠鏡是「遠方星光入射」，探照燈是「平行光束射出照向目標」；無影燈不射出平行光，而是讓許多光束從不同方向會聚到術野（見差異③）。</li>
+                <li><span class="hl-amber">焦點那一端</span>：望遠鏡放「感光元件／目鏡」成像，探照燈（和無影燈一樣）放「燈泡」當光源。</li>
                 <li>同一塊鏡面，因<strong>設計目的相反</strong>而長相迥異，但幾何原理相同。</li>
             </ul>
             <p><strong>但要注意三個差異：</strong>① 望遠鏡<strong>收光成像</strong>、無影燈<strong>出光投射</strong>（方向相反）；② 牛頓式的招牌是那片 <span class="hl-sky">45° 斜鏡</span>，無影燈沒有對應元件；③ 望遠鏡要<strong>單一銳焦</strong>（光滑鏡面），無影燈反而把鏡面切成<strong>數千片微鏡格刻意散焦</strong>，投出許多重疊光斑來消除陰影。</p>
@@ -222,10 +222,10 @@
             <p>關鍵在於：<strong>交會處（焦點／重疊區）的每一點，都同時由整片鏡面上各個方向的光供應</strong>。擋住其中一部分，等於每個點都少收了一些光 → 只是變暗，而不是某塊不見。這正是：</p>
             <ul class="key-points">
                 <li><span class="hl-sky">望遠鏡</span>：牛頓式的<strong>斜鏡與支架就實實在在擋在主鏡前方</strong>的光路上，但你仍看到完整星空（只是對比略降）——勾選上面的「45° 斜鏡」即可看到這塊在路徑中的障礙物。</li>
-                <li><span class="hl-amber">手術無影燈</span>：醫師的手或器械擋進光束，<strong>術野仍然全亮、不被遮黑</strong>——因為術野是「許多反射鏡面光斑的重疊區」，被擋掉的方向，由其他方向補上（這就是主模擬器在演示的<strong>陰影稀釋</strong>）。</li>
+                <li><span class="hl-amber">手術無影燈</span>：醫師的手或器械擋進光束，<strong>術野仍然受光、不被遮黑</strong>（只是變暗）——因為術野是「許多反射鏡面光斑的重疊區」，被擋掉的方向，由其他方向補上（這就是主模擬器在演示的<strong>陰影稀釋</strong>）。</li>
             </ul>
             <p class="footnote">※ 反過來說，把光「平行射出去當探照燈」（不重疊、不交會）就<strong>沒有</strong>這種免疫力——障礙物會在遠處螢幕投下實影。所以無影燈刻意讓眾多鏡面光斑<strong>重疊匯聚在術野</strong>，把術野做成像「成像面／重疊區」一樣的交會處，才得以無影。本演示的障礙物示範採「收光・會聚到交會處」方向呈現此原理。</p>
-            <p class="footnote">※ 為呈現「方向相反、路徑相同」，本頁把碗口朝上。真實手術無影燈的反射碗碗口朝下、燈泡在焦點，原理完全相同——把這裡的「出光・投射」模式上下翻轉即是。最相近的日常裝置是探照燈／車頭燈反射鏡（光源在焦點、光向外射）。</p>
+            <p class="footnote">※ 為呈現「方向相反、路徑相同」，本頁把碗口朝上。真實的探照燈／車頭燈反射鏡就是這裡的「出光・投射」模式（光源在焦點、光向外射），只是碗口朝前。手術無影燈同樣把燈泡放在反射碗裡，但鏡面切成許多小鏡格、各自朝術野傾斜，讓光束會聚重疊在術野，而不是射出一道平行光。</p>
         </div>
     </div>
 
@@ -497,7 +497,7 @@
                     ctx.beginPath(); ctx.arc(fx, fy, 8, 0, Math.PI * 2); ctx.stroke();
                     ctx.fillStyle = '#e0f2fe';
                     ctx.beginPath(); ctx.arc(fx, fy, 3.5, 0, Math.PI * 2); ctx.fill();
-                    label(fx + 14, fy, obsOn ? '成像點／術野（仍全亮）' : '焦點（感光元件／成像）', '#7dd3fc');
+                    label(fx + 14, fy, obsOn ? '成像點／術野（仍受光，只變暗）' : '焦點（感光元件／成像）', '#7dd3fc');
                 }
             } else {
                 // 出光模式：焦點放燈泡（發光）
@@ -536,7 +536,7 @@
             }
             cap.textContent = state.mode === 'collect'
                 ? '收光・成像：平行星光 → 凹鏡 → 會聚於焦點（牛頓式反射望遠鏡）'
-                : '出光・投射：燈泡在焦點 → 凹鏡 → 射出平行光束（探照燈／手術無影燈）';
+                : '出光・投射：燈泡在焦點 → 凹鏡 → 射出平行光束（探照燈）';
         }
 
         function updateObsReadout() {
