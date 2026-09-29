@@ -1,5 +1,5 @@
 // sw.js — shadowless-lamp-sim Service Worker
-// 緩存本地靜態資產，實現 PWA 離線功能（2D 模擬完全離線可用）
+// 快取本地靜態資源，實現 PWA 離線功能（2D 模擬完全離線可用）
 
 // 每次更新靜態資產內容時遞增版本號，activate 會刪除舊快取、強制重新預快取，
 // 確保使用者下次造訪即取得最新版本
@@ -7,7 +7,7 @@
 //   「新標頭＋舊內文」且不把 query 納入快取鍵 → ?v=N 永遠打不掉陳舊副本。
 //   改以「檔名」承載版本（simulation-v6.js），路徑必在 CDN 快取鍵內，保證取新。
 //   另：預快取一律 cache:'no-cache' 強制重新驗證。）
-const CACHE_NAME = 'sls-cache-v26'; // Phase 76：光斑外不再畫成 100%（灰色虛線標示無光可比）＋任務 2 照實測重新設計，simulation-v9→v10、ui-enhancements-v4→v5
+const CACHE_NAME = 'sls-cache-v27'; // Phase 77：Gemini 第二輪修正（被攔截光線畫到遮擋物為止、3D 燈頭張角與發散角脫鉤等），simulation-v10→v11、simulation3d→simulation3d-v7
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 // ⚠️ 帶版本碼的資產必須與 index.html 的引用完全一致（Phase 64 修正）：
@@ -18,9 +18,9 @@ const LOCAL_ASSETS = [
     '/shadowless-lamp-sim/',
     '/shadowless-lamp-sim/index.html',
     '/shadowless-lamp-sim/index.css?v=17',
-    '/shadowless-lamp-sim/simulation-v10.js',
+    '/shadowless-lamp-sim/simulation-v11.js',
     '/shadowless-lamp-sim/ui-enhancements-v5.js',
-    '/shadowless-lamp-sim/simulation3d.js?v=6',
+    '/shadowless-lamp-sim/simulation3d-v7.js',
     '/shadowless-lamp-sim/optics-reciprocity.html',
     '/shadowless-lamp-sim/icon.svg',
     '/shadowless-lamp-sim/manifest.json',

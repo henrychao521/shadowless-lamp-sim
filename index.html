@@ -33,9 +33,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css?v=17">
     <!-- Preload simulation.js：在 HTML 解析期間提前下載，縮短首次模擬呈現時間 -->
-    <!-- 版本改以「檔名」承載（simulation-v10.js）：GitHub Pages CDN 對部分資產不把
+    <!-- 版本改以「檔名」承載（simulation-v11.js）：GitHub Pages CDN 對部分資產不把
          query 納入快取鍵，?v=N 破壞快取在邊緣節點無效（Phase 65 教訓）-->
-    <link rel="preload" as="script" href="simulation-v10.js">
+    <link rel="preload" as="script" href="simulation-v11.js">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Three.js ESM Import Map — jsDelivr has better CDN coverage in Asia/Taiwan -->
     <script type="importmap">
@@ -179,7 +179,7 @@
                     <input type="checkbox" id="realistic_mode" style="width: 18px; height: 18px; cursor: pointer;">
                     切換 3D 真實手術環境模式 <span class="tag-3d">3D</span>
                 </label>
-                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">開啟後將顯示 Low-Poly 手術檯、實體模型與真實陰影效果，並隱藏抽象幾何光束。受瀏覽器 WebGL 陰影貼圖數量限制，真實模式固定以 12 盞代表燈呈現光影，「LED 數量」滑桿在此模式只改變整體亮度；燈數對陰影稀釋的影響請看 2D 剖面與 3D 熱圖。</p>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; line-height: 1.4;">開啟後將顯示 Low-Poly 手術檯、實體模型與真實陰影效果，並隱藏抽象幾何光束。受瀏覽器 WebGL 陰影貼圖數量限制，真實模式固定以 12 盞代表燈呈現光影，「LED 數量」滑桿在此模式只改變整體亮度；燈數對陰影稀釋的影響請看 2D 剖面與 3D 熱圖。3D 熱圖把每顆 LED 當成點光源，「發散角」滑桿只作用在 2D 剖面。</p>
             </div>
 
             <div class="control-group control-3d-only" id="smart_comp_group" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed rgba(255,255,255,0.1); display: none;">
@@ -255,7 +255,7 @@
             <!-- 光學原理類比小卡：連結光路逆行互動演示頁 -->
             <div class="info-card" style="border-left:3px solid var(--accent-blue);">
                 <h3>光學原理類比：探照燈＝望遠鏡反過來用</h3>
-                <p style="font-size:0.86rem;color:var(--text-secondary);">多面反射式無影燈的反射碗，與<strong style="color:var(--text-primary);">牛頓式反射望遠鏡的主鏡</strong>共用同一個物理基礎：凹拋物面的「焦點 ↔ 平行光」性質。差別只在<strong style="color:var(--text-primary);">光路方向相反</strong>——望遠鏡<em>收光成像</em>、無影燈<em>出光投射</em>，即<strong style="color:var(--accent-blue);">光路可逆</strong>。</p>
+                <p style="font-size:0.86rem;color:var(--text-secondary);">探照燈的反射碗，與<strong style="color:var(--text-primary);">牛頓式反射望遠鏡的主鏡</strong>共用同一個物理基礎：凹拋物面的「焦點 ↔ 平行光」性質。差別只在<strong style="color:var(--text-primary);">光路方向相反</strong>——望遠鏡<em>收光成像</em>、探照燈<em>出光投射</em>，即<strong style="color:var(--accent-blue);">光路可逆</strong>。多面反射式無影燈則不射出平行光：鏡面切成許多小鏡格，讓光束從不同方向<strong style="color:var(--text-primary);">會聚到術野</strong>，演示頁的「障礙物演示」就在說明這為什麼不留影。</p>
                 <a href="optics-reciprocity.html" style="display:inline-flex;align-items:center;gap:0.4rem;margin-top:0.6rem;padding:0.5rem 0.85rem;font-size:0.85rem;font-weight:600;color:#fff;text-decoration:none;border-radius:8px;background:linear-gradient(120deg,var(--accent-blue),var(--accent-teal));">▶ 開啟光路逆行互動演示</a>
             </div>
         </aside>
@@ -391,7 +391,7 @@
             <h2>參考文獻與理論基礎：外科手術無影燈技術報告 <span>(點擊展開/收合閱讀完整報告)</span></h2>
         </div>
         <article id="paper-content" class="paper-content collapsed">
-            <h2>外科手術無影燈之光學與機械設計原理、國際標準規範及計算機模擬技術報告</h2>
+            <h2>外科手術無影燈之光學與機械設計原理、國際標準規範及電腦模擬技術報告</h2>
             <p>在現代臨床手術室中，手術照明系統並非僅是單純提供光線的通用照明工具，而是一項攸關手術精準度、病患安全及醫生視覺疲勞控制的精密醫療儀器。外科手術無影燈的主要功能在於為手術部位提供高強度、無色差、溫度可控且均勻的照明。在手術操作期間，主刀醫師的頭部、雙手、助理的肢體以及各種手術器械，會頻繁且不可避免地進入光源與手術創口之間，從而產生阻擋光線的障礙。</p>
             <p>傳統的單一光源在此情況下會於目標區域形成深暗的「本影（Umbra）」，導致切口深處視野受阻，增加手術風險。無影燈光學系統的核心任務在於，透過多點幾何光源的配置與波前調控技術，將原本清晰黑暗的本影極大限度地稀釋為幾乎不可察覺的「半影（Penumbra）」，進而維持術野的連續高亮可視性。</p>
 
@@ -418,14 +418,14 @@
                 
                 <p style="margin-top: 1rem;"><strong>具備光學基礎的「弧形」設計，是減輕明暗差異的絕對關鍵：</strong></p>
                 <ul style="margin-bottom: 0;">
-                    <li><strong>巨觀的弧形（立體燈頭排列）：</strong> 如同我們 3D 模擬器中呈現的，LED 不能排列在平面上，必須排列在一個<strong>半球面的凹弧形（Dome）</strong>上。這確保所有光線都能精準指向一個共同的「空間焦點（手術創口）」，讓光束從四面八方交會，極大地強化了繞過障礙物補光的能力。</li>
+                    <li><strong>巨觀的弧形（立體燈頭排列）：</strong> 如同我們 3D 模擬器中呈現的，LED 常排列在一個<strong>半球面的凹弧形（Dome）</strong>上；若燈盤做成較薄的平面造型（利於層流通風），則讓各 LED 模組或透鏡各自傾斜，把光束導向同一點。兩種做法的目的相同：讓所有光線都精準指向一個共同的「空間焦點（手術創口）」，讓光束從四面八方交會，極大地強化了繞過障礙物補光的能力。</li>
                     <li><strong>微觀的弧形（光學透鏡與反射面）：</strong> 一般 LED 光線會四散發散，導致焦距不夠深。工程師會在每顆 LED 前方加上「<strong>非球面弧形透鏡（Aspheric Lens）</strong>」將發散光壓縮成高強度的窄光柱；或採用「<strong>多焦橢圓曲線反射面</strong>」，利用弧形反光鏡將光線反射到目標區。這能大幅減少雜散光，讓明暗分佈變得極度均勻且集中。</li>
                 </ul>
             </div>
 
             <h3>顯色生理學與熱量控制調控機制</h3>
             <ul>
-                <li><strong>顯色指數（CRI）與深紅還原度（R9）：</strong>在手術中，核心視覺物體多由鮮紅血液與組織構成。若 R9 過低會導致紅色發灰，容易引發誤判。因此國際標準要求 R9 > 90。</li>
+                <li><strong>顯色指數（CRI）與深紅還原度（R9）：</strong>在手術中，核心視覺物體多由鮮紅血液與組織構成。若 R9 過低會導致紅色發灰，容易引發誤判。IEC 60601-2-41 要求一般顯色指數 Ra 介於 85–100，R9 則只要求量測並在說明書標示、未訂下限；許多廠商把 R9 ≥ 90 當成高階機種的規格來標榜。</li>
                 <li><strong>相關色溫（CCT）調諧：</strong>不同的手術類型偏好不同的色溫。為解決混光時可能產生的陰影邊界色分離（條紋），現代透鏡表面刻有微結構（Micro-structured surface）進行波段混頻。</li>
                 <li><strong>熱輻射抑制：</strong>LED 為冷光源，出光光譜幾乎不含紅外線（晶片本身仍會發熱，需靠散熱設計）。總輻照度（Total Irradiance）受 IEC 60601-2-41 限制，以保護患者組織不被灼傷：2009 年版（第 2 版）單一燈具須在 1000 W/m² 以下（<a href="https://www.pnnl.gov/main/publications/external/technical_reports/pnnl-sa-77241.pdf" target="_blank" rel="noopener">PNNL 2011</a>）；2021 年第 3 版收緊為 700 W/m²（<a href="https://www.getinge.com/dam/hospital/documents/english/maquet-surgical-lights-iec_standard-flyer-107958-en.pdf" target="_blank" rel="noopener">Getinge ed.3 解說單</a>、<a href="https://www.mindray.com/en/products/surgical-lights/hyled-q-series" target="_blank" rel="noopener">Mindray HyLED Q 產品頁</a>）。多盞燈的光斑重疊時可能超過上限，說明書須提醒醫護人員。</li>
             </ul>
@@ -467,8 +467,8 @@
             <h3>智慧自適應補償技術</h3>
             <p>新型智慧無影燈整合了微控制器偵測反饋迴路：</p>
             <ul>
-                <li><strong>障礙物空間感測與主動調變 (PWM)：</strong>使用超音波或 ToF 雷達偵測遮擋物。當偵測到特定區段被嚴重遮擋時，微控制器會關閉或調暗該區域 LED 避免強光直射醫生頭部，同時調高其餘未受遮擋方向的電流，實時補償焦點平面的照度。</li>
-                <li><strong>全景融合技術：</strong>在燈頭邊緣呈環形集成多個微型相機模組，自動挑選未遮擋視角進行實時圖像拼接與畫面穩定處理，生成無阻擋的教學錄像流。</li>
+                <li><strong>障礙物空間感測與主動調變 (PWM)：</strong>使用超音波或 ToF 雷達偵測遮擋物。當偵測到特定區段被嚴重遮擋時，微控制器會關閉或調暗該區域 LED 避免強光直射醫生頭部，同時調高其餘未受遮擋方向的電流，即時補償焦點平面的照度。</li>
+                <li><strong>全景融合技術：</strong>在燈頭邊緣呈環形整合多個微型相機模組，自動挑選未遮擋視角進行即時影像拼接與畫面穩定處理，產生無遮擋的教學錄影串流。</li>
             </ul>
 
             <h3>引用的文獻與真實連結</h3>
@@ -519,7 +519,7 @@
             // ── 懶載入 3D 模組（首次切換至 3D tab 才下載 Three.js bundle）──
             if (viewName === '3d' && !window._sls3dLoading) {
                 window._sls3dLoading = true;
-                import('./simulation3d.js?v=6').catch(function(e) {
+                import('./simulation3d-v7.js').catch(function(e) {
                     console.warn('[sls] 3D module load failed:', e);
                     window._sls3dLoading = false; // 允許重試
                 });
@@ -632,8 +632,8 @@
         }
     })();
     </script>
-    <script src="simulation-v10.js"></script>
-    <!-- simulation3d.js は 3D tab 首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
+    <script src="simulation-v11.js"></script>
+    <!-- simulation3d-v7.js 在 3D 分頁首次點擊時懶載入（見 switchView 內的 import()），節省初始頁面載入流量 -->
     <script>
     // ── ARIA Tablist 鍵盤導航（WAI-ARIA tablist pattern）──
     (function() {
@@ -1235,7 +1235,7 @@
             var isActive = btn.classList.toggle('active');
             btn.textContent = isActive ? '⏹' : '▶';
             btn.title = isActive ? '停止自動旋轉' : '自動旋轉 Demo 模式（適合課堂投影）';
-            // 呼叫 simulation3d.js 暴露的 API（ES module 無法直接讀取）
+            // 呼叫 simulation3d-v7.js 暴露的 API（ES module 無法直接讀取）
             if (window.sls3d && window.sls3d.setAutoRotate) {
                 window.sls3d.setAutoRotate(isActive);
             }
