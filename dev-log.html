@@ -163,6 +163,7 @@
         <tr><td>說法與模擬實測一致＋幾何合理性提示</td><td><span class="badge badge-green">✅ Phase 75</span></td><td>Phase 74 掃描發現四處說法和模擬器不符，逐一以 Playwright 前後實測修正：① 白話解讀「增加燈數或加大發散角來補光」→ 改為拉低燈（燈頭張角變大）、遮擋物遠離術野或移到側邊；② 「高效多燈」同時把遮擋物移到 x12（40.0% vs 54.5% 的差距來自位置）→ 少燈／多燈只差燈數（40.0% vs 42.6%），另設「只移遮擋物」對照（54.1%）；③ 發散角 1°／15° 中心 39.1%／40.0% 不變，參考答案改說明分子分母同比例縮小（中心光線 1385→75 條）、代價是實際亮度約剩 1/18；④ 嚴苛遮擋 h80／y65／r14 頂端 79cm 穿進燈頭 → h100／x6／y45／r14（24.4%），並新增 #geometry-warning 兩級提示。學習單任務 3／4 對調（燈高實驗成為任務 3），仍 4 頁。ui-enhancements-v3→v4、SW v24→v25、deploy.yml 三處同步</td></tr>
         <tr><td>光斑外不畫 100%＋任務 2 重新設計</td><td><span class="badge badge-green">✅ Phase 76</span></td><td>照度圖原把光斑外（無遮擋時 0 條光線）畫成 100%、光斑邊緣 1 條光線的格子在 0%／100% 亂跳：IEC 標準 81 格中 57～76 格是假 100%。改為無遮擋光線數低於光斑內最多一格 70% 就不畫曲線，另以 0% 處灰色虛線標示「光斑外：沒有光，無從比較」，圖下加光斑說明（±Xcm）；修改後假 100%／假 0% 皆為 0。任務 2 原答案「最低點跟著遮擋物移動」不成立（光斑只有約 ±5cm），改為遮擋物側移 0→30cm 的控制變因實驗（40／41／54／68／84／100%，先不變後變亮）。順帶修正手機圖表卡溢出蓋住設計對照表（min-height:250px 取消自動下限）。simulation-v9→v10、ui-enhancements-v4→v5、index.css?v=16→17、SW v25→v26、deploy.yml 三處同步</td></tr>
         <tr><td>Gemini 第二輪審查修正</td><td><span class="badge badge-green">✅ Phase 77</span></td><td>Gemini 3.1 Pro／3.8 Flash 對 9/28 修正前快照的 38 條意見逐條比對現版：已修 11、駁回 7、新修正 19、待決定 1（另列 1 項延伸待決定）。新修正：① 3D 抽象模式把「發散角」滑桿當成燈罩球冠張角，LED 擠在燈頭中央 0.4–6cm，IEC 預設 3D 熱圖中心 0%（2D 40%）→ 改與 2D 同幾何（術野為球心、半寬 35cm 球冠），重算約 63%；遮擋判定改用目標位置而非補間中的位置；體積光錐方向顛倒、聚光燈瞄準地板一併修正。② 2D 被攔截光線畫到遮擋物為止。③ 光路逆行頁：無影燈不是拋物面平行光、遮擋後「變暗」不是「全亮」。④ R9 未有 IEC 下限、LED 燈盤可為平面、中國用語。simulation-v10→v11、simulation3d.js?v=6→simulation3d-v7.js、SW v26→v27、deploy.yml 三處同步</td></tr>
+        <tr><td>研究報告 docx／surgery_light.txt 中國用語二次掃描</td><td><span class="badge badge-green">✅ Phase 78</span></td><td>Phase 77 的「中國用語」修正只改到 index.html 理論報告頁，研究報告 docx 與 surgery_light.txt 這份獨立長文未同步。全文逐條掃描並比對語境後替換 15 處：計算機模擬→電腦模擬、三維（微結構／光路追跡／分區響應）→3D、厘米→公分、圖像→影像（×3）、反饋→回饋、傳感器→感測器、實時→即時（×2）、錄像→錄影、集成→整合、流媒體→串流、遠程→遠距。docx 只改 <code>word/document.xml</code> 純文字 run（zip 內其餘 103 個檔案位元組原封不動），改前改後 w:p 155／w:r 613／w:drawing 98／media 90 個檔案完全相同；LibreOffice 轉 PDF 仍 14 頁，逐頁抽查 1、4、6、7、12 頁確認版面與詞句正確。備份 <code>.bak-2026-09-29c.docx</code> 不進 git。</td></tr>
         <tr><td>dev-log 分頁</td><td><span class="badge badge-green">✅ Phase 69</span></td><td>dev-log.html 已漲至 215KB（其中逐字稿區段獨佔 118KB），整段移出為獨立頁 <code>dev-log-transcript.html</code>，主頁瘦身至 97KB 並留醒目連結；新對話往後依時序增補於該頁尾端。deploy.yml 三處補檔；兩檔標籤平衡驗證通過（dev-log 不在 SW 預快取，無需 bump）</td></tr>
         <tr><td>inline JS 整併</td><td><span class="badge badge-green">✅ Phase 68</span></td><td>把 Phase 59（± 微調鈕）、60（數值就地輸入）、61（試試看一鍵套場景）、63（白話即時解讀）四個自包含 IIFE 自 index.html 抽出，整併為單一可快取檔 <code>ui-enhancements-v1.js</code>（10KB，檔名承載版本）。index.html 90.7KB→80.9KB、inline script 23→19 塊；外部檔置於原第一個區塊位置（&lt;/body&gt; 前），執行順序與行為不變。SW 預快取補檔、deploy.yml 三處補檔、SW↔HTML 資產交叉檢查一致；SW v16→v17</td></tr>
         <tr><td>探究學習單 PDF</td><td><span class="badge badge-green">✅ Phase 67</span></td><td>新增可列印探究學習單（A4 三頁，Chrome headless 產 PDF，黑白印表機友善）：第 1–2 頁為學生任務——對應站上「🔬 試試看」五任務的「先猜→操作→記錄」書寫欄（含勾選預測、照度記錄格、開放問答線）+ 自我檢核 3 題；第 3 頁教師指引（108 課綱對應、各任務參考答案要點、常見迷思澄清、評量建議、課堂操作技巧），發放前可抽除。試試看卡尾新增「🖨️ 下載探究學習單」連結；deploy.yml 三處清單補檔（Phase 56 教訓）；pdftoppm 三頁逐頁目視驗證。index.css ?v=13→v14、SW v15→v16</td></tr>
@@ -176,6 +177,18 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 78 — 研究報告 docx／surgery_light.txt 中國用語二次掃描 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-09-29 · 手術無影燈光學設計與模擬.docx／surgery_light.txt · python-docx run 級改寫＋LibreOffice PDF 驗證</div>
+      <p>Phase 77 在理論報告頁（index.html）修過的「計算機模擬→電腦模擬、實時→即時、錄像流→錄影串流、集成→整合」等用語，並未同步到首頁下載連結指向的研究報告 docx 與其對應的 surgery_light.txt——兩份是獨立長文，當時只改了網站上呈現的摘要版。這次逐條掃描全文（不限使用者列的示例清單），判斷語境後替換：</p>
+      <ul>
+        <li><strong>替換清單</strong>：計算機模擬→電腦模擬（1）、三維→3D（微結構／光路追跡／分區響應，共 3）、厘米→公分（1，單位注解「厘米 cm」為中國大陸慣用單位詞，台灣一律用公分）、圖像→影像（3，攝影機/視訊語境）、反饋→回饋（1）、傳感器→感測器（1）、實時→即時（2）、錄像→錄影（1）、集成→整合（1）、流媒體→串流（1）、遠程→遠距（1）。合計 15 個替換點、17 處字詞（三維與圖像各含多個出現位置）。未動：「優化」「運算法則」等在台灣科技寫作亦通用、非明確中國專屬用詞，維持原樣。</li>
+        <li><strong>docx 安全改法</strong>：先備份 <code>手術無影燈光學設計與模擬.bak-2026-09-29c.docx</code>（不進 git，已列入 .git/info/exclude）；解壓 zip 只改寫 <code>word/document.xml</code> 內的 <code>&lt;w:t&gt;</code> 純文字，其餘 102 個內部檔案（含 90 個 media 圖片）原始位元組重新封裝、zip 內容清單與壓縮方式不變。</li>
+        <li><strong>結構驗證</strong>：改前改後 w:p 155、w:r 613、w:drawing 98、media 90 個檔案，三項計數與圖片數完全相同；<code>python3 -m zipfile</code> 測試無壞檔。LibreOffice <code>soffice --headless --convert-to pdf</code> 轉出後仍為 14 頁；抽查第 1 頁（標題「…計算機模擬技術報告」→「…電腦模擬技術報告」）、第 4／6 頁（3D 微結構、3D 光路追跡）、第 7 頁（單位「公分 cm」）、第 12 頁（即時補償、回饋迴路、感測器矩陣、3D 分區響應、教學錄影、全景串流、遠距醫療診斷）文字與版面正常，無跑版或截斷。</li>
+        <li><strong>surgery_light.txt</strong>：套用同一組 15 個替換，逐字串比對確認與 docx 一致，全文無殘留舊詞。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 77 — Gemini 第二輪審查：3D 燈頭幾何、光路圖、光路逆行類比與用語 <span class="badge badge-green">完成</span></h3>

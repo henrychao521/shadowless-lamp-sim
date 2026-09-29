@@ -1390,6 +1390,18 @@
         </div>
       </div>
 
+      <div class="msg user">
+        <div class="role">👤 使用者（Phase 78）</div>
+        <div class="content">研究報告 docx（首頁下載連結那份）與 surgery_light.txt 裡的中國用語改成台灣用語，至少包括計算機模擬→電腦模擬、實時→即時、錄像→錄影、流媒體→串流，另外全文掃描其他常見中國用語逐一判斷語境後替換；docx 只改純文字 run 不動圖片與結構，改前改後段落／run／圖片數須相同，LibreOffice 轉 PDF 確認頁數與版面正常。開分支 fix/docx-wording，不 push/merge，不派子代理。</div>
+      </div>
+
+      <div class="msg ai">
+        <div class="role">🤖 Claude（Phase 78 — 用語二次掃描）</div>
+        <div class="content">
+          Phase 77 只改了 index.html 理論報告頁的用語，研究報告 docx 與 surgery_light.txt 這份獨立長文沒有同步，還留著「計算機模擬」「錄像」「流媒體」等詞。全文逐條掃描後替換 15 個詞（三維→3D、厘米→公分、圖像→影像、反饋→回饋、傳感器→感測器、實時→即時、錄像→錄影、集成→整合、流媒體→串流、遠程→遠距，含重複出現共 17 處），docx 只改 word/document.xml 的純文字 run，改前改後 w:p 155／w:r 613／w:drawing 98／media 90 個檔案不變，LibreOffice 轉 PDF 仍 14 頁，抽查第 1、4、6、7、12 頁確認版面正常。備份 .bak-2026-09-29c.docx 不進 git。
+        </div>
+      </div>
+
     </div>
   </section>
 
