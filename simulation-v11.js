@@ -313,7 +313,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 const dist = Math.sqrt((obsX - cx) ** 2 + (obsY - cy) ** 2);
                 const isBlocked = dist < obsR;
 
-                allRays.push({ start: { x: sx, y: sy }, end: { x: targetX, y: targetY }, blocked: isBlocked });
+                // 被攔截的光線畫到「碰到遮擋物的那一點」為止（原本畫穿遮擋物直達工作面，看起來像遮擋物是半透明的）
+                let endX = targetX, endY = targetY;
+                if (isBlocked) {
+                    // |S + t·V − C|² = r² 取較小的 t（光線進入圓的點）；光源若已在圓內則 t 取 0
+                    const b2 = -dotWV;
+                    const c2 = wx * wx + wy * wy - obsR * obsR;
+                    const disc = b2 * b2 - dotVV * c2;
+                    const tHit = disc > 0 ? Math.max(0, (-b2 - Math.sqrt(disc)) / dotVV) : tProj;
+                    endX = sx + tHit * vx;
+                    endY = sy + tHit * vy;
+                }
+                allRays.push({ start: { x: sx, y: sy }, end: { x: endX, y: endY }, blocked: isBlocked });
 
                 if (targetX >= -TARGET_WIDTH && targetX <= TARGET_WIDTH) {
                     hitUnobstructed.push(targetX);
