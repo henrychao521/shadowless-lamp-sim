@@ -7,7 +7,7 @@
 //   「新標頭＋舊內文」且不把 query 納入快取鍵 → ?v=N 永遠打不掉陳舊副本。
 //   改以「檔名」承載版本（simulation-v6.js），路徑必在 CDN 快取鍵內，保證取新。
 //   另：預快取一律 cache:'no-cache' 強制重新驗證。）
-const CACHE_NAME = 'sls-cache-v27'; // Phase 77：Gemini 第二輪修正（被攔截光線畫到遮擋物為止、3D 燈頭張角與發散角脫鉤等），simulation-v10→v11、simulation3d→simulation3d-v7
+const CACHE_NAME = 'sls-cache-v28'; // Phase 79：學習單／首頁課綱對應「光與照明」改為課綱類別「設計與製作」「科技的應用」（R2-15 B）
 
 // 本地靜態資產（相對於 GitHub Pages 的根路徑）
 // ⚠️ 帶版本碼的資產必須與 index.html 的引用完全一致（Phase 64 修正）：

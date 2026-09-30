@@ -163,6 +163,7 @@
         <tr><td>說法與模擬實測一致＋幾何合理性提示</td><td><span class="badge badge-green">✅ Phase 75</span></td><td>Phase 74 掃描發現四處說法和模擬器不符，逐一以 Playwright 前後實測修正：① 白話解讀「增加燈數或加大發散角來補光」→ 改為拉低燈（燈頭張角變大）、遮擋物遠離術野或移到側邊；② 「高效多燈」同時把遮擋物移到 x12（40.0% vs 54.5% 的差距來自位置）→ 少燈／多燈只差燈數（40.0% vs 42.6%），另設「只移遮擋物」對照（54.1%）；③ 發散角 1°／15° 中心 39.1%／40.0% 不變，參考答案改說明分子分母同比例縮小（中心光線 1385→75 條）、代價是實際亮度約剩 1/18；④ 嚴苛遮擋 h80／y65／r14 頂端 79cm 穿進燈頭 → h100／x6／y45／r14（24.4%），並新增 #geometry-warning 兩級提示。學習單任務 3／4 對調（燈高實驗成為任務 3），仍 4 頁。ui-enhancements-v3→v4、SW v24→v25、deploy.yml 三處同步</td></tr>
         <tr><td>光斑外不畫 100%＋任務 2 重新設計</td><td><span class="badge badge-green">✅ Phase 76</span></td><td>照度圖原把光斑外（無遮擋時 0 條光線）畫成 100%、光斑邊緣 1 條光線的格子在 0%／100% 亂跳：IEC 標準 81 格中 57～76 格是假 100%。改為無遮擋光線數低於光斑內最多一格 70% 就不畫曲線，另以 0% 處灰色虛線標示「光斑外：沒有光，無從比較」，圖下加光斑說明（±Xcm）；修改後假 100%／假 0% 皆為 0。任務 2 原答案「最低點跟著遮擋物移動」不成立（光斑只有約 ±5cm），改為遮擋物側移 0→30cm 的控制變因實驗（40／41／54／68／84／100%，先不變後變亮）。順帶修正手機圖表卡溢出蓋住設計對照表（min-height:250px 取消自動下限）。simulation-v9→v10、ui-enhancements-v4→v5、index.css?v=16→17、SW v25→v26、deploy.yml 三處同步</td></tr>
         <tr><td>Gemini 第二輪審查修正</td><td><span class="badge badge-green">✅ Phase 77</span></td><td>Gemini 3.1 Pro／3.8 Flash 對 9/28 修正前快照的 38 條意見逐條比對現版：已修 11、駁回 7、新修正 19、待決定 1（另列 1 項延伸待決定）。新修正：① 3D 抽象模式把「發散角」滑桿當成燈罩球冠張角，LED 擠在燈頭中央 0.4–6cm，IEC 預設 3D 熱圖中心 0%（2D 40%）→ 改與 2D 同幾何（術野為球心、半寬 35cm 球冠），重算約 63%；遮擋判定改用目標位置而非補間中的位置；體積光錐方向顛倒、聚光燈瞄準地板一併修正。② 2D 被攔截光線畫到遮擋物為止。③ 光路逆行頁：無影燈不是拋物面平行光、遮擋後「變暗」不是「全亮」。④ R9 未有 IEC 下限、LED 燈盤可為平面、中國用語。simulation-v10→v11、simulation3d.js?v=6→simulation3d-v7.js、SW v26→v27、deploy.yml 三處同步</td></tr>
+        <tr><td>學習單課綱單元名稱</td><td><span class="badge badge-green">✅ Phase 79</span></td><td>使用者決定（R2-15 選 B）：108 課綱生活科技沒有「光與照明」這個單元名稱，學習單第 1 頁副標與教師指引「課綱對應」、首頁學習指引的課綱對應句，改為課綱學習內容類別「設計與製作」「科技的應用」。學習單 PDF 以 Chrome headless 重出（仍 4 頁，pypdf 確認舊詞 0 處）。CACHE_NAME v27→v28</td></tr>
         <tr><td>研究報告 docx／surgery_light.txt 中國用語二次掃描</td><td><span class="badge badge-green">✅ Phase 78</span></td><td>Phase 77 的「中國用語」修正只改到 index.html 理論報告頁，研究報告 docx 與 surgery_light.txt 這份獨立長文未同步。全文逐條掃描並比對語境後替換 15 處：計算機模擬→電腦模擬、三維（微結構／光路追跡／分區響應）→3D、厘米→公分、圖像→影像（×3）、反饋→回饋、傳感器→感測器、實時→即時（×2）、錄像→錄影、集成→整合、流媒體→串流、遠程→遠距。docx 只改 <code>word/document.xml</code> 純文字 run（zip 內其餘 103 個檔案位元組原封不動），改前改後 w:p 155／w:r 613／w:drawing 98／media 90 個檔案完全相同；LibreOffice 轉 PDF 仍 14 頁，逐頁抽查 1、4、6、7、12 頁確認版面與詞句正確。備份 <code>.bak-2026-09-29c.docx</code> 不進 git。</td></tr>
         <tr><td>dev-log 分頁</td><td><span class="badge badge-green">✅ Phase 69</span></td><td>dev-log.html 已漲至 215KB（其中逐字稿區段獨佔 118KB），整段移出為獨立頁 <code>dev-log-transcript.html</code>，主頁瘦身至 97KB 並留醒目連結；新對話往後依時序增補於該頁尾端。deploy.yml 三處補檔；兩檔標籤平衡驗證通過（dev-log 不在 SW 預快取，無需 bump）</td></tr>
         <tr><td>inline JS 整併</td><td><span class="badge badge-green">✅ Phase 68</span></td><td>把 Phase 59（± 微調鈕）、60（數值就地輸入）、61（試試看一鍵套場景）、63（白話即時解讀）四個自包含 IIFE 自 index.html 抽出，整併為單一可快取檔 <code>ui-enhancements-v1.js</code>（10KB，檔名承載版本）。index.html 90.7KB→80.9KB、inline script 23→19 塊；外部檔置於原第一個區塊位置（&lt;/body&gt; 前），執行順序與行為不變。SW 預快取補檔、deploy.yml 三處補檔、SW↔HTML 資產交叉檢查一致；SW v16→v17</td></tr>
@@ -177,6 +178,18 @@
   <!-- ── 開發階段 ── -->
   <section>
     <h2>🛠️ 開發階段紀錄</h2>
+
+    <div class="phase-card">
+      <h3>Phase 79 — 學習單課綱對應：「光與照明」改為「設計與製作／科技的應用」 <span class="badge badge-green">完成</span></h3>
+      <div class="meta">2026-09-30 · 學習單.html／學習單.pdf／index.html／sw.js · Chrome headless 重出 PDF</div>
+      <p>第二輪審查指出學習單寫「光與照明」單元，但 108 課綱生活科技沒有這個名稱（可能是某版課本的章名）。使用者選 B：改為課綱類別「設計與製作」「科技的應用」。</p>
+      <ul>
+        <li><strong>學習單</strong>：第 1 頁副標「生活科技．光與照明／工程設計與問題解決」→「生活科技（設計與製作／科技的應用）．工程設計與問題解決」；教師指引「適用「光與照明」「設計與製作」單元」→「適用課綱類別「設計與製作」「科技的應用」」。</li>
+        <li><strong>首頁</strong>：學習指引的課綱對應句同一個說法，「適合作為「光與照明」或「設計與製作」單元的探究素材」一併改為課綱類別，避免網站與學習單不一致。</li>
+        <li><strong>驗證</strong>：<code>Google Chrome --headless --print-to-pdf --no-pdf-header-footer</code> 重出學習單 PDF，仍 4 頁；pypdf 抽文字確認「光與照明」0 處、「科技的應用」出現；第 1、4 頁轉 PNG 目視版面不變。motion_qc（MQC_CONC=3）index／學習單桌機＋手機：無裁切、重疊、溢出；手機點 2D／3D 切換時的 CLS 與 main 相同屬既有現象；console 只有學習單 favicon 的本機 404（main 相同）。</li>
+        <li><strong>三件套</strong>：只改文字，沒有改 JS／CSS 檔名；CACHE_NAME v27→v28 讓已安裝 PWA 拿到新版首頁與 PDF。</li>
+      </ul>
+    </div>
 
     <div class="phase-card">
       <h3>Phase 78 — 研究報告 docx／surgery_light.txt 中國用語二次掃描 <span class="badge badge-green">完成</span></h3>
